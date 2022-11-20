@@ -25,8 +25,8 @@ namespace crp {
     }
 
     std::vector<char> CrpPipeline::readFile(const std::string &filepath) {
-        std::string enginePath = ENGINE_DIR + filepath;
-//        std::string enginePath = filepath;
+//        std::string enginePath = ENGINE_DIR + filepath;
+        std::string enginePath = filepath;
         std::ifstream file(enginePath, std::ios::ate | std::ios::binary);
         if (!file.is_open()) {
             throw std::runtime_error("failed to open file: " + enginePath);

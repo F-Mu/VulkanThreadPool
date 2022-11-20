@@ -38,6 +38,7 @@ namespace crp {
         };
 
         CrpModel(CrpDevice &device, const CrpModel::Builder &builder);
+        CrpModel(CrpDevice &device, const std::vector<Vertex>&vertices);
 
         ~CrpModel();
 
@@ -47,6 +48,9 @@ namespace crp {
 
         static std::unique_ptr<CrpModel> createModelFromFile(
                 CrpDevice &device, const std::string &filepath);
+
+        static std::unique_ptr<CrpModel> createModelFromVertices(
+                CrpDevice &device, const std::vector<Vertex>&vertices);
 
         void bind(VkCommandBuffer commandBuffer);
 

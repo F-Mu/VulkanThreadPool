@@ -1,4 +1,6 @@
 #include "crp_game_obejct.hpp"
+#include "crp_device.hpp"
+#include <iostream>
 
 namespace crp {
 // Matrix corrsponds to Translate * Ry * Rx * Rz * Scale
@@ -60,12 +62,75 @@ namespace crp {
         };
     }
 
+
     CrpGameObject CrpGameObject::makePointLight(float intensity, float radius, glm::vec3 color) {
         CrpGameObject gameObj = CrpGameObject::createGameObject();
         gameObj.color = color;
         gameObj.transform.scale.x = radius;
         gameObj.pointLight = std::make_unique<PointLightComponent>();
         gameObj.pointLight->lightIntensity = intensity;
+        return gameObj;
+    }
+
+    std::vector<CrpModel::Vertex> fun(glm::vec3 x, glm::vec3 y, glm::vec3 z, glm::vec3 w, glm::vec3 &color) {
+        return {{x, color},
+                {y, color},
+                {z, color},
+                {y, color},
+                {z, color},
+                {w, color}};
+    }
+
+    std::vector<CrpModel::Vertex> fun2(glm::vec3 &x, glm::vec3 &y, glm::vec3 &z, glm::vec3 &w, glm::vec3 &color) {
+        std::vector<CrpModel::Vertex> ans;
+        auto up = fun(x + glm::vec3{-.005f, -.005f, 0.}, y + glm::vec3{.005f, -.005f, 0.},
+                      x + glm::vec3{-.005f, .005f, 0.}, y + glm::vec3{.005f, .005f, 0.}, color);
+        auto bo = fun(z + glm::vec3{-.005f, -.005f, 0.}, w + glm::vec3{.005f, -.005f, 0.},
+                      z + glm::vec3{-.005f, .005f, 0.}, w + glm::vec3{.005f, .005f, 0.}, color);
+        auto le = fun(x + glm::vec3{-.005f, -.005f, 0.}, x + glm::vec3{.005f, -.005f, 0.},
+                      z + glm::vec3{-.005f, .005f, 0.}, z + glm::vec3{.005f, .005f, 0.}, color);
+        auto ri = fun(y + glm::vec3{-.005f, -.005f, 0.}, y + glm::vec3{.005f, -.005f, 0.},
+                      w + glm::vec3{-.005f, .005f, 0.}, w + glm::vec3{.005f, .005f, 0.}, color);
+        ans.insert(ans.end(), up.begin(), up.end());
+        ans.insert(ans.end(), le.begin(), le.end());
+        ans.insert(ans.end(), ri.begin(), ri.end());
+        ans.insert(ans.end(), bo.begin(), bo.end());
+        return ans;
+    }
+
+
+    CrpGameObject
+    CrpGameObject::makeRectangle(CrpDevice &device, glm::vec3 x, glm::vec3 y, glm::vec3 z, glm::vec3 w, bool fill,
+                                 glm::vec3 color) {
+        CrpGameObject gameObj = CrpGameObject::createGameObject();
+        gameObj.color = color;
+        gameObj.rectangle = std::make_unique<RectangleComponent>(x, y, z, w, fill);
+        if (fill)
+            gameObj.model = CrpModel::createModelFromVertices(device,
+                                                              fun(x, y, z, w, color)
+            );
+        else
+            gameObj.model = CrpModel::createModelFromVertices(device,
+                                                              fun2(x, y, z, w, color)
+            );
+        return gameObj;
+    }
+
+
+    CrpGameObject
+    CrpGameObject::makeRectangle(CrpDevice &device, std::vector<glm::vec3> &v, bool fill,
+                                 glm::vec3 color) {
+        CrpGameObject gameObj = CrpGameObject::createGameObject();
+        gameObj.color = color;
+        gameObj.rectangle = std::make_unique<RectangleComponent>(v, fill);
+        if (fill)
+            gameObj.model = CrpModel::createModelFromVertices(device,
+                                                              fun(v[0], v[1], v[2], v[3], color)
+            );
+        else
+            gameObj.model = CrpModel::createModelFromVertices(device,
+                                                              fun2(v[0], v[1], v[2], v[3], color)
+            );
         return gameObj;
     }
 }

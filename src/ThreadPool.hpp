@@ -1,9 +1,11 @@
 #pragma once
+
 #include <functional>
 #include <mutex>
 #include <queue>
 #include <vector>
 #include <future>
+
 namespace crp {
     class ThreadPool {
     public:
@@ -28,11 +30,8 @@ namespace crp {
 
     ThreadPool::ThreadPool() : stop{false} {
         activateThreadNum = 0;
-        int n = std::thread::hardware_concurrency();
-        n = n ? n : 2;
-//        std::cout<<n<<std::endl;
+        int n = 5;
         for (int i = 0; i < n; ++i) {
-//            std::cout << "tp" << activateNum() << '#' << std::endl;
             threads.emplace_back([this] {
                 while (!this->stop) {
                     task_type task;
@@ -45,7 +44,6 @@ namespace crp {
                         task = std::move(tasks.front());
                         tasks.pop();
                         ++activateThreadNum;
-//                        std::cout << "tp" << activateNum() << '#' << std::endl;
                     }
                     task();
                     {

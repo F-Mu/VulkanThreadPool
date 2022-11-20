@@ -1,7 +1,6 @@
 #include "first_app.hpp"
 #include "keyboard_movement_controller.hpp"
 #include "systems/simple_render_system.hpp"
-#include "systems/point_light_system.hpp"
 #include "crp_camera.hpp"
 #include "crp_buffer.hpp"
 //libs
@@ -25,12 +24,15 @@ namespace crp {
                 .setMaxSets(CrpSwapChain::MAX_FRAMES_IN_FLIGHT)
                 .addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, CrpSwapChain::MAX_FRAMES_IN_FLIGHT)
                 .build();
-        loadGameObjects();
+//        loadGameObjects();
+        startEngine();
+//        loadGameObjects();
     }
 
     FirstApp::~FirstApp() {}
 
     void FirstApp::run() {
+//        globalContext.startEngine();
         std::vector<std::unique_ptr<CrpBuffer>> uboBuffers(CrpSwapChain::MAX_FRAMES_IN_FLIGHT);
         for (int i = 0; i < uboBuffers.size(); ++i) {
             uboBuffers[i] = std::make_unique<CrpBuffer>(
@@ -56,11 +58,9 @@ namespace crp {
 
         SimpleRenderSystem simpleRenderSystem{crpDevice, crpRenderer.getSwapChainRenderPass(),
                                               globalSetLayout->getDescriptorSetLayout()};
-        PointLightSystem pointLightSystem{crpDevice, crpRenderer.getSwapChainRenderPass(),
-                                          globalSetLayout->getDescriptorSetLayout()};
         CrpCamera camera{};
 //        camera.setViewDirection(glm::vec3(0.f), glm::vec3(0.5f, 0.f, 1.f));
-        camera.setViewTarget(glm::vec3(-1.f, -2.f, 2.f), glm::vec3(0.f, 0.f, 2.5f));
+        camera.setViewTarget(glm::vec3(0.f, -2.f, 2.f), glm::vec3(0.f, 0.f, 2.5f));
 
         auto viewerObject = CrpGameObject::createGameObject();
         viewerObject.transform.translation.z = -2.5f;
@@ -90,7 +90,7 @@ namespace crp {
                         commandBuffer,
                         camera,
                         globalDescriptorSets[frameIndex],
-                        gameObjects,
+                        gameObjectManager->gameObjects,
                 };
 
                 //update
@@ -98,7 +98,6 @@ namespace crp {
                 ubo.projection = camera.getProjection();
                 ubo.view = camera.getView();
                 ubo.inverseView = camera.getInverseView();
-                pointLightSystem.update(frameInfo, ubo);
                 uboBuffers[frameIndex]->writeToBuffer(&ubo);
                 uboBuffers[frameIndex]->flush();
 
@@ -107,7 +106,6 @@ namespace crp {
 
                 //order here matters
                 simpleRenderSystem.renderGameObjects(frameInfo);
-                pointLightSystem.render(frameInfo);
                 crpRenderer.endSwapChainRenderPass(commandBuffer);
                 crpRenderer.endFrame();
             }
@@ -118,48 +116,30 @@ namespace crp {
 
 
     void FirstApp::loadGameObjects() {
-        std::shared_ptr<CrpModel> crpModel = CrpModel::createModelFromFile(
-                crpDevice, "models/flat_vase.obj");
-        auto flatVase = CrpGameObject::createGameObject();
-        flatVase.model = crpModel;
-        flatVase.transform.translation = {-.5f, .5f, 0.f};
-        flatVase.transform.scale = glm::vec3{3.f, 1.5f, 3.f};
-        gameObjects.emplace(flatVase.getId(), std::move(flatVase));
-
-        crpModel = CrpModel::createModelFromFile(
-                crpDevice, "models/smooth_vase.obj");
-        auto smoothVase = CrpGameObject::createGameObject();
-        smoothVase.model = crpModel;
-        smoothVase.transform.translation = {.5f, .5f, 0.f};
-        smoothVase.transform.scale = glm::vec3{3.f, 1.5f, 3.f};
-        gameObjects.emplace(smoothVase.getId(), std::move(smoothVase));
-
-        crpModel = CrpModel::createModelFromFile(
-                crpDevice, "models/quad.obj");
-        auto floor = CrpGameObject::createGameObject();
-        floor.model = crpModel;
-        floor.transform.translation = {0.f, .5f, 0.f};
-        floor.transform.scale = glm::vec3{3.f, 1.f, 3.f};
-        gameObjects.emplace(floor.getId(), std::move(floor));
-
-        std::vector<glm::vec3> lightColors{
-                {1.f, .1f, .1f},
-                {.1f, .1f, 1.f},
-                {.1f, 1.f, .1f},
-                {1.f, 1.f, .1f},
-                {.1f, 1.f, 1.f},
-                {1.f, 1.f, 1.f}  //
+        std::vector<CrpModel::Vertex> vertices{
+                {{-0.5f, -0.5f, 0}, {1., 0., 0.}},
+                {{-0.3f, -0.5f, 0}, {1., 0., 0.}},
+                {{-0.3f, -0.3f, 0}, {0., 1., 0.}},
+//                {{-0.1f,0.1,0},{0.,0.,1.}},
+//                {{-0.1f,-0.1f,0},{1.,0.,0.}},
+//                {{0.1f,0.1f,0},{0.,1.,0.}},
         };
+        auto rect = CrpGameObject::makeRectangle(crpDevice,
+                                                 {-0.5f, -0.5f, 0}, {-0.3f, -0.5f, 0}, {-0.5f, -0.3f, 0},
+                                                 {-0.3f, -0.3f, 0}, true, {0.5, 0, 0});
 
-        for (int i = 0; i < lightColors.size(); ++i) {
-            auto pointLight = CrpGameObject::makePointLight(0.2f);
-            pointLight.color = lightColors[i];
-            auto rotateLight = glm::rotate(
-                    glm::mat4(1.f),
-                    (i * glm::two_pi<float>()) / lightColors.size(),
-                    {0.f, -1.f, 0.f});
-            pointLight.transform.translation = glm::vec3(rotateLight * glm::vec4(-1.f, -1.f, -1.f, 1.f));
-            gameObjects.emplace(pointLight.getId(), std::move(pointLight));
-        }
+        gameObjectManager->gameObjects.emplace(rect.getId(), std::move(rect));
+        rect = CrpGameObject::makeRectangle(crpDevice,
+                                            {-0.6f, -0.6f, 0}, {-0.2f, -0.6f, 0}, {-0.6f, -0.2f, 0},
+                                            {-0.2f, -0.2f, 0}, false);
+
+        gameObjectManager->gameObjects.emplace(rect.getId(), std::move(rect));
+
+    }
+
+    void FirstApp::startEngine() {
+        gameObjectManager = std::make_shared<GameObjectManager>();
+        threadPoolSystem = std::make_shared<ThreadPoolSystem>(crpDevice, gameObjectManager);
+        runTimeSystem = std::make_shared<RunTimeSystem>(crpDevice, gameObjectManager);
     }
 }

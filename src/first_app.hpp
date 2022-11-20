@@ -6,6 +6,8 @@
 #include "crp_game_obejct.hpp"
 #include "crp_renderer.hpp"
 #include "crp_descriptors.hpp"
+#include "systems/thread_pool_system.hpp"
+#include "systems/run_time_system.hpp"
 //std
 #include <memory>
 #include <vector>
@@ -26,6 +28,8 @@ namespace crp {
 
         void run();
 
+        void startEngine();
+
     private:
         void loadGameObjects();
 
@@ -35,6 +39,10 @@ namespace crp {
 
         //note: order of declarations matters
         std::unique_ptr<CrpDescriptorPool> globalPool{};
-        CrpGameObject::Map gameObjects;
+
+        std::shared_ptr<ThreadPoolSystem> threadPoolSystem;
+        std::shared_ptr<RunTimeSystem> runTimeSystem;
+        std::shared_ptr<GameObjectManager> gameObjectManager;
+//        CrpGameObject::Map gameObjects;
     };
 }
