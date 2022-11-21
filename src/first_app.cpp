@@ -15,9 +15,16 @@
 #include <cassert>
 #include <iostream>
 #include <chrono>
+#include <thread>
 
 float MAX_FRAME_TIME = 60;
 namespace crp {
+    void input() {
+        int x;
+        while (std::cin >> x) {
+            std::cout << x << std::endl;
+        }
+    }
 
     FirstApp::FirstApp() {
         globalPool = CrpDescriptorPool::Builder(crpDevice)
@@ -26,13 +33,12 @@ namespace crp {
                 .build();
 //        loadGameObjects();
         startEngine();
-//        loadGameObjects();
+        test();
     }
 
     FirstApp::~FirstApp() {}
 
     void FirstApp::run() {
-//        globalContext.startEngine();
         std::vector<std::unique_ptr<CrpBuffer>> uboBuffers(CrpSwapChain::MAX_FRAMES_IN_FLIGHT);
         for (int i = 0; i < uboBuffers.size(); ++i) {
             uboBuffers[i] = std::make_unique<CrpBuffer>(
@@ -66,6 +72,7 @@ namespace crp {
         viewerObject.transform.translation.z = -2.5f;
         KeyboardMovementController cameraController{};
 
+//        std::thread th(input);
         auto currentTime = std::chrono::high_resolution_clock::now();
 
         while (!crpWindow.shouldClose()) {
@@ -80,8 +87,9 @@ namespace crp {
             cameraController.moveInPlaneXZ(crpWindow.getGLFWwindow(), frameTime, viewerObject);
             camera.setViewYXZ(viewerObject.transform.translation, viewerObject.transform.rotation);
 
-            float aspect = crpRenderer.getAspectRatio();
-            camera.setPerspectiveProjection(glm::radians(50.f), aspect, 0.1f, 100.f);
+//            float aspect = crpRenderer.getAspectRatio();
+            camera.setOrthographicProjection(-2, 2, -2, 2, -5, 5);
+//            camera.setPerspectiveProjection(glm::radians(50.f), aspect, 0.1f, 100.f);
             if (auto commandBuffer = crpRenderer.beginFrame()) {
                 int frameIndex = crpRenderer.getFrameIndex();
                 FrameInfo frameInfo{
@@ -92,6 +100,8 @@ namespace crp {
                         globalDescriptorSets[frameIndex],
                         gameObjectManager->gameObjects,
                 };
+                threadPoolSystem->tick(frameInfo);
+                taskQueueSystem->tick(frameInfo);
 
                 //update
                 GlobalUbo ubo{};
@@ -115,31 +125,46 @@ namespace crp {
     }
 
 
-    void FirstApp::loadGameObjects() {
-        std::vector<CrpModel::Vertex> vertices{
-                {{-0.5f, -0.5f, 0}, {1., 0., 0.}},
-                {{-0.3f, -0.5f, 0}, {1., 0., 0.}},
-                {{-0.3f, -0.3f, 0}, {0., 1., 0.}},
-//                {{-0.1f,0.1,0},{0.,0.,1.}},
-//                {{-0.1f,-0.1f,0},{1.,0.,0.}},
-//                {{0.1f,0.1f,0},{0.,1.,0.}},
-        };
-        auto rect = CrpGameObject::makeRectangle(crpDevice,
-                                                 {-0.5f, -0.5f, 0}, {-0.3f, -0.5f, 0}, {-0.5f, -0.3f, 0},
-                                                 {-0.3f, -0.3f, 0}, true, {0.5, 0, 0});
-
-        gameObjectManager->gameObjects.emplace(rect.getId(), std::move(rect));
-        rect = CrpGameObject::makeRectangle(crpDevice,
-                                            {-0.6f, -0.6f, 0}, {-0.2f, -0.6f, 0}, {-0.6f, -0.2f, 0},
-                                            {-0.2f, -0.2f, 0}, false);
-
-        gameObjectManager->gameObjects.emplace(rect.getId(), std::move(rect));
+    void FirstApp::test() {
+        glm::vec3 to = runTimeSystem->points[0];
+        threadPoolSystem->addMoveTask(threadPoolSystem->threads[0], to);
+        taskQueueSystem->addMoveTask(taskQueueSystem->tasks[0], to);
+        taskQueueSystem->addDeleteTask(taskQueueSystem->tasks[1]);
+//        std::vector<CrpModel::Vertex> vertices{
+//                {{-0.5f, -0.5f, 0}, {1., 0., 0.}},
+//                {{-0.3f, -0.5f, 0}, {1., 0., 0.}},
+//                {{-0.3f, -0.3f, 0}, {0., 1., 0.}},
+////                {{-0.1f,0.1,0},{0.,0.,1.}},
+////                {{-0.1f,-0.1f,0},{1.,0.,0.}},
+////                {{0.1f,0.1f,0},{0.,1.,0.}},
+//        };
+//        float layer = 1;
+//        float deplayer = -3;
+//
+//        auto rect = CrpGameObject::makeRectangle(crpDevice,
+//                                                 {-0.5f, -0.5f, layer}, {-0.3f, -0.5f, layer}, {-0.5f, -0.3f, layer},
+//                                                 {-0.3f, -0.3f, layer}, true, {0.5, 0, 0});
+//
+//        gameObjectManager->gameObjects.emplace(rect.getId(), std::move(rect));
+//        rect = CrpGameObject::makeRectangle(crpDevice,
+//                                            {-0.4f, -0.5f, deplayer}, {-0.3f, -0.5f, deplayer},
+//                                            {-0.5f, -0.3f, deplayer},
+//                                            {-0.3f, -0.3f, deplayer}, true, {0, 0.5, 0});
+//
+//        gameObjectManager->gameObjects.emplace(rect.getId(), std::move(rect));
+//        rect = CrpGameObject::makeRectangle(crpDevice,
+//                                            {-0.6f, -0.6f, layer}, {-0.2f, -0.6f, layer}, {-0.6f, -0.2f, layer},
+//                                            {-0.2f, -0.2f, layer}, false);
+//
+//        gameObjectManager->gameObjects.emplace(rect.getId(), std::move(rect));
 
     }
 
     void FirstApp::startEngine() {
         gameObjectManager = std::make_shared<GameObjectManager>();
         threadPoolSystem = std::make_shared<ThreadPoolSystem>(crpDevice, gameObjectManager);
-        runTimeSystem = std::make_shared<RunTimeSystem>(crpDevice, gameObjectManager);
+        runTimeSystem = std::make_shared<RuntimeSystem>(crpDevice, gameObjectManager);
+        taskQueueSystem = std::make_shared<TaskQueueSystem>(crpDevice, gameObjectManager);
     }
+
 }

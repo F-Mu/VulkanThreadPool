@@ -1,7 +1,7 @@
 #pragma once
 
 #include "crp_camera.hpp"
-#include "crp_game_obejct.hpp"
+#include "resources/game_object_manager.hpp"
 
 #include <vulkan/vulkan.h>
 
@@ -27,6 +27,6 @@ namespace crp {
         VkCommandBuffer commandBuffer;
         CrpCamera &camera;
         VkDescriptorSet globalDescriptorSet;
-        CrpGameObject::Map &gameObjects;
+        GameObjectManager::Map &gameObjects;
     };
 }

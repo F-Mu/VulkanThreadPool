@@ -7,7 +7,8 @@
 #include "crp_renderer.hpp"
 #include "crp_descriptors.hpp"
 #include "systems/thread_pool_system.hpp"
-#include "systems/run_time_system.hpp"
+#include "systems/runtime_system.hpp"
+#include "systems/task_queue_system.hpp"
 //std
 #include <memory>
 #include <vector>
@@ -31,7 +32,7 @@ namespace crp {
         void startEngine();
 
     private:
-        void loadGameObjects();
+        void test();
 
         CrpWindow crpWindow{WIDTH, HEIGHT, "Hello Vulkan!"};
         CrpDevice crpDevice{crpWindow};
@@ -41,8 +42,9 @@ namespace crp {
         std::unique_ptr<CrpDescriptorPool> globalPool{};
 
         std::shared_ptr<ThreadPoolSystem> threadPoolSystem;
-        std::shared_ptr<RunTimeSystem> runTimeSystem;
+        std::shared_ptr<RuntimeSystem> runTimeSystem;
         std::shared_ptr<GameObjectManager> gameObjectManager;
+        std::shared_ptr<TaskQueueSystem> taskQueueSystem;
 //        CrpGameObject::Map gameObjects;
     };
 }

@@ -72,7 +72,8 @@ namespace crp {
         return gameObj;
     }
 
-    std::vector<CrpModel::Vertex> fun(glm::vec3 x, glm::vec3 y, glm::vec3 z, glm::vec3 w, glm::vec3 &color) {
+    std::vector<CrpModel::Vertex>
+    fun(const glm::vec3 x, const glm::vec3 y, const glm::vec3 z, const glm::vec3 w, const glm::vec3 &color) {
         return {{x, color},
                 {y, color},
                 {z, color},
@@ -81,7 +82,8 @@ namespace crp {
                 {w, color}};
     }
 
-    std::vector<CrpModel::Vertex> fun2(glm::vec3 &x, glm::vec3 &y, glm::vec3 &z, glm::vec3 &w, glm::vec3 &color) {
+    std::vector<CrpModel::Vertex>
+    fun2(const glm::vec3 &x, const glm::vec3 &y, const glm::vec3 &z, const glm::vec3 &w, const glm::vec3 &color) {
         std::vector<CrpModel::Vertex> ans;
         auto up = fun(x + glm::vec3{-.005f, -.005f, 0.}, y + glm::vec3{.005f, -.005f, 0.},
                       x + glm::vec3{-.005f, .005f, 0.}, y + glm::vec3{.005f, .005f, 0.}, color);
@@ -118,8 +120,9 @@ namespace crp {
 
 
     CrpGameObject
-    CrpGameObject::makeRectangle(CrpDevice &device, std::vector<glm::vec3> &v, bool fill,
-                                 glm::vec3 color) {
+    CrpGameObject::makeRectangle(CrpDevice &device, const std::vector<glm::vec3> &v, const glm::vec3 &center,
+                                 bool fill,
+                                 const glm::vec3 color) {
         CrpGameObject gameObj = CrpGameObject::createGameObject();
         gameObj.color = color;
         gameObj.rectangle = std::make_unique<RectangleComponent>(v, fill);
@@ -131,6 +134,7 @@ namespace crp {
             gameObj.model = CrpModel::createModelFromVertices(device,
                                                               fun2(v[0], v[1], v[2], v[3], color)
             );
+        gameObj.transform.translation = center;
         return gameObj;
     }
 }

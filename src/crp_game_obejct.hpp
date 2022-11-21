@@ -33,15 +33,12 @@ namespace crp {
         RectangleComponent(glm::vec3 x, glm::vec3 y, glm::vec3 z, glm::vec3 w, bool fill) : x{x}, y{y}, z{z}, w{w},
                                                                                             fill{fill} {}
 
-        RectangleComponent(std::vector<glm::vec3>&v, bool fill) : x{v[0]}, y{v[1]}, z{v[2]}, w{v[3]},
-                                                                                            fill{fill} {}
+        RectangleComponent(const std::vector<glm::vec3> &v, bool fill) : x{v[0]}, y{v[1]}, z{v[2]}, w{v[3]},
+                                                                   fill{fill} {}
     };
 
     class CrpGameObject {
     public:
-        using id_t = unsigned int;
-        using Map = std::unordered_map<id_t, CrpGameObject>;
-
         static CrpGameObject createGameObject() {
             static id_t currentId = 0;
             return {currentId++};
@@ -54,8 +51,9 @@ namespace crp {
                 CrpDevice &device, glm::vec3 x, glm::vec3 y, glm::vec3 z, glm::vec3 w, bool fill,
                 glm::vec3 color = glm::vec3(1.f));
 
-        static CrpGameObject makeRectangle(CrpDevice &device, std::vector<glm::vec3> &v, bool fill,
-                                           glm::vec3 color = glm::vec3(1.f));
+        static CrpGameObject
+        makeRectangle(CrpDevice &device, const std::vector<glm::vec3> &v, const glm::vec3 &center, bool fill,
+                      const glm::vec3 color = glm::vec3(1.f));
 
         CrpGameObject(const CrpGameObject &) = delete;
 

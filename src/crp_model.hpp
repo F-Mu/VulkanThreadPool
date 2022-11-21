@@ -38,7 +38,8 @@ namespace crp {
         };
 
         CrpModel(CrpDevice &device, const CrpModel::Builder &builder);
-        CrpModel(CrpDevice &device, const std::vector<Vertex>&vertices);
+
+        CrpModel(CrpDevice &device, const std::vector<Vertex> &vertices);
 
         ~CrpModel();
 
@@ -50,7 +51,7 @@ namespace crp {
                 CrpDevice &device, const std::string &filepath);
 
         static std::unique_ptr<CrpModel> createModelFromVertices(
-                CrpDevice &device, const std::vector<Vertex>&vertices);
+                CrpDevice &device, const std::vector<Vertex> &vertices);
 
         void bind(VkCommandBuffer commandBuffer);
 
@@ -63,11 +64,11 @@ namespace crp {
 
         CrpDevice &crpDevice;
 
-        std::unique_ptr<CrpBuffer>vertexBuffer;
+        std::unique_ptr<CrpBuffer> vertexBuffer;
         uint32_t vertexCount;
 
         bool hasIndexBuffer = false;
-        std::unique_ptr<CrpBuffer>indexBuffer;
+        std::unique_ptr<CrpBuffer> indexBuffer;
         uint32_t indexCount;
     };
 }
