@@ -1,8 +1,29 @@
-//
-// Created by 陈若朋 on 2022/11/21.
-//
+#pragma once
 
-#ifndef VULKAN_THREAD_POOL_GLOBAL_CONTEXT_HPP
-#define VULKAN_THREAD_POOL_GLOBAL_CONTEXT_HPP
+#include <memory>
+#include "../crp_device.hpp"
 
-#endif //VULKAN_THREAD_POOL_GLOBAL_CONTEXT_HPP
+namespace crp {
+    class ThreadPoolSystem;
+
+    class RuntimeSystem;
+
+    class GameObjectManager;
+
+    class TaskQueueSystem;
+
+    class GlobalContext {
+    public:
+        void startEngine(CrpDevice&crpDevice);
+
+        void shutdownEngine();
+
+    public:
+        std::shared_ptr<ThreadPoolSystem> threadPoolSystem;
+        std::shared_ptr<RuntimeSystem> runTimeSystem;
+        std::shared_ptr<GameObjectManager> gameObjectManager;
+        std::shared_ptr<TaskQueueSystem> taskQueueSystem;
+    };
+
+    extern GlobalContext globalContext;
+}

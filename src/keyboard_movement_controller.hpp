@@ -17,9 +17,10 @@ namespace crp {
             int lookRight = GLFW_KEY_RIGHT;
             int lookUp = GLFW_KEY_UP;
             int lookDown = GLFW_KEY_DOWN;
+            int close = GLFW_KEY_END;
         };
 
-        void moveInPlaneXZ(GLFWwindow*window, float dt, CrpGameObject &gameObject);
+        void moveInPlaneXZ(GLFWwindow *window, float dt, CrpGameObject &gameObject);
 
         KeyMappings keys{};
         float moveSpeed{3.f};

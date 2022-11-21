@@ -42,8 +42,9 @@ namespace crp {
             for (auto &kv: frameInfo.gameObjects) {
                 if (kv.first == moveTask.rectangle.id) {
                     moveTask.tick();
-                    kv.second.transform.translation += moveTask.speed;
-//                    std::cout<<kv.second.transform.translation[2]<<std::endl;
+                    kv.second.transform.translation = moveTask.rectangle.center;
+//                    PRINT(kv.second.transform.translation);
+//                    PRINT(moveTask.direction);
                     break;
                 }
 //            assert(lightIndex < MAX_LIGHTS && "Point lights exceed maximum specified");

@@ -29,8 +29,6 @@ namespace crp {
 
         void run();
 
-        void startEngine();
-
     private:
         void test();
 
@@ -40,11 +38,6 @@ namespace crp {
 
         //note: order of declarations matters
         std::unique_ptr<CrpDescriptorPool> globalPool{};
-
-        std::shared_ptr<ThreadPoolSystem> threadPoolSystem;
-        std::shared_ptr<RuntimeSystem> runTimeSystem;
-        std::shared_ptr<GameObjectManager> gameObjectManager;
-        std::shared_ptr<TaskQueueSystem> taskQueueSystem;
 //        CrpGameObject::Map gameObjects;
     };
 }

@@ -1,5 +1,7 @@
 #include "task_queue_system.hpp"
 #include "../first_app.hpp"
+#include "../global/global_context.hpp"
+
 namespace crp {
     TaskQueueSystem::TaskQueueSystem(crp::CrpDevice &crpDevice,
                                      const std::shared_ptr<GameObjectManager> &manager) {
@@ -41,7 +43,9 @@ namespace crp {
             for (auto &kv: frameInfo.gameObjects) {
                 if (kv.first == moveTask.rectangle.id) {
                     moveTask.tick();
-                    kv.second.transform.translation += moveTask.speed;
+                    kv.second.transform.translation = moveTask.rectangle.center;
+//                    PRINT(kv.second.transform.translation);
+//                    PRINT(moveTask.direction);
                     break;
                 }
             }
@@ -60,7 +64,7 @@ namespace crp {
                 }
             }
             if (deleteTask.second == 0) {
-
+//                globalContext.gameObjectManager->deleteById(deleteTask.first);
 //                shouldDelete.push_back(deleteTask.first);
 //                frameInfo.gameObjects.erase(deleteTask.first);
                 it = deleteTasks.erase(it);
@@ -72,6 +76,16 @@ namespace crp {
 
     void TaskQueueSystem::addMoveTask(Rectangle &task, glm::vec3 &point) {
         moveTasks.emplace_back(task, point);
+    }
+
+    void TaskQueueSystem::addRunTask(Rectangle &task, glm::vec3 &point) {
+        std::vector<glm::vec3> destinations;
+        auto &center = task.center;
+//        std::cout<<MID(center[0], point[0])<<std::endl;
+        destinations.emplace_back(MID(center[0], point[0]), center[1], TASK_LAYER);
+        destinations.emplace_back(MID(center[0], point[0]), point[1], TASK_LAYER);
+        destinations.emplace_back(point[0], point[1], TASK_LAYER);
+        moveTasks.emplace_back(task, destinations);
     }
 
     void TaskQueueSystem::addDeleteTask(Rectangle &task) {

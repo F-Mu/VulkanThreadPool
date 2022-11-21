@@ -12,17 +12,19 @@ namespace crp {
     public:
         TaskQueueSystem(CrpDevice &crpDevice, const std::shared_ptr<GameObjectManager> &manager);
 
-        void addMoveTask(Rectangle &thread, glm::vec3 &point);
+        void addMoveTask(Rectangle &task, glm::vec3 &point);
 
-        void addDeleteTask(Rectangle &thread);
+        void addDeleteTask(Rectangle &task);
 
         void tick(FrameInfo &frameInfo);
+
+        void addRunTask(Rectangle &task, glm::vec3 &point);
 
         std::vector<glm::vec3> points;
         std::vector<Rectangle> tasks;
         std::vector<TaskToMove> moveTasks;
         std::vector<std::pair<GameObjectManager::id_t, float>> deleteTasks;
-        std::vector<GameObjectManager::id_t>shouldDelete;
+        std::vector<GameObjectManager::id_t> shouldDelete;
     private:
         float up = -1.1f, down = 1.1f, left = 1.f, right = 1.5f;
         glm::vec3 x{left, up, QUEUE_LAYER}, y{right, up, QUEUE_LAYER}, z{left, down, QUEUE_LAYER}, w{right, down,

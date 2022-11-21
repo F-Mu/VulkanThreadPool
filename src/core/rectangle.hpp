@@ -10,7 +10,7 @@ namespace crp {
     public:
         using id_t = unsigned int;
 
-        void MoveToPoint(glm::vec3 &speed);
+        void MoveToPoint(glm::vec3 &direction, glm::vec3 &destination);
 
     public:
         std::vector<glm::vec3> points;
@@ -21,22 +21,22 @@ namespace crp {
     class TaskToMove {
     public:
         Rectangle rectangle;
-        glm::vec3 destination;
-        glm::vec3 speed;
+//        glm::vec3 speed;
+        glm::vec3 direction;
+        std::vector<glm::vec3> destinations;
+        std::vector<float> times;
+//        float len;
 
-        TaskToMove(Rectangle &rectangle, glm::vec3 &destination) : rectangle{rectangle},
-                                                                   destination{destination} {
-            auto direction = destination - rectangle.center;
-            speed = direction / FRAME_TIME;
-        }
+        TaskToMove(Rectangle &rectangle, glm::vec3 &destination);
 
-        bool isFinished() const {
-            auto i = rectangle.center - destination;
-            return fabs(i[0]) < EPS && fabs(i[1]) < EPS;
-        };
+        TaskToMove(Rectangle &rectangle, std::vector<glm::vec3> &destinations);
 
-        void tick() {
-            rectangle.MoveToPoint(speed);
-        }
+        bool isFinished() const { return now == destinations.size(); };
+
+        void tick();
+
+    private:
+        int now = 0;
+        float speed;
     };
 }

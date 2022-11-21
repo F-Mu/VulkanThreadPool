@@ -3,6 +3,7 @@
 #include "systems/simple_render_system.hpp"
 #include "crp_camera.hpp"
 #include "crp_buffer.hpp"
+#include "global/global_context.hpp"
 //libs
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
@@ -21,8 +22,10 @@ float MAX_FRAME_TIME = 60;
 namespace crp {
     void input() {
         int x;
-        while (std::cin >> x) {
-            std::cout << x << std::endl;
+        while (true) {
+            std::cout << "You can add task(0)" << std::endl;
+            std::cout << "You can quit(1)" << std::endl;
+            std::cin >> x;
         }
     }
 
@@ -32,7 +35,7 @@ namespace crp {
                 .addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, CrpSwapChain::MAX_FRAMES_IN_FLIGHT)
                 .build();
 //        loadGameObjects();
-        startEngine();
+        globalContext.startEngine(crpDevice);
         test();
     }
 
@@ -98,10 +101,8 @@ namespace crp {
                         commandBuffer,
                         camera,
                         globalDescriptorSets[frameIndex],
-                        gameObjectManager->gameObjects,
+                        globalContext.gameObjectManager->gameObjects,
                 };
-                threadPoolSystem->tick(frameInfo);
-                taskQueueSystem->tick(frameInfo);
 
                 //update
                 GlobalUbo ubo{};
@@ -110,6 +111,8 @@ namespace crp {
                 ubo.inverseView = camera.getInverseView();
                 uboBuffers[frameIndex]->writeToBuffer(&ubo);
                 uboBuffers[frameIndex]->flush();
+                globalContext.threadPoolSystem->tick(frameInfo);
+                globalContext.taskQueueSystem->tick(frameInfo);
 
                 //render
                 crpRenderer.beginSwapChainRenderPass(commandBuffer);
@@ -122,14 +125,16 @@ namespace crp {
         }
 
         vkDeviceWaitIdle(crpDevice.device());
+        globalContext.shutdownEngine();
     }
 
 
     void FirstApp::test() {
-        glm::vec3 to = runTimeSystem->points[0];
-        threadPoolSystem->addMoveTask(threadPoolSystem->threads[0], to);
-        taskQueueSystem->addMoveTask(taskQueueSystem->tasks[0], to);
-        taskQueueSystem->addDeleteTask(taskQueueSystem->tasks[1]);
+        glm::vec3 to = globalContext.runTimeSystem->points[0];
+        globalContext.threadPoolSystem->addMoveTask(globalContext.threadPoolSystem->threads[0], to);
+        globalContext.taskQueueSystem->addRunTask(globalContext.taskQueueSystem->tasks[0],
+                                                  globalContext.runTimeSystem->points[0]);
+        globalContext.taskQueueSystem->addDeleteTask(globalContext.taskQueueSystem->tasks[1]);
 //        std::vector<CrpModel::Vertex> vertices{
 //                {{-0.5f, -0.5f, 0}, {1., 0., 0.}},
 //                {{-0.3f, -0.5f, 0}, {1., 0., 0.}},
@@ -158,13 +163,6 @@ namespace crp {
 //
 //        gameObjectManager->gameObjects.emplace(rect.getId(), std::move(rect));
 
-    }
-
-    void FirstApp::startEngine() {
-        gameObjectManager = std::make_shared<GameObjectManager>();
-        threadPoolSystem = std::make_shared<ThreadPoolSystem>(crpDevice, gameObjectManager);
-        runTimeSystem = std::make_shared<RuntimeSystem>(crpDevice, gameObjectManager);
-        taskQueueSystem = std::make_shared<TaskQueueSystem>(crpDevice, gameObjectManager);
     }
 
 }
