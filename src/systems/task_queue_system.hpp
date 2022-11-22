@@ -2,6 +2,7 @@
 
 #include <glm/glm.hpp>
 #include <queue>
+#include <list>
 #include "../crp_device.hpp"
 #include "../core/macro.hpp"
 #include "../resources/game_object_manager.hpp"
@@ -9,6 +10,7 @@
 #include "../crp_frame_info.hpp"
 
 namespace crp {
+    template<typename Fun, typename... Args>
     class task {
     public:
         Rectangle rectangle;
@@ -20,17 +22,24 @@ namespace crp {
 
         void addMoveTask(Rectangle &task, glm::vec3 &point);
 
+        void addMoveTask(Rectangle &task, std::vector<glm::vec3> &point);
+
         void addDeleteTask(Rectangle &task);
 
         void tick(FrameInfo &frameInfo);
+
+        void roundTick();
 
         void addRunTask(Rectangle &task, glm::vec3 &point);
 
         void addTask(CrpDevice &crpDevice, const std::shared_ptr<GameObjectManager> &manager);
 
+        void sortTasks();
+
         std::vector<glm::vec3> points;
-        std::queue<Rectangle> tasks;
-        std::vector<TaskToMove> moveTasks;
+        std::list<Rectangle> tasksInQueue;
+        std::queue<Rectangle> tasksWait;
+        std::vector<std::unique_ptr<TaskToMove>> moveTasks;
         std::vector<std::pair<GameObjectManager::id_t, float>> deleteTasks;
         std::vector<GameObjectManager::id_t> shouldDelete;
     private:

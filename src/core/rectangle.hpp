@@ -20,7 +20,7 @@ namespace crp {
 
     class TaskToMove {
     public:
-        Rectangle rectangle;
+        Rectangle&rectangle;
 //        glm::vec3 speed;
         glm::vec3 direction;
         std::vector<glm::vec3> destinations;

@@ -4,7 +4,7 @@ namespace crp {
 #define TASK_LAYER (-1)
 #define THREAD_LAYER (0)
 //#define FRAME_TIME 60
-#define FRAME_TIME (120.f)
+#define FRAME_TIME (90.f)
 #define EPS (1e-2)
 #define TASK_NUM 8
 #define THREAD_NUM 5

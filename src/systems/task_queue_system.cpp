@@ -25,20 +25,20 @@ namespace crp {
     }
 
     void TaskQueueSystem::tick(FrameInfo &frameInfo) {
+//        std::cout<<moveTasks.size()<<std::endl;
         for (auto it = moveTasks.begin(); it != moveTasks.end();) {
-            auto &moveTask = *it;
+            auto moveTask = it->get();
+//            std::cout<<moveTask->rectangle.points.size()<<' '<<moveTasks.size()<<std::endl;
             for (auto &kv: frameInfo.gameObjects) {
-                if (kv.first == moveTask.rectangle.id) {
-                    moveTask.tick();
-                    kv.second.transform.translation = moveTask.rectangle.center;
-//                    PRINT(kv.second.transform.translation);
-//                    PRINT(moveTask.direction);
+                if (kv.first == moveTask->rectangle.id) {
+                    moveTask->tick();
+                    kv.second.transform.translation = moveTask->rectangle.center;
                     break;
                 }
             }
-            if (it->isFinished())
+            if (moveTask->isFinished()) {
                 it = moveTasks.erase(it);
-            else
+            } else
                 ++it;
         }
         for (auto it = deleteTasks.begin(); it != deleteTasks.end();) {
@@ -60,9 +60,34 @@ namespace crp {
         }
     }
 
+    void TaskQueueSystem::roundTick() {
+        sortTasks();
+    }
+
+    void TaskQueueSystem::sortTasks() {
+        if (!tasksInQueue.empty() && tasksInQueue.front().center != points[0]) {
+//            std::cout<<tasksInQueue.front().center[0]<<' '<<points[0][0]<<std::endl;
+            glm::vec3 offset = points[0] - tasksInQueue.front().center;
+            for (auto &i: tasksInQueue) {
+                glm::vec3 target = i.center + offset;
+                addMoveTask(i, target);
+            }
+        }
+        while (tasksInQueue.size() < TASK_NUM && !tasksWait.empty()) {
+            auto now = std::move(tasksWait.front());
+            tasksWait.pop();
+            std::vector<glm::vec3> targets = {points[TASK_NUM - 1], points[tasksInQueue.size()]};
+            tasksInQueue.emplace_back(now);
+            addMoveTask(tasksInQueue.back(), targets);
+        }
+    }
 
     void TaskQueueSystem::addMoveTask(Rectangle &task, glm::vec3 &point) {
-        moveTasks.emplace_back(task, point);
+        moveTasks.emplace_back(std::make_unique<TaskToMove>(task, point));
+    }
+
+    void TaskQueueSystem::addMoveTask(Rectangle &task, std::vector<glm::vec3> &point) {
+        moveTasks.emplace_back(std::make_unique<TaskToMove>(task, point));
     }
 
     void TaskQueueSystem::addRunTask(Rectangle &task, glm::vec3 &point) {
@@ -71,7 +96,7 @@ namespace crp {
         destinations.emplace_back(MID(center[0], point[0]), center[1], TASK_LAYER);
         destinations.emplace_back(MID(center[0], point[0]), point[1], TASK_LAYER);
         destinations.emplace_back(point[0], point[1], TASK_LAYER);
-        moveTasks.emplace_back(task, destinations);
+        moveTasks.emplace_back(std::make_unique<TaskToMove>(task, destinations));
     }
 
     void TaskQueueSystem::addDeleteTask(Rectangle &task) {
@@ -93,5 +118,7 @@ namespace crp {
         auto TaskRect = CrpGameObject::makeRectangle(crpDevice, task.points, task.center, true, {0, .5f, .5f});
         task.id = TaskRect.getId();
         manager->gameObjects.emplace(TaskRect.getId(), std::move(TaskRect));
+        tasksWait.push(task);
     }
+
 }

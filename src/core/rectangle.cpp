@@ -5,15 +5,22 @@
 namespace crp {
 
     void Rectangle::MoveToPoint(glm::vec3 &direction, glm::vec3 &destination) {
+//        std::cout<<direction[0]<<'#'<<points.size()<<std::endl;
         int flag, pos, flag2;
         if (fabs(center[0] - destination[0]) < EPS)flag = center[1] - destination[1] > 0 ? 1 : -1, pos = 1;
         else flag = center[0] - destination[0] > 0 ? 1 : -1, pos = 0;
+        if(EQUAL(center,destination)){
+            center = destination;
+            return;
+        }
         for (auto &i: points) {
             i += direction;
         }
         center += direction;
         flag2 = center[pos] - destination[pos] > 0 ? 1 : -1;
-        if (flag != flag2)center = destination;
+        if (flag != flag2) {
+            center = destination;
+        }
 //        if (fabs(destination[1] - 0.88) < EPS)
 //            std::cout << destination[0] << ' ' << destination[1] << ' ' << flag << ' ' << flag2 << ' ' << center[0]
 //                      << std::endl;
@@ -23,13 +30,12 @@ namespace crp {
 //        std::cout<<now<<' '<<destinations.size()<<std::endl;
         if (isFinished())return;
         rectangle.MoveToPoint(direction, destinations[now]);
-        if (EQUAL(rectangle.center, destinations[now])) {
+        if (rectangle.center== destinations[now]) {
             ++now;
             if (isFinished())return;
             auto dir = destinations[now] - destinations[now - 1];
 //            direction = dir / (times[now] * FRAME_TIME);
             direction = NORMALIZE(dir) * speed;
-
         }
     }
 

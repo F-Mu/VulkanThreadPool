@@ -80,7 +80,6 @@ namespace crp {
 
         while (!crpWindow.shouldClose()) {
             glfwPollEvents();
-
             auto newTime = std::chrono::high_resolution_clock::now();
             float frameTime = std::chrono::duration<float, std::chrono::seconds::period>(newTime - currentTime).count();
             currentTime = newTime;
@@ -105,6 +104,12 @@ namespace crp {
                 };
 
                 //update
+                static int frameNum = 0;
+                if (frameNum == 0) {
+                    globalContext.taskQueueSystem->roundTick();
+                    globalContext.threadPoolSystem->roundTick();
+                    globalContext.threadPoolSystem->add([](int answer) { return answer; }, 1);
+                }
                 GlobalUbo ubo{};
                 ubo.projection = camera.getProjection();
                 ubo.view = camera.getView();
@@ -121,8 +126,12 @@ namespace crp {
                 simpleRenderSystem.renderGameObjects(frameInfo);
                 crpRenderer.endSwapChainRenderPass(commandBuffer);
                 crpRenderer.endFrame();
+                ++frameNum;
+                if (frameNum == FRAME_TIME)
+                    frameNum = 0;
             }
         }
+
         vkDeviceWaitIdle(crpDevice.device());
         globalContext.shutdownEngine();
     }
@@ -130,8 +139,8 @@ namespace crp {
 
     void FirstApp::test() {
         glm::vec3 to = globalContext.runTimeSystem->points[0];
-        globalContext.threadPoolSystem->addMoveTask(globalContext.threadPoolSystem->threads[0].rectangle, to);
-        globalContext.taskQueueSystem->addTask(crpDevice, globalContext.gameObjectManager);
+//        globalContext.threadPoolSystem->addMoveTask(globalContext.threadPoolSystem->threads[0].rectangle, to);
+//        globalContext.taskQueueSystem->addTask(crpDevice, globalContext.gameObjectManager);
 //        globalContext.taskQueueSystem->addRunTask(globalContext.taskQueueSystem->tasks[0],
 //                                                  globalContext.runTimeSystem->points[0]);
 //        globalContext.taskQueueSystem->addDeleteTask(globalContext.taskQueueSystem->tasks[1]);

@@ -1,4 +1,6 @@
 #include "thread_pool_system.hpp"
+#include "../global/global_context.hpp"
+#include "runtime_system.hpp"
 #include <iostream>
 #include <map>
 
@@ -22,21 +24,6 @@ namespace crp {
         float threadWidth = right - left - .1f;
         float threadHeight = (hCut - .1f);
         for (int i = 0; i < THREAD_NUM; ++i) {
-            threads[i].th = std::thread([this] {
-                while (!this->stop) {
-                    task_type task;
-                    {
-                        std::unique_lock<std::mutex> lock(this->_mut);
-                        this->cond.wait(lock, [this] {
-                            return this->stop || !tasks.empty();
-                        });
-                        if (stop)return;
-                        task = std::move(tasks.front());
-                        tasks.pop();
-                    }
-                    task();
-                }
-            });
             points[i] = {mid, yFirst + hCut * i, THREAD_LAYER};
             threads[i].rectangle.center = points[i];
             threads[i].rectangle.points.resize(4);
@@ -48,6 +35,55 @@ namespace crp {
                     {l, d, THREAD_LAYER},
                     {r, d, THREAD_LAYER},
             };
+
+//            PRINT(threads[i].rectangle.center);
+            threads[i].th = std::thread([this, i] {
+                while (!this->stop) {
+                    task_type task;
+//                    std::cout<<this->threads[i].rectangle.points[0][0]<<std::endl;
+                    {
+                        std::unique_lock<std::mutex> lock(this->_mut);
+                        this->start.wait(lock, [this] {
+                            return this->stop || !tasks.empty();
+                        });
+                        if (stop)return;
+                        task = std::move(tasks.front());
+                        tasks.pop();
+                    }
+                    tasks.front();
+//                    std::cout<<"#"<<std::endl;
+//                    std::cout<<tasks.size()<<std::endl;
+//                    std::cout<<i<<std::endl;
+//                    PRINT(threads[i].rectangle.center);
+                    addMoveTask(threads[i].rectangle, globalContext.runTimeSystem->points[i]);
+
+//                    while (!stop && threads[i].rectangle.center != globalContext.runTimeSystem->points[i]) {
+////                        std::cout << "#" << std::endl;
+////                        PRINT(threads[i].rectangle.center);
+////                        PRINT(globalContext.runTimeSystem->points[i]);
+////                        std::cout << "#" << std::endl;
+//                        continue;
+//                    }
+                    {
+//                        std::cout << "#" << std::endl;
+                        std::unique_lock<std::mutex> lock(runMut);
+                        this->run.wait(lock, [this, i] {
+//                            return true;
+                            return this->stop || threads[i].rectangle.center == globalContext.runTimeSystem->points[i];
+                        });
+                        if (stop)return;
+                    }
+                    task();
+                    addMoveTask(threads[i].rectangle, points[i]);
+                    {
+                        std::unique_lock<std::mutex> lock(this->resetMut);
+                        this->reset.wait(lock, [this, i] {
+                            return this->stop || threads[i].rectangle.center == points[i];
+                        });
+                        if (stop)return;
+                    }
+                }
+            });
             auto ThreadRect = CrpGameObject::makeRectangle(crpDevice,
                                                            threads[i].rectangle.points, points[i], true, {0, 0, .5f});
             threads[i].rectangle.id = ThreadRect.getId();
@@ -58,54 +94,44 @@ namespace crp {
 
     void ThreadPoolSystem::tick(FrameInfo &frameInfo) {
         for (auto it = moveTasks.begin(); it != moveTasks.end();) {
-            auto &moveTask = *it;
+            auto moveTask = it->get();
             for (auto &kv: frameInfo.gameObjects) {
-                if (kv.first == moveTask.rectangle.id) {
-                    moveTask.tick();
-                    kv.second.transform.translation = moveTask.rectangle.center;
+                if (kv.first == moveTask->rectangle.id) {
+                    moveTask->tick();
+                    kv.second.transform.translation = moveTask->rectangle.center;
 //                    PRINT(kv.second.transform.translation);
 //                    PRINT(moveTask.direction);
                     break;
                 }
 //            assert(lightIndex < MAX_LIGHTS && "Point lights exceed maximum specified");
             }
-            if (it->isFinished())
+            if (moveTask->isFinished())
                 it = moveTasks.erase(it);
             else
                 ++it;
         }
+        run.notify_all();
     }
 
+    void ThreadPoolSystem::roundTick() {
+        //order
+        reset.notify_all();
+    }
 
     void ThreadPoolSystem::addMoveTask(Rectangle &thread, glm::vec3 &point) {
-        moveTasks.emplace_back(thread, point);
+        moveTasks.emplace_back(std::make_unique<TaskToMove>(thread, point));
     }
 
     //thread_pool
     void ThreadPoolSystem::clear() {
         stop = true;
-        cond.notify_all();
+        start.notify_all();
+        reset.notify_all();
+        run.notify_all();
         for (auto &thread: threads) {
             if (thread.th.joinable())
                 thread.th.join();
         }
-    }
-
-    template<typename Fun, typename... Args>
-    std::future<typename std::invoke_result<Fun, Args...>::type>
-    ThreadPoolSystem::add(Fun &&fun, Args &&...args) {
-        using result_type = typename std::invoke_result<Fun, Args...>::type;
-        using task = std::packaged_task<result_type()>;
-        auto t = std::make_shared<task>(std::bind(std::forward<Fun>(fun), std::forward<Args>(args)...));
-        auto ret = t->get_future();
-        {
-            std::lock_guard<std::mutex> lock(this->_mut);
-            if (stop)
-                throw std::runtime_error("Thread pool has stopped");
-            tasks.emplace([t] { (*t)(); });
-        }
-        cond.notify_one();
-        return ret;
     }
 
 }
