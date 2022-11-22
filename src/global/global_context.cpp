@@ -18,7 +18,10 @@ namespace crp {
 
     void GlobalContext::shutdownEngine() {
         gameObjectManager.reset();
+
+        threadPoolSystem->clear();
         threadPoolSystem.reset();
+
         runTimeSystem.reset();
         taskQueueSystem.reset();
     }

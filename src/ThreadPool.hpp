@@ -56,7 +56,7 @@ namespace crp {
     }
 
     ThreadPool::~ThreadPool() {
-        stop = false;
+        stop = true;
         for (auto &thread: threads) {
             if (thread.joinable())
                 thread.join();

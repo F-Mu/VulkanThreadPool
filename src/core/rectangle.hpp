@@ -13,8 +13,8 @@ namespace crp {
         void MoveToPoint(glm::vec3 &direction, glm::vec3 &destination);
 
     public:
-        std::vector<glm::vec3> points;
-        glm::vec3 center;
+        std::vector<glm::vec3> points{};
+        glm::vec3 center{};
         id_t id;
     };
 

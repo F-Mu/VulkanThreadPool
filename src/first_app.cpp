@@ -123,7 +123,6 @@ namespace crp {
                 crpRenderer.endFrame();
             }
         }
-
         vkDeviceWaitIdle(crpDevice.device());
         globalContext.shutdownEngine();
     }
@@ -131,10 +130,11 @@ namespace crp {
 
     void FirstApp::test() {
         glm::vec3 to = globalContext.runTimeSystem->points[0];
-        globalContext.threadPoolSystem->addMoveTask(globalContext.threadPoolSystem->threads[0], to);
-        globalContext.taskQueueSystem->addRunTask(globalContext.taskQueueSystem->tasks[0],
-                                                  globalContext.runTimeSystem->points[0]);
-        globalContext.taskQueueSystem->addDeleteTask(globalContext.taskQueueSystem->tasks[1]);
+        globalContext.threadPoolSystem->addMoveTask(globalContext.threadPoolSystem->threads[0].rectangle, to);
+        globalContext.taskQueueSystem->addTask(crpDevice, globalContext.gameObjectManager);
+//        globalContext.taskQueueSystem->addRunTask(globalContext.taskQueueSystem->tasks[0],
+//                                                  globalContext.runTimeSystem->points[0]);
+//        globalContext.taskQueueSystem->addDeleteTask(globalContext.taskQueueSystem->tasks[1]);
 //        std::vector<CrpModel::Vertex> vertices{
 //                {{-0.5f, -0.5f, 0}, {1., 0., 0.}},
 //                {{-0.3f, -0.5f, 0}, {1., 0., 0.}},

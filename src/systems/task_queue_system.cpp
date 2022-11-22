@@ -11,30 +11,17 @@ namespace crp {
         manager->gameObjects.emplace(TaskQueueRect.getId(), std::move(TaskQueueRect));
         float mid = (left + right) / 2;
         points.resize(TASK_NUM);
-        tasks.resize(TASK_NUM);
         float hCut = (down - up) / float(TASK_NUM);
         float yFirst = (up + hCut + up) / 2;
-        float taskWidth = right - left - .15f;
-        float taskHeight = (hCut - .1f);
+        taskWidth = right - left - .15f;
+        taskHeight = (hCut - .1f);
         for (int i = 0; i < TASK_NUM; ++i) {
             points[i] = {mid, yFirst + hCut * i, TASK_LAYER};
-            tasks[i].center = points[i];
-            tasks[i].points.resize(4);
-            float l = -taskWidth / 2, r = taskWidth / 2,
-                    u = -taskHeight / 2, d = taskHeight / 2;
-//            std::cout << l << ' ' << r << ' ' << u << ' ' << d << ' ' << taskUp << ' ' << taskHeight << ' ' << hCut
-//                      << std::endl;
-            tasks[i].points = {
-                    {l, u, TASK_LAYER},
-                    {r, u, TASK_LAYER},
-                    {l, d, TASK_LAYER},
-                    {r, d, TASK_LAYER},
-            };
-            auto TaskRect = CrpGameObject::makeRectangle(crpDevice,
-                                                         tasks[i].points, points[i], true, {0, .5f, .5f});
-            tasks[i].id = TaskRect.getId();
-            manager->gameObjects.emplace(TaskRect.getId(), std::move(TaskRect));
         }
+
+        //init
+        taskInitPosition = points.back();
+        taskInitPosition.x += 1;
     }
 
     void TaskQueueSystem::tick(FrameInfo &frameInfo) {
@@ -81,7 +68,6 @@ namespace crp {
     void TaskQueueSystem::addRunTask(Rectangle &task, glm::vec3 &point) {
         std::vector<glm::vec3> destinations;
         auto &center = task.center;
-//        std::cout<<MID(center[0], point[0])<<std::endl;
         destinations.emplace_back(MID(center[0], point[0]), center[1], TASK_LAYER);
         destinations.emplace_back(MID(center[0], point[0]), point[1], TASK_LAYER);
         destinations.emplace_back(point[0], point[1], TASK_LAYER);
@@ -90,5 +76,22 @@ namespace crp {
 
     void TaskQueueSystem::addDeleteTask(Rectangle &task) {
         deleteTasks.emplace_back(task.id, FRAME_TIME);
+    }
+
+    void TaskQueueSystem::addTask(CrpDevice &crpDevice, const std::shared_ptr<GameObjectManager> &manager) {
+        Rectangle task;
+        task.center = taskInitPosition;
+        task.points.resize(4);
+        float l = -taskWidth / 2, r = taskWidth / 2,
+                u = -taskHeight / 2, d = taskHeight / 2;
+        task.points = {
+                {l, u, TASK_LAYER},
+                {r, u, TASK_LAYER},
+                {l, d, TASK_LAYER},
+                {r, d, TASK_LAYER},
+        };
+        auto TaskRect = CrpGameObject::makeRectangle(crpDevice, task.points, task.center, true, {0, .5f, .5f});
+        task.id = TaskRect.getId();
+        manager->gameObjects.emplace(TaskRect.getId(), std::move(TaskRect));
     }
 }
