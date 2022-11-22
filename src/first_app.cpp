@@ -4,6 +4,10 @@
 #include "crp_camera.hpp"
 #include "crp_buffer.hpp"
 #include "global/global_context.hpp"
+#include "systems/thread_pool_system.hpp"
+#include "systems/runtime_system.hpp"
+#include "systems/task_queue_system.hpp"
+#include "resources/move_task_manager.hpp"
 //libs
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
@@ -42,6 +46,12 @@ namespace crp {
     FirstApp::~FirstApp() {}
 
     void FirstApp::run() {
+        auto &runTimeSystem = globalContext.runTimeSystem;
+        auto &taskQueueSystem = globalContext.runTimeSystem->taskQueueSystem;
+        auto &threadPoolSystem = globalContext.runTimeSystem->threadPoolSystem;
+        auto &moveTaskManager = globalContext.moveTaskManager;
+
+
         std::vector<std::unique_ptr<CrpBuffer>> uboBuffers(CrpSwapChain::MAX_FRAMES_IN_FLIGHT);
         for (int i = 0; i < uboBuffers.size(); ++i) {
             uboBuffers[i] = std::make_unique<CrpBuffer>(
@@ -87,6 +97,7 @@ namespace crp {
             frameTime = glm::min(frameTime, MAX_FRAME_TIME);
 
             cameraController.moveInPlaneXZ(crpWindow.getGLFWwindow(), frameTime, viewerObject);
+            cameraController.addTask(crpWindow.getGLFWwindow());
             camera.setViewYXZ(viewerObject.transform.translation, viewerObject.transform.rotation);
 
 //            float aspect = crpRenderer.getAspectRatio();
@@ -104,20 +115,21 @@ namespace crp {
                 };
 
                 //update
-                static int frameNum = 0;
-                if (frameNum == 0) {
-                    globalContext.taskQueueSystem->roundTick();
-                    globalContext.threadPoolSystem->roundTick();
-                    globalContext.threadPoolSystem->add([](int answer) { return answer; }, 1);
-                }
+//                static int frameNum = 0;
+//                if (frameNum == 0) {
+//                    runTimeSystem->roundTick();
+////                    threadPoolSystem->add([](int answer) { return answer; }, 1);
+//                }
                 GlobalUbo ubo{};
                 ubo.projection = camera.getProjection();
                 ubo.view = camera.getView();
                 ubo.inverseView = camera.getInverseView();
                 uboBuffers[frameIndex]->writeToBuffer(&ubo);
                 uboBuffers[frameIndex]->flush();
-                globalContext.threadPoolSystem->tick(frameInfo);
-                globalContext.taskQueueSystem->tick(frameInfo);
+                runTimeSystem->tick(frameInfo);
+                moveTaskManager->tick(frameInfo);
+//                threadPoolSystem->tick(frameInfo);
+//                taskQueueSystem->tick(frameInfo);
 
                 //render
                 crpRenderer.beginSwapChainRenderPass(commandBuffer);
@@ -126,9 +138,9 @@ namespace crp {
                 simpleRenderSystem.renderGameObjects(frameInfo);
                 crpRenderer.endSwapChainRenderPass(commandBuffer);
                 crpRenderer.endFrame();
-                ++frameNum;
-                if (frameNum == FRAME_TIME)
-                    frameNum = 0;
+//                ++frameNum;
+//                if (frameNum == FRAME_TIME)
+//                    frameNum = 0;
             }
         }
 
@@ -136,10 +148,20 @@ namespace crp {
         globalContext.shutdownEngine();
     }
 
+    void fun() {
+    }
 
     void FirstApp::test() {
+        auto &runTimeSystem = globalContext.runTimeSystem;
+        auto &taskQueueSystem = globalContext.runTimeSystem->taskQueueSystem;
+        auto &threadPoolSystem = globalContext.runTimeSystem->threadPoolSystem;
         glm::vec3 to = globalContext.runTimeSystem->points[0];
-//        globalContext.threadPoolSystem->addMoveTask(globalContext.threadPoolSystem->threads[0].rectangle, to);
+//        taskQueueSystem->add()
+        int x = 1;
+//        taskQueueSystem->add(fun(),x);
+//        runTimeSystem->add([])
+//        taskQueueSystem->add([](int answer) { return answer; }, 1);
+//        globalContext.moveTaskManager->addMoveTask(threadPoolSystem->threads[0], to);
 //        globalContext.taskQueueSystem->addTask(crpDevice, globalContext.gameObjectManager);
 //        globalContext.taskQueueSystem->addRunTask(globalContext.taskQueueSystem->tasks[0],
 //                                                  globalContext.runTimeSystem->points[0]);

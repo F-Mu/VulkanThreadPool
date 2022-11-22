@@ -6,9 +6,6 @@
 #include "crp_game_obejct.hpp"
 #include "crp_renderer.hpp"
 #include "crp_descriptors.hpp"
-#include "systems/thread_pool_system.hpp"
-#include "systems/runtime_system.hpp"
-#include "systems/task_queue_system.hpp"
 //std
 #include <memory>
 #include <vector>

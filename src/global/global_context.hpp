@@ -12,6 +12,8 @@ namespace crp {
 
     class TaskQueueSystem;
 
+    class MoveTaskManager;
+
     class GlobalContext {
     public:
         void startEngine(CrpDevice&crpDevice);
@@ -19,10 +21,9 @@ namespace crp {
         void shutdownEngine();
 
     public:
-        std::shared_ptr<ThreadPoolSystem> threadPoolSystem;
         std::shared_ptr<RuntimeSystem> runTimeSystem;
         std::shared_ptr<GameObjectManager> gameObjectManager;
-        std::shared_ptr<TaskQueueSystem> taskQueueSystem;
+        std::shared_ptr<MoveTaskManager> moveTaskManager;
     };
 
     extern GlobalContext globalContext;

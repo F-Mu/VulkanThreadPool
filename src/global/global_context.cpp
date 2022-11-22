@@ -3,6 +3,7 @@
 #include "../systems/thread_pool_system.hpp"
 #include "../systems/task_queue_system.hpp"
 #include "../systems/runtime_system.hpp"
+#include "../resources/move_task_manager.hpp"
 
 namespace crp {
     class CrpDevice;
@@ -10,20 +11,16 @@ namespace crp {
     GlobalContext globalContext;
 
     void GlobalContext::startEngine(CrpDevice &crpDevice) {
+        moveTaskManager = std::make_shared<MoveTaskManager>();
         gameObjectManager = std::make_shared<GameObjectManager>();
-        threadPoolSystem = std::make_shared<ThreadPoolSystem>(crpDevice, gameObjectManager);
-        runTimeSystem = std::make_shared<RuntimeSystem>(crpDevice, gameObjectManager);
-        taskQueueSystem = std::make_shared<TaskQueueSystem>(crpDevice, gameObjectManager);
+        runTimeSystem = std::make_shared<RuntimeSystem>(crpDevice);
     }
 
     void GlobalContext::shutdownEngine() {
-        gameObjectManager.reset();
-
-        threadPoolSystem->clear();
-        threadPoolSystem.reset();
-
+        runTimeSystem->clear();
         runTimeSystem.reset();
-        taskQueueSystem.reset();
+        gameObjectManager.reset();
+        moveTaskManager.reset();
     }
 
 }

@@ -1,14 +1,15 @@
 #include "task_queue_system.hpp"
 #include "../first_app.hpp"
 #include "../global/global_context.hpp"
+#include "../resources/move_task_manager.hpp"
+#include "../resources/game_object_manager.hpp"
 
 namespace crp {
-    TaskQueueSystem::TaskQueueSystem(crp::CrpDevice &crpDevice,
-                                     const std::shared_ptr<GameObjectManager> &manager) {
+    TaskQueueSystem::TaskQueueSystem(CrpDevice &crpDevice) : crpDevice{crpDevice} {
         auto TaskQueueRect = CrpGameObject::makeRectangle(crpDevice,
                                                           x, y, z, w, false);
         id = TaskQueueRect.getId();
-        manager->gameObjects.emplace(TaskQueueRect.getId(), std::move(TaskQueueRect));
+        globalContext.gameObjectManager->gameObjects.emplace(TaskQueueRect.getId(), std::move(TaskQueueRect));
         float mid = (left + right) / 2;
         points.resize(TASK_NUM);
         float hCut = (down - up) / float(TASK_NUM);
@@ -25,22 +26,8 @@ namespace crp {
     }
 
     void TaskQueueSystem::tick(FrameInfo &frameInfo) {
-//        std::cout<<moveTasks.size()<<std::endl;
-        for (auto it = moveTasks.begin(); it != moveTasks.end();) {
-            auto moveTask = it->get();
-//            std::cout<<moveTask->rectangle.points.size()<<' '<<moveTasks.size()<<std::endl;
-            for (auto &kv: frameInfo.gameObjects) {
-                if (kv.first == moveTask->rectangle.id) {
-                    moveTask->tick();
-                    kv.second.transform.translation = moveTask->rectangle.center;
-                    break;
-                }
-            }
-            if (moveTask->isFinished()) {
-                it = moveTasks.erase(it);
-            } else
-                ++it;
-        }
+        sortTasks();
+//        std::cout<<m1oveTasks.size()<<std::endl;
         for (auto it = deleteTasks.begin(); it != deleteTasks.end();) {
             auto &deleteTask = *it;
             for (auto &kv: frameInfo.gameObjects) {
@@ -61,33 +48,37 @@ namespace crp {
     }
 
     void TaskQueueSystem::roundTick() {
-        sortTasks();
     }
 
     void TaskQueueSystem::sortTasks() {
-        if (!tasksInQueue.empty() && tasksInQueue.front().center != points[0]) {
-//            std::cout<<tasksInQueue.front().center[0]<<' '<<points[0][0]<<std::endl;
-            glm::vec3 offset = points[0] - tasksInQueue.front().center;
+        if (!tasksInQueue.empty()) {
+            int cnt = -1;
+//            std::cout << tasksInQueue.size() << std::endl;
             for (auto &i: tasksInQueue) {
-                glm::vec3 target = i.center + offset;
-                addMoveTask(i, target);
+//                if (cnt == 0 && !i.move) {
+//                    PRINT(i.center);
+//                    PRINT(points[cnt]);
+//                }
+//                std::cout << "#" << std::endl;
+//                std::cout << i.move << std::endl;
+//                PRINT(i.center);
+//                PRINT(points[cnt]);
+//                std::cout << "#" << std::endl;
+                ++cnt;
+                if (i.move)continue;
+                globalContext.moveTaskManager->addMoveTask(i, points[cnt], FRAME_TIME/5);
             }
         }
+
         while (tasksInQueue.size() < TASK_NUM && !tasksWait.empty()) {
             auto now = std::move(tasksWait.front());
             tasksWait.pop();
-            std::vector<glm::vec3> targets = {points[TASK_NUM - 1], points[tasksInQueue.size()]};
+            std::vector<glm::vec3> target = {points[TASK_NUM - 1], points[tasksInQueue.size()]};
+//            glm::vec3 target = points[TASK_NUM - 1];
+//            std::cout<<tasksInQueue.size()<<std::endl;
             tasksInQueue.emplace_back(now);
-            addMoveTask(tasksInQueue.back(), targets);
+            globalContext.moveTaskManager->addMoveTask(tasksInQueue.back(), target);
         }
-    }
-
-    void TaskQueueSystem::addMoveTask(Rectangle &task, glm::vec3 &point) {
-        moveTasks.emplace_back(std::make_unique<TaskToMove>(task, point));
-    }
-
-    void TaskQueueSystem::addMoveTask(Rectangle &task, std::vector<glm::vec3> &point) {
-        moveTasks.emplace_back(std::make_unique<TaskToMove>(task, point));
     }
 
     void TaskQueueSystem::addRunTask(Rectangle &task, glm::vec3 &point) {
@@ -103,22 +94,29 @@ namespace crp {
         deleteTasks.emplace_back(task.id, FRAME_TIME);
     }
 
-    void TaskQueueSystem::addTask(CrpDevice &crpDevice, const std::shared_ptr<GameObjectManager> &manager) {
-        Rectangle task;
-        task.center = taskInitPosition;
-        task.points.resize(4);
-        float l = -taskWidth / 2, r = taskWidth / 2,
-                u = -taskHeight / 2, d = taskHeight / 2;
-        task.points = {
-                {l, u, TASK_LAYER},
-                {r, u, TASK_LAYER},
-                {l, d, TASK_LAYER},
-                {r, d, TASK_LAYER},
-        };
-        auto TaskRect = CrpGameObject::makeRectangle(crpDevice, task.points, task.center, true, {0, .5f, .5f});
-        task.id = TaskRect.getId();
-        manager->gameObjects.emplace(TaskRect.getId(), std::move(TaskRect));
-        tasksWait.push(task);
+    void TaskQueueSystem::addTask() {
     }
 
+    bool TaskQueueSystem::isSorted() {
+        if (tasksInQueue.empty())return false;
+//        PRINT(tasksInQueue.front().center);1111
+        return STRICT_EQUAL(tasksInQueue.front().center, points[0]);
+//        int cnt = 0;
+//        for (auto &i: tasksInQueue) {
+//            if (i.center != points[cnt])return false;
+//            ++cnt;
+//        }
+//        return true;
+    }
+
+//    void taskList::run(Thread &thread) {
+//    }
+
+    void Task::run(glm::vec3 &point) {
+        std::vector<glm::vec3> destinations;
+        destinations.emplace_back(MID(center[0], point[0]), center[1], TASK_LAYER);
+        destinations.emplace_back(MID(center[0], point[0]), point[1], TASK_LAYER);
+        destinations.emplace_back(point[0], point[1], TASK_LAYER);
+        globalContext.moveTaskManager->moveTasks.emplace_back(std::make_unique<TaskToMove>(*this, destinations));
+    }
 }
