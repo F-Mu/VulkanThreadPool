@@ -29,7 +29,7 @@ namespace crp {
     private:
         void test();
 
-        CrpWindow crpWindow{WIDTH, HEIGHT, "Hello Vulkan!"};
+        CrpWindow crpWindow{WIDTH, HEIGHT, "ThreadPool"};
         CrpDevice crpDevice{crpWindow};
         CrpRenderer crpRenderer{crpWindow, crpDevice};
 
