@@ -25,11 +25,6 @@ namespace crp {
             frameInfo.gameObjects.find(moveTask->rectangle.id)
                     ->second.transform.translation = moveTask->rectangle.center;
             if (moveTask->isFinished()) {
-                if (moveTask->rectangle.move) {
-                    std::cout << "delete:" << moveTask->rectangle.id << ' ' << moveTask->rectangle.move << std::endl;
-                    std::cout << (it == moveTasks.end());
-                    PRINT(moveTask->rectangle.center);
-                }
                 it = moveTasks.erase(it);
             } else
                 ++it;
