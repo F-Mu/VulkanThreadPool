@@ -16,7 +16,7 @@ namespace crp {
 
     class GlobalContext {
     public:
-        void startEngine(CrpDevice&crpDevice);
+        void startEngine(CrpDevice &crpDevice);
 
         void shutdownEngine();
 
@@ -24,6 +24,7 @@ namespace crp {
         std::shared_ptr<RuntimeSystem> runTimeSystem;
         std::shared_ptr<GameObjectManager> gameObjectManager;
         std::shared_ptr<MoveTaskManager> moveTaskManager;
+        bool debug{};
     };
 
     extern GlobalContext globalContext;

@@ -4,6 +4,7 @@
 #include <queue>
 #include <list>
 #include <future>
+#include <utility>
 #include "../crp_device.hpp"
 #include "../core/macro.hpp"
 #include "../core/rectangle.hpp"
@@ -16,7 +17,7 @@ namespace crp {
 
     class Task : public Rectangle {
     public:
-        Task(std::function<void()> fun, Rectangle &rec) : task{fun}, Rectangle(rec) {};
+        Task(std::function<void()> fun, Rectangle &rec) : task{std::move(fun)}, Rectangle(rec) {};
 
         Task() {};
         std::function<void()> task;
@@ -34,8 +35,6 @@ namespace crp {
 
         void roundTick();
 
-        void addRunTask(Rectangle &task, glm::vec3 &point);
-
         void addTask();
 
         void sortTasks();
@@ -46,9 +45,10 @@ namespace crp {
         std::list<Task> tasksInQueue;
         std::queue<Task> tasksRun;
         std::queue<Task> tasksWait;
-        std::vector<std::unique_ptr<TaskToMove>> moveTasks;
-        std::vector<std::pair<GameObjectManager::id_t, float>> deleteTasks;
+        std::list<std::unique_ptr<std::pair<GameObjectManager::id_t, float>>> deleteTasks;
         std::vector<GameObjectManager::id_t> shouldDelete;
+        std::mutex taskMut;
+        std::condition_variable taskCond;
     private:
         float up = -1.1f, down = 1.1f, left = 1.f, right = 1.5f;
         glm::vec3 x{left, up, QUEUE_LAYER}, y{right, up, QUEUE_LAYER}, z{left, down, QUEUE_LAYER}, w{right, down,
@@ -93,7 +93,7 @@ namespace crp {
 //                tasksInQueue.emplace_back(now);
 //                globalContext.moveTaskManager->addMoveTask(tasksInQueue.back(), targets);
 //            }
-            sortTasks();
+//            sortTasks();
 ////            threadPoolSystem->start.notify_one();
             return ret;
         }

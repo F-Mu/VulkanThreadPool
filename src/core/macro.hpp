@@ -6,13 +6,14 @@ namespace crp {
 //#define FRAME_TIME 60
 #define FRAME_TIME (90.f)
 #define EPS (1e-2)
+#define STRICT_EPS (1e-7)
 #define TASK_NUM 8
 #define THREAD_NUM 5
 #define MAX_TASK_NUM 30
 #define SCALE glm::vec3{1.f, 1.f, 1.f}
 #define LEN(vec3) sqrt(vec3[0]*vec3[0]+vec3[1]*vec3[1])
 #define EQUAL(vec3a, vec3b) (fabs(vec3a[0]-vec3b[0])<EPS&&fabs(vec3a[1]-vec3b[1])<EPS)
-#define STRICT_EQUAL(vec3a, vec3b) (vec3a[0]==vec3b[0]&&vec3a[1]==vec3b[1])
+#define STRICT_EQUAL(vec3a, vec3b) (fabs(vec3a[0]-vec3b[0])<STRICT_EPS&&fabs(vec3a[1]-vec3b[1])<STRICT_EPS)
 #define NORMALIZE(vec) glm::vec3{vec[0]/LEN(vec),vec[1]/LEN(vec),0.f}
 #define PRINT(vec) std::cout<<'('<<vec[0]<<','<<vec[1]<<','<<vec[2]<<')'<<std::endl;
 #define MID(x, y) ((x+y)/2)

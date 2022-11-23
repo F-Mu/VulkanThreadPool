@@ -100,9 +100,7 @@ namespace crp {
             cameraController.addTask(crpWindow.getGLFWwindow());
             camera.setViewYXZ(viewerObject.transform.translation, viewerObject.transform.rotation);
 
-//            float aspect = crpRenderer.getAspectRatio();
             camera.setOrthographicProjection(-2, 2, -2, 2, -5, 5);
-//            camera.setPerspectiveProjection(glm::radians(50.f), aspect, 0.1f, 100.f);
             if (auto commandBuffer = crpRenderer.beginFrame()) {
                 int frameIndex = crpRenderer.getFrameIndex();
                 FrameInfo frameInfo{
@@ -115,11 +113,6 @@ namespace crp {
                 };
 
                 //update
-//                static int frameNum = 0;
-//                if (frameNum == 0) {
-//                    runTimeSystem->roundTick();
-////                    threadPoolSystem->add([](int answer) { return answer; }, 1);
-//                }
                 GlobalUbo ubo{};
                 ubo.projection = camera.getProjection();
                 ubo.view = camera.getView();
@@ -128,6 +121,7 @@ namespace crp {
                 uboBuffers[frameIndex]->flush();
                 runTimeSystem->tick(frameInfo);
                 moveTaskManager->tick(frameInfo);
+
 //                threadPoolSystem->tick(frameInfo);
 //                taskQueueSystem->tick(frameInfo);
 
@@ -138,9 +132,6 @@ namespace crp {
                 simpleRenderSystem.renderGameObjects(frameInfo);
                 crpRenderer.endSwapChainRenderPass(commandBuffer);
                 crpRenderer.endFrame();
-//                ++frameNum;
-//                if (frameNum == FRAME_TIME)
-//                    frameNum = 0;
             }
         }
 

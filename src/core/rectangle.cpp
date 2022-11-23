@@ -5,19 +5,13 @@
 namespace crp {
 
     void Rectangle::MoveToPoint(glm::vec3 &direction, glm::vec3 &destination) {
-//        std::cout<<direction[0]<<'#'<<points.size()<<std::endl;
         direction[2] = 0;
         int flag, pos, flag2;
         if (fabs(center[0] - destination[0]) < EPS)flag = center[1] - destination[1] > 0 ? 1 : -1, pos = 1;
         else flag = center[0] - destination[0] > 0 ? 1 : -1, pos = 0;
-//        std::cout<<"#"<<std::endl;
-//        PRINT(center);
-//        PRINT(destination);
-//        std::cout<<"#"<<std::endl;
         if (EQUAL(center, destination)) {
             center[0] = destination[0];
             center[1] = destination[1];
-//            move=false;
             return;
         }
         for (auto &i: points) {
@@ -27,14 +21,11 @@ namespace crp {
         flag2 = center[pos] - destination[pos] > 0 ? 1 : -1;
         if (flag != flag2) {
             center = destination;
-//            move=false;
         }
-//        if (fabs(destination[1] - 0.88) < EPS)
-//            std::cout << destination[0] << ' ' << destination[1] << ' ' << flag << ' ' << flag2 << ' ' << center[0]
-//                      << std::endl;
     }
 
     void TaskToMove::tick() {
+        if (rectangle.points.size() != 4)return;//补丁
 //        std::cout<<now<<' '<<destinations.size()<<std::endl;
         if (isFinished())return;
         rectangle.MoveToPoint(direction, destinations[now]);
@@ -74,6 +65,7 @@ namespace crp {
         auto dir = destination - rectangle.center;
 //        float len = LEN(dir);
 //        speed = len / FRAME_TIME;
+        times.emplace_back(time);
         direction = dir / time;
         rectangle.move = true;
 //        std::cout << direction[0] << ' ' << direction[1] << '#' << destination[0] << ' ' << destination[1] << std::endl;

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <vector>
+#include <list>
 #include <memory>
 
 #include "../core/rectangle.hpp"
@@ -8,7 +8,7 @@ namespace crp {
     class FrameInfo;
     class MoveTaskManager {
     public:
-        std::vector<std::unique_ptr<TaskToMove>> moveTasks;
+        std::list<std::unique_ptr<TaskToMove>> moveTasks;
 
         void addMoveTask(Rectangle &task, glm::vec3 &point,float time=FRAME_TIME);
 

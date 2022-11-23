@@ -53,16 +53,22 @@ namespace crp {
                     Task task;
                     {
                         std::unique_lock<std::mutex> lock(this->startMut);
-                        this->start.wait(lock, [this, &tasks] {
+                        this->start.wait(lock, [this] {
                             if (!globalContext.runTimeSystem)return false;
                             return this->stop ||
                                    globalContext.runTimeSystem->taskQueueSystem->isSorted();
                         });
 //                        std::cout<<"#"<<std::endl;
                         if (stop)return;
-                        task = std::move(tasks.front());
-                        tasks.pop_front();
-                        globalContext.runTimeSystem->taskQueueSystem->sortTasks();
+                        {
+                            std::lock_guard<std::mutex> taskMut(globalContext.runTimeSystem->taskQueueSystem->taskMut);
+//                            globalContext.runTimeSystem->taskQueueSystem->taskCond.wait(taskMut, [] {
+//                                return false;
+//                            });
+                            task = std::move(tasks.front());
+                            tasks.pop_front();
+                        }
+//                        globalContext.runTimeSystem->taskQueueSystem->sortTasks();
                         --availableThreadNum;
                     }
                     task.run(globalContext.runTimeSystem->points[i]);

@@ -18,7 +18,7 @@ namespace crp {
     public:
         std::vector<glm::vec3> points{};
         glm::vec3 center{};
-        bool move{};
+        bool move = false;
     };
 
     class TaskToMove {
@@ -34,8 +34,8 @@ namespace crp {
 
         TaskToMove(Rectangle &rectangle, std::vector<glm::vec3> &destinations, float time = FRAME_TIME);
 
-        bool isFinished() const {
-            if (now == destinations.size()) {
+        bool isFinished() {
+            if (now == destinations.size() || rectangle.points.size() != 4) {//补丁
                 rectangle.move = false;
                 return true;
             }

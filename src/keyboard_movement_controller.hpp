@@ -22,6 +22,7 @@ namespace crp {
             int add3 = GLFW_KEY_3;
             int add4 = GLFW_KEY_4;
             int add5 = GLFW_KEY_5;
+            int debug = GLFW_KEY_M;
         };
 
         void moveInPlaneXZ(GLFWwindow *window, float dt, CrpGameObject &gameObject);

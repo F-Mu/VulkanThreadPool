@@ -44,12 +44,13 @@ namespace crp {
         if (glfwGetKey(window, keys.add4) == GLFW_PRESS)add[3] = true;
         if (glfwGetKey(window, keys.add5) == GLFW_PRESS)add[4] = true;
 
-        if (add[0] && glfwGetKey(window, keys.add1) == GLFW_RELEASE)time = 1,add[0]=false;
-        if (add[1] && glfwGetKey(window, keys.add2) == GLFW_RELEASE)time = 2,add[1]=false;
-        if (add[2] && glfwGetKey(window, keys.add3) == GLFW_RELEASE)time = 3,add[2]=false;
-        if (add[3] && glfwGetKey(window, keys.add4) == GLFW_RELEASE)time = 4,add[3]=false;
-        if (add[4] && glfwGetKey(window, keys.add5) == GLFW_RELEASE)time = 5,add[4]=false;
+        if (add[0] && glfwGetKey(window, keys.add1) == GLFW_RELEASE)time = 1, add[0] = false;
+        if (add[1] && glfwGetKey(window, keys.add2) == GLFW_RELEASE)time = 2, add[1] = false;
+        if (add[2] && glfwGetKey(window, keys.add3) == GLFW_RELEASE)time = 3, add[2] = false;
+        if (add[3] && glfwGetKey(window, keys.add4) == GLFW_RELEASE)time = 4, add[3] = false;
+        if (add[4] && glfwGetKey(window, keys.add5) == GLFW_RELEASE)time = 5, add[4] = false;
 
+        if (glfwGetKey(window, keys.debug) == GLFW_PRESS)globalContext.debug = true;
         if (time == 0)return;
         globalContext.runTimeSystem->taskQueueSystem->add(
                 [time] { std::this_thread::sleep_for(std::chrono::seconds(time)); });

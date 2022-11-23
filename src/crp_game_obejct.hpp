@@ -22,10 +22,6 @@ namespace crp {
         glm::mat3 normalMatrix();
     };
 
-    struct PointLightComponent {
-        float lightIntensity = 1.0f;
-    };
-
     struct RectangleComponent {
         glm::vec3 x, y, z, w;
         bool fill;
@@ -43,9 +39,6 @@ namespace crp {
             static id_t currentId = 0;
             return {currentId++};
         }
-
-        static CrpGameObject makePointLight(
-                float intensity = 10.f, float radius = 0.1f, glm::vec3 color = glm::vec3(1.f));
 
         static CrpGameObject makeRectangle(
                 CrpDevice &device, glm::vec3 x, glm::vec3 y, glm::vec3 z, glm::vec3 w, bool fill,
@@ -69,7 +62,6 @@ namespace crp {
         TransformComponent transform{};
 
         std::shared_ptr<CrpModel> model{};
-        std::unique_ptr<PointLightComponent> pointLight = nullptr;
         std::unique_ptr<RectangleComponent> rectangle = nullptr;
 
     private:

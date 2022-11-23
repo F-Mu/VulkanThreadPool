@@ -62,16 +62,6 @@ namespace crp {
         };
     }
 
-
-    CrpGameObject CrpGameObject::makePointLight(float intensity, float radius, glm::vec3 color) {
-        CrpGameObject gameObj = CrpGameObject::createGameObject();
-        gameObj.color = color;
-        gameObj.transform.scale.x = radius;
-        gameObj.pointLight = std::make_unique<PointLightComponent>();
-        gameObj.pointLight->lightIntensity = intensity;
-        return gameObj;
-    }
-
     std::vector<CrpModel::Vertex>
     fun(const glm::vec3 x, const glm::vec3 y, const glm::vec3 z, const glm::vec3 w, const glm::vec3 &color) {
         return {{x, color},
