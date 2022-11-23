@@ -53,7 +53,7 @@ namespace crp {
                 for (auto &i: tasksInQueue) {
                     ++cnt;
                     if (i.move)continue;
-                    if(i.points.size()!=4)std::cout<<"#"<<std::endl;
+//                    if(i.points.size()!=4)std::cout<<"#"<<std::endl;
                     if (STRICT_EQUAL(i.center, points[cnt]))continue;
 //                    std::cout<<"#"<<std::endl;
                     globalContext.moveTaskManager->addMoveTask(i, points[cnt], FRAME_TIME / 5);
