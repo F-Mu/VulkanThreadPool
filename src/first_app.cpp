@@ -139,9 +139,6 @@ namespace crp {
         globalContext.shutdownEngine();
     }
 
-    void fun() {
-    }
-
     void FirstApp::test() {
         auto &runTimeSystem = globalContext.runTimeSystem;
         auto &taskQueueSystem = globalContext.runTimeSystem->taskQueueSystem;

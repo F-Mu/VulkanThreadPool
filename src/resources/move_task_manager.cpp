@@ -21,21 +21,9 @@ namespace crp {
                 it = moveTasks.erase(it);
                 continue;
             }
-            if (moveTask->rectangle.points.empty())
-                std::cout << moveTask->rectangle.id << std::endl;
-//            PRINT(moveTask->destinations[0]);
-//            std::cout<<moveTask->rectangle.points.size()<<' '<<moveTasks.size()<<std::endl;
-//            std::cout << moveTask->isFinished() << std::endl;
             moveTask->tick();
             frameInfo.gameObjects.find(moveTask->rectangle.id)
                     ->second.transform.translation = moveTask->rectangle.center;
-//            for (auto &kv: frameInfo.gameObjects) {
-//                if (kv.first == moveTask->rectangle.id) {
-//                    moveTask->tick();
-//                    kv.second.transform.translation = moveTask->rectangle.center;
-//                    break;
-//                }
-//            }
             if (moveTask->isFinished()) {
                 if (moveTask->rectangle.move) {
                     std::cout << "delete:" << moveTask->rectangle.id << ' ' << moveTask->rectangle.move << std::endl;
