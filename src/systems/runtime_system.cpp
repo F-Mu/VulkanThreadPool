@@ -8,8 +8,6 @@ namespace crp {
             crpDevice{crpDevice},
             taskQueueSystem{std::make_shared<TaskQueueSystem>(crpDevice)},
             threadPoolSystem{std::make_shared<ThreadPoolSystem>(crpDevice)},
-            tasksInQueue{taskQueueSystem->tasksInQueue},
-            tasksWait{taskQueueSystem->tasksWait},
             tasksRun{taskQueueSystem->tasksRun} {
         threadPoolSystem->threadsInit(taskQueueSystem->tasksInQueue);
         auto RuntimeRect = CrpGameObject::makeRectangle(crpDevice,
@@ -30,21 +28,8 @@ namespace crp {
         taskQueueSystem->tick(frameInfo);
         threadPoolSystem->tick(frameInfo);
         if (!taskQueueSystem->isSorted())return;
-//        std::cout<<"#"<<std::endl;
-//        if(tasksInQueue)
-//        PRINT(taskQueueSystem->points[0]);
-//        PRINT(tasksInQueue.front().center);
         if (threadPoolSystem->availableNum() != 0)
             threadPoolSystem->start.notify_one();
-    }
-
-    void RuntimeSystem::roundTick() {
-        taskQueueSystem->roundTick();
-        threadPoolSystem->roundTick();
-    }
-
-    void RuntimeSystem::addTask() {
-
     }
 
     void RuntimeSystem::clear() {

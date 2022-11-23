@@ -35,8 +35,6 @@ namespace crp {
 
         void tick(FrameInfo &frameInfo);
 
-        void roundTick();
-
         void threadPoolInit();
 
         void threadsInit(std::list<Task> &tasks);

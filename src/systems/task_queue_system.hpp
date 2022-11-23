@@ -33,10 +33,6 @@ namespace crp {
 
         void tick(FrameInfo &frameInfo);
 
-        void roundTick();
-
-        void addTask();
-
         void sortTasks();
 
         bool isSorted();
@@ -48,7 +44,6 @@ namespace crp {
         std::list<std::unique_ptr<std::pair<GameObjectManager::id_t, float>>> deleteTasks;
         std::vector<GameObjectManager::id_t> shouldDelete;
         std::mutex taskMut;
-        std::condition_variable taskCond;
     private:
         float up = -1.1f, down = 1.1f, left = 1.f, right = 1.5f;
         glm::vec3 x{left, up, QUEUE_LAYER}, y{right, up, QUEUE_LAYER}, z{left, down, QUEUE_LAYER}, w{right, down,
@@ -69,6 +64,7 @@ namespace crp {
             using task = std::packaged_task<result_type()>;
 
             Rectangle rec;
+            rec.movable = true;
             rec.center = taskInitPosition;
             rec.points.resize(4);
             float l = -taskWidth / 2, r = taskWidth / 2,
@@ -86,15 +82,6 @@ namespace crp {
             auto ret = t->get_future();
 
             tasksWait.emplace([t] { (*t)(); }, rec);
-//            if (tasksInQueue.size() < TASK_NUM) {
-//                auto now = std::move(tasksWait.front());
-//                tasksWait.pop();
-//                std::vector<glm::vec3> targets = {points[TASK_NUM - 1], points[tasksInQueue.size()]};
-//                tasksInQueue.emplace_back(now);
-//                globalContext.moveTaskManager->addMoveTask(tasksInQueue.back(), targets);
-//            }
-//            sortTasks();
-////            threadPoolSystem->start.notify_one();
             return ret;
         }
     };

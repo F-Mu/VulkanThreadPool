@@ -119,9 +119,9 @@ namespace crp {
                 ubo.inverseView = camera.getInverseView();
                 uboBuffers[frameIndex]->writeToBuffer(&ubo);
                 uboBuffers[frameIndex]->flush();
+                //order
                 runTimeSystem->tick(frameInfo);
                 moveTaskManager->tick(frameInfo);
-
 //                threadPoolSystem->tick(frameInfo);
 //                taskQueueSystem->tick(frameInfo);
 

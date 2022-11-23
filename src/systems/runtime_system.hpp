@@ -13,9 +13,6 @@ namespace crp {
     public:
         RuntimeSystem(CrpDevice &crpDevice);
 
-        void addTask();
-
-        void roundTick();
 
         void tick(FrameInfo &frameInfo);
 
@@ -25,8 +22,6 @@ namespace crp {
         std::shared_ptr<TaskQueueSystem> taskQueueSystem;
         std::shared_ptr<ThreadPoolSystem> threadPoolSystem;
 
-        std::list<Task> &tasksInQueue;
-        std::queue<Task> &tasksWait;
         std::queue<Task> tasksRun;
     private:
         float up = -1.1f, down = 1.1f, left = -0.3f, right = 0.3f;

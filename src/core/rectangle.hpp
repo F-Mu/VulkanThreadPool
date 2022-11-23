@@ -12,30 +12,27 @@ namespace crp {
 
         void MoveToPoint(glm::vec3 &direction, glm::vec3 &destination);
 
-//        Rectangle(){};
-//        Rectangle(Rectangle&&){}
         id_t id;
     public:
         std::vector<glm::vec3> points{};
         glm::vec3 center{};
         bool move = false;
+        bool movable = false;
     };
 
     class TaskToMove {
     public:
         Rectangle &rectangle;
-//        glm::vec3 speed;
         glm::vec3 direction;
         std::vector<glm::vec3> destinations;
         std::vector<float> times;
-//        float len;
 
         TaskToMove(Rectangle &rectangle, glm::vec3 &destination, float time = FRAME_TIME);
 
         TaskToMove(Rectangle &rectangle, std::vector<glm::vec3> &destinations, float time = FRAME_TIME);
 
-        bool isFinished() {
-            if (now == destinations.size() || rectangle.points.size() != 4) {//补丁
+        bool isFinished() {//会出现未完全生成的矩形，也可能把三个框莫名其妙移动了，补丁
+            if (now == destinations.size() || rectangle.points.size() != 4 || !rectangle.movable) {
                 rectangle.move = false;
                 return true;
             }

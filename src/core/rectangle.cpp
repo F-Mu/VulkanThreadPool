@@ -25,15 +25,12 @@ namespace crp {
     }
 
     void TaskToMove::tick() {
-        if (rectangle.points.size() != 4)return;//补丁
-//        std::cout<<now<<' '<<destinations.size()<<std::endl;
         if (isFinished())return;
         rectangle.MoveToPoint(direction, destinations[now]);
         if (rectangle.center == destinations[now]) {
             ++now;
             if (isFinished())return;
             auto dir = destinations[now] - destinations[now - 1];
-//            direction = dir / (times[now] * FRAME_TIME);
             direction = NORMALIZE(dir) * speed;
         }
     }
@@ -57,17 +54,14 @@ namespace crp {
         speed = len / time;
         direction = NORMALIZE(dir) * speed;
         rectangle.move = true;
-//        direction = dir / (times[0] * FRAME_TIME);
     }
 
     TaskToMove::TaskToMove(Rectangle &rectangle, glm::vec3 &destination, float time) : rectangle{rectangle},
                                                                                        destinations{destination} {
         auto dir = destination - rectangle.center;
-//        float len = LEN(dir);
-//        speed = len / FRAME_TIME;
         times.emplace_back(time);
         direction = dir / time;
         rectangle.move = true;
-//        std::cout << direction[0] << ' ' << direction[1] << '#' << destination[0] << ' ' << destination[1] << std::endl;
+//        PRINT(direction)
     }
 }

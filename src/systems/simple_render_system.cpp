@@ -79,11 +79,6 @@ namespace crp {
             auto &obj = kv.second;
 
             if (obj.model == nullptr)continue;
-//            std::cout<<kv.first<<std::endl;
-//std::cout<<obj.
-//        if(kv.first==1){
-//            std::cout<<obj.transform.translation[0]<<' '<<obj.transform.translation[1]<<' '<<obj.transform.translation[2]<<std::endl;
-//        }
             SimplePushConstantData push{};
             push.modelMatrix = obj.transform.mat4();
             push.normalMatrix = obj.transform.normalMatrix();

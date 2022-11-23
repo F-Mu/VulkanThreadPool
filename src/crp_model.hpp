@@ -29,16 +29,6 @@ namespace crp {
                 return position == other.position && color == other.color && normal == other.normal && uv == other.uv;
             }
         };
-
-        struct Builder {
-            std::vector<Vertex> vertices{};
-            std::vector<uint32_t> indices{};
-
-            void loadModel(const std::string &filepath);
-        };
-
-        CrpModel(CrpDevice &device, const CrpModel::Builder &builder);
-
         CrpModel(CrpDevice &device, const std::vector<Vertex> &vertices);
 
         ~CrpModel();
@@ -46,9 +36,6 @@ namespace crp {
         CrpModel(const CrpModel &) = delete;
 
         CrpModel &operator=(const CrpModel &) = delete;
-
-        static std::unique_ptr<CrpModel> createModelFromFile(
-                CrpDevice &device, const std::string &filepath);
 
         static std::unique_ptr<CrpModel> createModelFromVertices(
                 CrpDevice &device, const std::vector<Vertex> &vertices);

@@ -23,7 +23,9 @@ namespace crp {
             }
             if (moveTask->rectangle.points.empty())
                 std::cout << moveTask->rectangle.id << std::endl;
+//            PRINT(moveTask->destinations[0]);
 //            std::cout<<moveTask->rectangle.points.size()<<' '<<moveTasks.size()<<std::endl;
+//            std::cout << moveTask->isFinished() << std::endl;
             moveTask->tick();
             frameInfo.gameObjects.find(moveTask->rectangle.id)
                     ->second.transform.translation = moveTask->rectangle.center;

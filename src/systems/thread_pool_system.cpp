@@ -28,6 +28,7 @@ namespace crp {
         float threadHeight = (hCut - .1f);
         for (int i = 0; i < THREAD_NUM; ++i) {
             points[i] = {mid, yFirst + hCut * i, THREAD_LAYER};
+            threads[i].movable = true;
             threads[i].center = points[i];
             threads[i].points.resize(4);
             float l = -threadWidth / 2, r = threadWidth / 2,
@@ -62,16 +63,13 @@ namespace crp {
                         if (stop)return;
                         {
                             std::lock_guard<std::mutex> taskMut(globalContext.runTimeSystem->taskQueueSystem->taskMut);
-//                            globalContext.runTimeSystem->taskQueueSystem->taskCond.wait(taskMut, [] {
-//                                return false;
-//                            });
                             task = std::move(tasks.front());
+                            task.run(globalContext.runTimeSystem->points[i]);
                             tasks.pop_front();
                         }
 //                        globalContext.runTimeSystem->taskQueueSystem->sortTasks();
                         --availableThreadNum;
                     }
-                    task.run(globalContext.runTimeSystem->points[i]);
                     globalContext.moveTaskManager->addMoveTask(threads[i], globalContext.runTimeSystem->points[i]);
                     {
                         std::unique_lock<std::mutex> lock(runMut);
@@ -93,7 +91,6 @@ namespace crp {
                         });
                         if (stop)return;
                     }
-//                    std::cout << "#" << std::endl;
                     {
                         std::unique_lock<std::mutex> lock(this->startMut);
                         ++availableThreadNum;
@@ -107,10 +104,6 @@ namespace crp {
     void ThreadPoolSystem::tick(FrameInfo &frameInfo) {
         run.notify_all();
         reset.notify_all();
-    }
-
-    void ThreadPoolSystem::roundTick() {
-        //order
     }
 
     //thread_pool
