@@ -1,10 +1,10 @@
-#include "keyboard_movement_controller.hpp"
-#include "systems/task_queue_system.hpp"
-#include "systems/runtime_system.hpp"
-#include "global/global_context.hpp"
+#include "keyboard_controller.hpp"
+#include "resources/systems/task_queue_system.hpp"
+#include "resources/systems/runtime_system.hpp"
+#include "function/global/global_context.hpp"
 
 namespace crp {
-    void crp::KeyboardMovementController::moveInPlaneXZ(
+    void crp::KeyboardController::moveInPlaneXZ(
             GLFWwindow *window, float dt, crp::CrpGameObject &gameObject) {
         glm::vec3 rotate(0);
         if (glfwGetKey(window, keys.lookRight) == GLFW_PRESS)rotate.y += 1.f;
@@ -36,7 +36,7 @@ namespace crp {
         }
     }
 
-    void KeyboardMovementController::addTask(GLFWwindow *window) {
+    void KeyboardController::addTask(GLFWwindow *window) {
         int time = 0;
         if (glfwGetKey(window, keys.add1) == GLFW_PRESS)add[0] = true;
         if (glfwGetKey(window, keys.add2) == GLFW_PRESS)add[1] = true;

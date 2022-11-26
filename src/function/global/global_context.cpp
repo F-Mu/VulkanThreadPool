@@ -1,10 +1,9 @@
 #include "global_context.hpp"
-#include "../resources/game_object_manager.hpp"
-#include "../systems/thread_pool_system.hpp"
-#include "../systems/task_queue_system.hpp"
-#include "../systems/runtime_system.hpp"
-#include "../resources/move_task_manager.hpp"
-
+#include "resources/manager/game_object_manager.hpp"
+#include "resources/systems/thread_pool_system.hpp"
+#include "resources/systems/task_queue_system.hpp"
+#include "resources/systems/runtime_system.hpp"
+#include "resources/manager/move_task_manager.hpp"
 namespace crp {
     class CrpDevice;
 

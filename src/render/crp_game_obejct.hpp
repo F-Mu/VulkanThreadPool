@@ -30,7 +30,7 @@ namespace crp {
                                                                                             fill{fill} {}
 
         RectangleComponent(const std::vector<glm::vec3> &v, bool fill) : x{v[0]}, y{v[1]}, z{v[2]}, w{v[3]},
-                                                                   fill{fill} {}
+                                                                         fill{fill} {}
     };
 
     class CrpGameObject {
@@ -46,7 +46,7 @@ namespace crp {
 
         static CrpGameObject
         makeRectangle(CrpDevice &device, const std::vector<glm::vec3> &v, const glm::vec3 &center, bool fill,
-                      const glm::vec3 color = glm::vec3(1.f));
+                      glm::vec3 color = glm::vec3(1.f));
 
         CrpGameObject(const CrpGameObject &) = delete;
 
@@ -55,6 +55,11 @@ namespace crp {
         CrpGameObject(CrpGameObject &&) = default;
 
         CrpGameObject &operator=(CrpGameObject &&) = default;
+
+        void clear() {
+            model.reset();
+            rectangle.reset();
+        }
 
         id_t getId() { return id; }
 

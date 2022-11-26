@@ -1,7 +1,7 @@
 #pragma once
 
 #include "crp_camera.hpp"
-#include "resources/game_object_manager.hpp"
+#include "resources/manager/game_object_manager.hpp"
 
 #include <vulkan/vulkan.h>
 

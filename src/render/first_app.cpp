@@ -1,13 +1,13 @@
 #include "first_app.hpp"
-#include "keyboard_movement_controller.hpp"
-#include "systems/simple_render_system.hpp"
+#include "function/controller/keyboard_controller.hpp"
+#include "resources/systems/simple_render_system.hpp"
 #include "crp_camera.hpp"
 #include "crp_buffer.hpp"
-#include "global/global_context.hpp"
-#include "systems/thread_pool_system.hpp"
-#include "systems/runtime_system.hpp"
-#include "systems/task_queue_system.hpp"
-#include "resources/move_task_manager.hpp"
+#include "function/global/global_context.hpp"
+#include "resources/systems/thread_pool_system.hpp"
+#include "resources/systems/runtime_system.hpp"
+#include "resources/systems/task_queue_system.hpp"
+#include "resources/manager/move_task_manager.hpp"
 //libs
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
@@ -24,14 +24,6 @@
 
 float MAX_FRAME_TIME = 60;
 namespace crp {
-    void input() {
-        int x;
-        while (true) {
-            std::cout << "You can add task(0)" << std::endl;
-            std::cout << "You can quit(1)" << std::endl;
-            std::cin >> x;
-        }
-    }
 
     FirstApp::FirstApp() {
         globalPool = CrpDescriptorPool::Builder(crpDevice)
@@ -40,7 +32,7 @@ namespace crp {
                 .build();
 //        loadGameObjects();
         globalContext.startEngine(crpDevice);
-        test();
+//        test();
     }
 
     FirstApp::~FirstApp() {}
@@ -50,7 +42,7 @@ namespace crp {
         auto &taskQueueSystem = globalContext.runTimeSystem->taskQueueSystem;
         auto &threadPoolSystem = globalContext.runTimeSystem->threadPoolSystem;
         auto &moveTaskManager = globalContext.moveTaskManager;
-
+        auto &gameObjectManager = globalContext.gameObjectManager;
 
         std::vector<std::unique_ptr<CrpBuffer>> uboBuffers(CrpSwapChain::MAX_FRAMES_IN_FLIGHT);
         for (int i = 0; i < uboBuffers.size(); ++i) {
@@ -83,7 +75,7 @@ namespace crp {
 
         auto viewerObject = CrpGameObject::createGameObject();
         viewerObject.transform.translation.z = -2.5f;
-        KeyboardMovementController cameraController{};
+        KeyboardController cameraController{};
 
 //        std::thread th(input);
         auto currentTime = std::chrono::high_resolution_clock::now();
@@ -100,7 +92,7 @@ namespace crp {
             cameraController.addTask(crpWindow.getGLFWwindow());
             camera.setViewYXZ(viewerObject.transform.translation, viewerObject.transform.rotation);
 
-            camera.setOrthographicProjection(-2, 2, -2, 2, -5, 5);
+            camera.setOrthographicProjection(-2, 2, -2, 2, -3, 3);
             if (auto commandBuffer = crpRenderer.beginFrame()) {
                 int frameIndex = crpRenderer.getFrameIndex();
                 FrameInfo frameInfo{
@@ -132,8 +124,11 @@ namespace crp {
                 simpleRenderSystem.renderGameObjects(frameInfo);
                 crpRenderer.endSwapChainRenderPass(commandBuffer);
                 crpRenderer.endFrame();
+
             }
+//            gameObjectManager->tick();
         }
+//        gameObjectManager->tick();
 
         vkDeviceWaitIdle(crpDevice.device());
         globalContext.shutdownEngine();
@@ -143,7 +138,8 @@ namespace crp {
         auto &runTimeSystem = globalContext.runTimeSystem;
         auto &taskQueueSystem = globalContext.runTimeSystem->taskQueueSystem;
         auto &threadPoolSystem = globalContext.runTimeSystem->threadPoolSystem;
-        glm::vec3 to = globalContext.runTimeSystem->points[0];
+        auto &moveTaskManager = globalContext.moveTaskManager;
+        auto &gameObjectManager = globalContext.gameObjectManager;
 //        taskQueueSystem->add()
         int x = 1;
 //        taskQueueSystem->add(fun(),x);
@@ -166,14 +162,21 @@ namespace crp {
 //        float deplayer = -3;
 //
 //        auto rect = CrpGameObject::makeRectangle(crpDevice,
-//                                                 {-0.5f, -0.5f, layer}, {-0.3f, -0.5f, layer}, {-0.5f, -0.3f, layer},
-//                                                 {-0.3f, -0.3f, layer}, true, {0.5, 0, 0});
+//                                                 {-0.5f, -0.5f, QUEUE_LAYER}, {-0.3f, -0.5f, QUEUE_LAYER}, {-0.5f, -0.3f, QUEUE_LAYER},
+//                                                 {-0.3f, -0.3f, QUEUE_LAYER}, true, {1, 0, 0});
 //
 //        gameObjectManager->gameObjects.emplace(rect.getId(), std::move(rect));
 //        rect = CrpGameObject::makeRectangle(crpDevice,
-//                                            {-0.4f, -0.5f, deplayer}, {-0.3f, -0.5f, deplayer},
-//                                            {-0.5f, -0.3f, deplayer},
-//                                            {-0.3f, -0.3f, deplayer}, true, {0, 0.5, 0});
+//                                            {-0.4f, -0.5f, TASK_LAYER}, {-0.3f, -0.5f, TASK_LAYER},
+//                                            {-0.5f, -0.3f, TASK_LAYER},
+//                                            {-0.3f, -0.3f, TASK_LAYER}, true, {0, 0.5, 0});
+//
+//        gameObjectManager->gameObjects.emplace(rect.getId(), std::move(rect));
+//
+//        rect = CrpGameObject::makeRectangle(crpDevice,
+//                                            {-0.4f, -0.5f, THREAD_LAYER}, {-0.3f, -0.5f, THREAD_LAYER},
+//                                            {-0.5f, -0.3f, THREAD_LAYER},
+//                                            {-0.3f, -0.3f, THREAD_LAYER}, true, {0, 0, 1});
 //
 //        gameObjectManager->gameObjects.emplace(rect.getId(), std::move(rect));
 //        rect = CrpGameObject::makeRectangle(crpDevice,

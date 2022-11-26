@@ -1,10 +1,10 @@
 #pragma once
 
-#include "../crp_camera.hpp"
-#include "../crp_pipeline.hpp"
-#include "../crp_device.hpp"
-#include "../crp_game_obejct.hpp"
-#include "../crp_frame_info.hpp"
+#include "render/crp_camera.hpp"
+#include "render/crp_pipeline.hpp"
+#include "render/crp_device.hpp"
+#include "render/crp_game_obejct.hpp"
+#include "render/crp_frame_info.hpp"
 //std
 #include <memory>
 #include <vector>

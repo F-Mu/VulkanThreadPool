@@ -3,8 +3,7 @@
 #include <list>
 #include <memory>
 
-#include "../core/rectangle.hpp"
-
+#include "core/rectangle.hpp"
 namespace crp {
     class FrameInfo;
 

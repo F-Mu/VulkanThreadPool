@@ -3,8 +3,8 @@
 #include <vector>
 
 #include <glm/glm.hpp>
-#include "../crp_game_obejct.hpp"
-#include "../core/macro.hpp"
+#include "render/crp_game_obejct.hpp"
+#include "core/macro.hpp"
 #include "task_queue_system.hpp"
 #include "thread_pool_system.hpp"
 
@@ -12,7 +12,6 @@ namespace crp {
     class RuntimeSystem {
     public:
         RuntimeSystem(CrpDevice &crpDevice);
-
 
         void tick(FrameInfo &frameInfo);
 

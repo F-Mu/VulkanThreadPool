@@ -5,12 +5,12 @@
 #include <list>
 #include <future>
 #include <utility>
-#include "../crp_device.hpp"
-#include "../core/macro.hpp"
-#include "../core/rectangle.hpp"
-#include "../crp_frame_info.hpp"
-#include "../global/global_context.hpp"
-#include "../resources/move_task_manager.hpp"
+#include "render/crp_device.hpp"
+#include "core/macro.hpp"
+#include "core/rectangle.hpp"
+#include "render/crp_frame_info.hpp"
+#include "function/global/global_context.hpp"
+#include "resources/manager/move_task_manager.hpp"
 
 namespace crp {
     class Thread;
@@ -70,12 +70,13 @@ namespace crp {
             float l = -taskWidth / 2, r = taskWidth / 2,
                     u = -taskHeight / 2, d = taskHeight / 2;
             rec.points = {
-                    {l, u, TASK_LAYER},
-                    {r, u, TASK_LAYER},
-                    {l, d, TASK_LAYER},
-                    {r, d, TASK_LAYER},
+                    {l, u, 0},
+                    {r, u, 0},
+                    {l, d, 0},
+                    {r, d, 0},
             };
-            auto TaskRect = CrpGameObject::makeRectangle(crpDevice, rec.points, rec.center, true, {0, .5f, .5f});
+            auto TaskRect = CrpGameObject::makeRectangle(crpDevice, rec.points,
+                                                         {rec.center.x, rec.center.y, TASK_LAYER}, true, {0, .5f, .5f});
             rec.id = TaskRect.getId();
             globalContext.gameObjectManager->gameObjects.emplace(TaskRect.getId(), std::move(TaskRect));
             auto t = std::make_shared<task>(std::bind(std::forward<Fun>(fun), std::forward<Args>(args)...));

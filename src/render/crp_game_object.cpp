@@ -1,5 +1,6 @@
 #include "crp_game_obejct.hpp"
 #include "crp_device.hpp"
+#include "core/macro.hpp"
 #include <iostream>
 
 namespace crp {
@@ -87,6 +88,7 @@ namespace crp {
         ans.insert(ans.end(), le.begin(), le.end());
         ans.insert(ans.end(), ri.begin(), ri.end());
         ans.insert(ans.end(), bo.begin(), bo.end());
+//        PRINT(up[0].position);
         return ans;
     }
 

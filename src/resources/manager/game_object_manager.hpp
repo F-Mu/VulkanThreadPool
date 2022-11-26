@@ -1,6 +1,6 @@
 #pragma once
-
-#include "../crp_game_obejct.hpp"
+#include <list>
+#include "render/crp_game_obejct.hpp"
 
 namespace crp {
 
@@ -11,5 +11,8 @@ namespace crp {
         Map gameObjects;
 
         void deleteById(id_t id);
+        void tick();
+    private:
+        std::list<id_t>deleteTasks;
     };
 }

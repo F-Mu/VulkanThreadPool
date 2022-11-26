@@ -29,6 +29,7 @@ namespace crp {
                 return position == other.position && color == other.color && normal == other.normal && uv == other.uv;
             }
         };
+
         CrpModel(CrpDevice &device, const std::vector<Vertex> &vertices);
 
         ~CrpModel();

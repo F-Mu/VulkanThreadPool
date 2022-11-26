@@ -1,7 +1,7 @@
 #include "thread_pool_system.hpp"
-#include "../global/global_context.hpp"
-#include "../resources/game_object_manager.hpp"
-#include "../resources/move_task_manager.hpp"
+#include "function/global/global_context.hpp"
+#include "resources/manager/game_object_manager.hpp"
+#include "resources/manager/move_task_manager.hpp"
 #include "runtime_system.hpp"
 #include "task_queue_system.hpp"
 #include <iostream>
@@ -34,13 +34,14 @@ namespace crp {
             float l = -threadWidth / 2, r = threadWidth / 2,
                     u = -threadHeight / 2, d = threadHeight / 2;
             threads[i].points = {
-                    {l, u, THREAD_LAYER},
-                    {r, u, THREAD_LAYER},
-                    {l, d, THREAD_LAYER},
-                    {r, d, THREAD_LAYER},
+                    {l, u, 0},
+                    {r, u, 0},
+                    {l, d, 0},
+                    {r, d, 0},
             };
             auto ThreadRect = CrpGameObject::makeRectangle(crpDevice,
-                                                           threads[i].points, points[i], true, {0, 0, .5f});
+                                                           threads[i].points, {points[i].x, points[i].y, THREAD_LAYER},
+                                                           true, {0, 0, .5f});
             threads[i].id = ThreadRect.getId();
             globalContext.gameObjectManager->gameObjects.emplace(ThreadRect.getId(), std::move(ThreadRect));
         }
@@ -101,7 +102,7 @@ namespace crp {
         availableThreadNum = THREAD_NUM;
     }
 
-    void ThreadPoolSystem::tick(FrameInfo &frameInfo) {
+    void ThreadPoolSystem::tick() {
         run.notify_all();
         reset.notify_all();
     }
@@ -117,6 +118,4 @@ namespace crp {
                 thread.th.join();
         }
     }
-
-
 }

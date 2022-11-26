@@ -1,10 +1,10 @@
 #pragma once
 namespace crp {
 #define QUEUE_LAYER (-3)
-#define TASK_LAYER (-1)
-#define THREAD_LAYER (0)
+#define TASK_LAYER (-2)
+#define THREAD_LAYER (-1)
 //#define FRAME_TIME 60
-#define FRAME_TIME (90.f)
+#define FRAME_TIME (60.f)
 #define EPS (1e-2)
 #define STRICT_EPS (1e-7)
 #define TASK_NUM 8
@@ -15,6 +15,6 @@ namespace crp {
 #define EQUAL(vec3a, vec3b) (fabs(vec3a[0]-vec3b[0])<EPS&&fabs(vec3a[1]-vec3b[1])<EPS)
 #define STRICT_EQUAL(vec3a, vec3b) (fabs(vec3a[0]-vec3b[0])<STRICT_EPS&&fabs(vec3a[1]-vec3b[1])<STRICT_EPS)
 #define NORMALIZE(vec) glm::vec3{vec[0]/LEN(vec),vec[1]/LEN(vec),0.f}
-#define PRINT(vec) std::cout<<'('<<vec[0]<<','<<vec[1]<<','<<vec[2]<<')'<<std::endl;
+#define PRINT(vec) std::cout<<'('<<vec[0]<<','<<vec[1]<<','<<vec[2]<<')'<<std::endl
 #define MID(x, y) ((x+y)/2)
 }

@@ -1,10 +1,10 @@
 #pragma once
 
-#include "crp_game_obejct.hpp"
-#include "crp_window.hpp"
+#include "render/crp_game_obejct.hpp"
+#include "render/crp_window.hpp"
 
 namespace crp {
-    class KeyboardMovementController {
+    class KeyboardController {
     public:
         struct KeyMappings {
             int moveLeft = GLFW_KEY_A;

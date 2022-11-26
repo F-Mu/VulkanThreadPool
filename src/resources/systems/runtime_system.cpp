@@ -1,6 +1,6 @@
 #include "runtime_system.hpp"
-#include "../global/global_context.hpp"
-#include "../resources/game_object_manager.hpp"
+#include "function/global/global_context.hpp"
+#include "resources/manager/game_object_manager.hpp"
 #include <cmath>
 
 namespace crp {
@@ -26,7 +26,7 @@ namespace crp {
 
     void RuntimeSystem::tick(FrameInfo &frameInfo) {
         taskQueueSystem->tick(frameInfo);
-        threadPoolSystem->tick(frameInfo);
+        threadPoolSystem->tick();
         if (!taskQueueSystem->isSorted())return;
         if (threadPoolSystem->availableNum() != 0)
             threadPoolSystem->start.notify_one();

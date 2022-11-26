@@ -22,9 +22,23 @@ set(librariesList
 file(GLOB_RECURSE SOURCES ${PROJECT_SOURCE_DIR}/src/*.cpp)
 
 add_executable(${PROJECT_NAME} ${SOURCES})
-#add_executable(VulkanLearning main.cpp crp_swap_chain.cpp crp_swap_chain.hpp crp_model.hpp crp_model.cpp crp_game_obejct.hpp crp_renderer.hpp crp_renderer.cpp simple_render_system.hpp simple_render_system.cpp crp_camera.hpp crp_camera.cpp keyboard_movement_controller.cpp keyboard_movement_controller.hpp crp_utils.cpp crp_utils.hpp crp_game_object.cpp crp_buffer.cpp crp_buffer.hpp crp_frame_info.cpp crp_frame_info.hpp crp_descriptors.cpp crp_descriptors.hpp crp_device.cpp crp_window.cpp first_app.cpp crp_pipeline.cpp)
+#add_executable(${PROJECT_NAME} src/main.cpp)
 target_link_libraries(${PROJECT_NAME} ${librariesList})
 
+#add_library(hello_library STATIC
+#        src/Hello.cpp
+#        )
+#target_include_directories(hello_library
+#        PUBLIC
+#        ${PROJECT_SOURCE_DIR}/include
+#        )
+
+#message(${SOURCES})
+#target_link_directories(${PROJECT_NAME} PUBLIC ${PROJECT_SOURCE_DIR}/src)
+#target_link_directories(${PROJECT_NAME} PUBLIC ${PROJECT_SOURCE_DIR}/src/function/global)
+#target_link_directories(${PROJECT_NAME} PUBLIC ${PROJECT_SOURCE_DIR}/src/resources)
+#target_link_directories(${PROJECT_NAME} PUBLIC ${PROJECT_SOURCE_DIR}/src/systems)
+target_include_directories(${PROJECT_NAME} PUBLIC src)
 find_program(GLSL_VALIDATOR glslangValidator HINTS
         ${Vulkan_GLSLANG_VALIDATOR_EXECUTABLE}
         /usr/bin
@@ -55,3 +69,5 @@ add_custom_target(
         Shaders
         DEPENDS ${SPIRV_BINARY_FILES}
 )
+
+#include_directories(src)

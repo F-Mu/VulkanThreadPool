@@ -1,10 +1,12 @@
 #include "crp_model.hpp"
 
 #include "crp_utils.hpp"
+#include "core/macro.hpp"
 
 #define GLM_ENABLE_EXPERIMENTAL
 
 #include <glm/gtx/hash.hpp>
+#include <iostream>
 //std
 #include <cassert>
 #include <cstring>
@@ -33,13 +35,15 @@ namespace crp {
     }
 
     CrpModel::~CrpModel() {
-
+//        std::cout<<"#"<<std::endl;
+        vertexBuffer.reset();
+        indexBuffer.reset();
     }
 
 
     std::unique_ptr<CrpModel> CrpModel::createModelFromVertices(
             CrpDevice &device, const std::vector<Vertex> &vertices) {
-
+//        PRINT(vertices[0].position);
         return std::make_unique<CrpModel>(device, vertices);
     }
 

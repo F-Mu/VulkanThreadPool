@@ -1,8 +1,8 @@
 #include "task_queue_system.hpp"
-#include "../first_app.hpp"
-#include "../global/global_context.hpp"
-#include "../resources/move_task_manager.hpp"
-#include "../resources/game_object_manager.hpp"
+#include "render/first_app.hpp"
+#include "function/global/global_context.hpp"
+#include "resources/manager/move_task_manager.hpp"
+#include "resources/manager/game_object_manager.hpp"
 #include "runtime_system.hpp"
 
 namespace crp {
@@ -24,6 +24,8 @@ namespace crp {
         //init
         taskInitPosition = points.back();
         taskInitPosition.x += 1;
+//        PRINT(taskInitPosition);
+
     }
 
     void TaskQueueSystem::tick(FrameInfo &frameInfo) {
@@ -39,6 +41,7 @@ namespace crp {
                     ->second.transform.scale -= SCALE / FRAME_TIME;
             --deleteTask->second;
             if (deleteTask->second == 0) {
+                globalContext.gameObjectManager->deleteById(deleteTask->first);
                 it = deleteTasks.erase(it);
             } else
                 ++it;

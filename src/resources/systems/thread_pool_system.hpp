@@ -6,11 +6,11 @@
 #include <thread>
 #include <list>
 #include <glm/glm.hpp>
-#include "../crp_game_obejct.hpp"
-#include "../core/macro.hpp"
-#include "../resources/game_object_manager.hpp"
-#include "../crp_frame_info.hpp"
-#include "../core/rectangle.hpp"
+#include "render/crp_game_obejct.hpp"
+#include "core/macro.hpp"
+#include "resources/manager/game_object_manager.hpp"
+#include "render/crp_frame_info.hpp"
+#include "core/rectangle.hpp"
 
 namespace crp {
 
@@ -33,7 +33,7 @@ namespace crp {
 
         void clear();
 
-        void tick(FrameInfo &frameInfo);
+        void tick();
 
         void threadPoolInit();
 
