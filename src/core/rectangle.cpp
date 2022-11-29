@@ -1,6 +1,4 @@
-
 #include "rectangle.hpp"
-#include <iostream>
 
 namespace crp {
 
@@ -41,16 +39,16 @@ namespace crp {
                                                                                                  destinations{
                                                                                                          destinations} {
         auto dir = destinations[0] - rectangle.center;
-        float len = LEN(dir);
+        float len = glm::length(dir);
         for (int i = 1; i < destinations.size(); ++i) {
             auto d = destinations[i] - destinations[i - 1];
-            len += LEN(d);
+            len += glm::length(d);
         }
         times.resize(destinations.size());
-        times[0] = LEN(dir) / len;
+        times[0] = glm::length(dir) / len;
         for (int i = 1; i < destinations.size(); ++i) {
             auto d = destinations[i] - destinations[i - 1];
-            times[i] = LEN(d) / len;
+            times[i] = glm::length(d) / len;
         }
         speed = len / time;
         direction = glm::normalize(dir) * speed;
@@ -63,6 +61,5 @@ namespace crp {
         times.emplace_back(time);
         direction = dir / time;
         rectangle.move = true;
-//        PRINT(direction)
     }
 }

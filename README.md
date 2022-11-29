@@ -50,6 +50,10 @@ https://github.com/blurrypiano/littleVulkanEngine/tree/master
 
 + 基本完成所有功能，更新为1.0
 
+**v1.1**
+
++ 把底层宏更改为const常量和inline函数
+
 **待实现（可能也不会实现）：**
 
 + 更好的异步执行（暂时没有思路）
