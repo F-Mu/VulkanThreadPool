@@ -56,7 +56,7 @@ https://github.com/blurrypiano/littleVulkanEngine/tree/master
 
 + 尝试更好的分层（在摆了在摆了）
 
-+ 任务执行完删除资源（由于验证层报错，但不会修，可能不修了，接口已经准备好了，只需要在循环中加上gameObjectManager->tick();即可，由于新增任务回调，接口暂未修改，建议不删除）
++ 任务执行完删除资源（由于验证层报错，但不会修，可能不修了，接口已经准备好了，只需要在循环中加上gameObjectManager->tick();即可，由于新增异步执行，接口暂未修改，建议不删除）
 
 + 模仿Piccolo小引擎优化主循环（VulkanLearning项目遗留问题，不太会改）
 
