@@ -20,25 +20,26 @@ namespace crp {
         center += direction;
         flag2 = center[pos] - destination[pos] > 0 ? 1 : -1;
         if (flag != flag2) {
-            center = destination;
+            center[0] = destination[0];
+            center[1] = destination[1];
         }
     }
 
-    void TaskToMove::tick() {
+    void MoveTask::tick() {
         if (isFinished())return;
         rectangle.MoveToPoint(direction, destinations[now]);
-        if (rectangle.center == destinations[now]) {
+        if (STRICT_EQUAL(rectangle.center, destinations[now])) {
             ++now;
             if (isFinished())return;
             auto dir = destinations[now] - destinations[now - 1];
-            direction = NORMALIZE(dir) * speed;
+            direction = glm::normalize(dir) * speed;
         }
     }
 
-    TaskToMove::TaskToMove(Rectangle &rectangle, std::vector<glm::vec3> &destinations, float time) : rectangle{
+    MoveTask::MoveTask(Rectangle &rectangle, std::vector<glm::vec3> &destinations, float time) : rectangle{
             rectangle},
-                                                                                                     destinations{
-                                                                                                             destinations} {
+                                                                                                 destinations{
+                                                                                                         destinations} {
         auto dir = destinations[0] - rectangle.center;
         float len = LEN(dir);
         for (int i = 1; i < destinations.size(); ++i) {
@@ -52,12 +53,12 @@ namespace crp {
             times[i] = LEN(d) / len;
         }
         speed = len / time;
-        direction = NORMALIZE(dir) * speed;
+        direction = glm::normalize(dir) * speed;
         rectangle.move = true;
     }
 
-    TaskToMove::TaskToMove(Rectangle &rectangle, glm::vec3 &destination, float time) : rectangle{rectangle},
-                                                                                       destinations{destination} {
+    MoveTask::MoveTask(Rectangle &rectangle, glm::vec3 &destination, float time) : rectangle{rectangle},
+                                                                                   destinations{destination} {
         auto dir = destination - rectangle.center;
         times.emplace_back(time);
         direction = dir / time;

@@ -20,7 +20,7 @@ namespace crp {
 
         SimpleRenderSystem &operator=(const SimpleRenderSystem &) = delete;
 
-        void renderGameObjects(FrameInfo &frameInfo);
+        void tick(FrameInfo &frameInfo);
 
     private:
         void createPipelineLayout(VkDescriptorSetLayout globalSetLayout);

@@ -5,12 +5,12 @@ namespace crp {
 
     void MoveTaskManager::addMoveTask(Rectangle &task, glm::vec3 &point, float time) {
         if (task.move)return;
-        moveTasks.emplace_back(std::make_unique<TaskToMove>(task, point, time));
+        moveTasks.emplace_back(std::make_unique<MoveTask>(task, point, time));
     }
 
     void MoveTaskManager::addMoveTask(Rectangle &task, std::vector<glm::vec3> &points, float time) {
         if (task.move)return;
-        moveTasks.emplace_back(std::make_unique<TaskToMove>(task, points, time));
+        moveTasks.emplace_back(std::make_unique<MoveTask>(task, points, time));
     }
 
     void MoveTaskManager::tick(FrameInfo &frameInfo) {

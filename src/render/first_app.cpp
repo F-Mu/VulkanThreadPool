@@ -22,7 +22,6 @@
 #include <chrono>
 #include <thread>
 
-float MAX_FRAME_TIME = 60;
 namespace crp {
 
     FirstApp::FirstApp() {
@@ -30,7 +29,6 @@ namespace crp {
                 .setMaxSets(CrpSwapChain::MAX_FRAMES_IN_FLIGHT)
                 .addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, CrpSwapChain::MAX_FRAMES_IN_FLIGHT)
                 .build();
-//        loadGameObjects();
         globalContext.startEngine(crpDevice);
 //        test();
     }
@@ -70,14 +68,12 @@ namespace crp {
         SimpleRenderSystem simpleRenderSystem{crpDevice, crpRenderer.getSwapChainRenderPass(),
                                               globalSetLayout->getDescriptorSetLayout()};
         CrpCamera camera{};
-//        camera.setViewDirection(glm::vec3(0.f), glm::vec3(0.5f, 0.f, 1.f));
         camera.setViewTarget(glm::vec3(0.f, -2.f, 2.f), glm::vec3(0.f, 0.f, 2.5f));
 
         auto viewerObject = CrpGameObject::createGameObject();
         viewerObject.transform.translation.z = -2.5f;
         KeyboardController cameraController{};
 
-//        std::thread th(input);
         auto currentTime = std::chrono::high_resolution_clock::now();
 
         while (!crpWindow.shouldClose()) {
@@ -86,7 +82,7 @@ namespace crp {
             float frameTime = std::chrono::duration<float, std::chrono::seconds::period>(newTime - currentTime).count();
             currentTime = newTime;
 
-            frameTime = glm::min(frameTime, MAX_FRAME_TIME);
+            frameTime = glm::min(frameTime, FRAME_TIME);
 
             cameraController.moveInPlaneXZ(crpWindow.getGLFWwindow(), frameTime, viewerObject);
             cameraController.addTask(crpWindow.getGLFWwindow());
@@ -104,6 +100,28 @@ namespace crp {
                         globalContext.gameObjectManager->gameObjects,
                 };
 
+                /** 测试异步执行 如果任务完成则输出，否则不输出**/
+//                static int x = 0;
+//                if (x == 0 || x >= 30) {
+//                    int time = 1;
+//                    static auto now = globalContext.runTimeSystem->taskQueueSystem->add(
+//                            [time] {
+//                                std::this_thread::sleep_for(std::chrono::seconds(time));
+//                                return 1;
+//                            });
+//                    globalContext.runTimeSystem->taskQueueSystem->add(
+//                            [time] {
+//                                std::this_thread::sleep_for(std::chrono::seconds(time));
+//                                return 1;
+//                            });
+//                    if (x == 30 || x == 300) {
+//                        auto result = now->getResult(true);
+//                        if (result.has_value())
+//                            std::cout << *result << '#' << std::endl;
+//                    }
+//                }
+//                ++x;
+
                 //update
                 GlobalUbo ubo{};
                 ubo.projection = camera.getProjection();
@@ -112,19 +130,16 @@ namespace crp {
                 uboBuffers[frameIndex]->writeToBuffer(&ubo);
                 uboBuffers[frameIndex]->flush();
                 //order
-                runTimeSystem->tick(frameInfo);
-                moveTaskManager->tick(frameInfo);
-//                threadPoolSystem->tick(frameInfo);
-//                taskQueueSystem->tick(frameInfo);
 
                 //render
                 crpRenderer.beginSwapChainRenderPass(commandBuffer);
 
                 //order here matters
-                simpleRenderSystem.renderGameObjects(frameInfo);
+                runTimeSystem->tick(frameInfo);
+                moveTaskManager->tick(frameInfo);
+                simpleRenderSystem.tick(frameInfo);
                 crpRenderer.endSwapChainRenderPass(commandBuffer);
                 crpRenderer.endFrame();
-
             }
 //            gameObjectManager->tick();
         }
@@ -135,13 +150,13 @@ namespace crp {
     }
 
     void FirstApp::test() {
-        auto &runTimeSystem = globalContext.runTimeSystem;
-        auto &taskQueueSystem = globalContext.runTimeSystem->taskQueueSystem;
-        auto &threadPoolSystem = globalContext.runTimeSystem->threadPoolSystem;
-        auto &moveTaskManager = globalContext.moveTaskManager;
-        auto &gameObjectManager = globalContext.gameObjectManager;
+//        auto &runTimeSystem = globalContext.runTimeSystem;
+//        auto &taskQueueSystem = globalContext.runTimeSystem->taskQueueSystem;
+//        auto &threadPoolSystem = globalContext.runTimeSystem->threadPoolSystem;
+//        auto &moveTaskManager = globalContext.moveTaskManager;
+//        auto &gameObjectManager = globalContext.gameObjectManager;
 //        taskQueueSystem->add()
-        int x = 1;
+//        int x = 1;
 //        taskQueueSystem->add(fun(),x);
 //        runTimeSystem->add([])
 //        taskQueueSystem->add([](int answer) { return answer; }, 1);

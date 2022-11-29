@@ -1,4 +1,6 @@
 #include "runtime_system.hpp"
+#include "task_queue_system.hpp"
+#include "thread_pool_system.hpp"
 #include "function/global/global_context.hpp"
 #include "resources/manager/game_object_manager.hpp"
 #include <cmath>
@@ -7,9 +9,8 @@ namespace crp {
     RuntimeSystem::RuntimeSystem(CrpDevice &crpDevice) :
             crpDevice{crpDevice},
             taskQueueSystem{std::make_shared<TaskQueueSystem>(crpDevice)},
-            threadPoolSystem{std::make_shared<ThreadPoolSystem>(crpDevice)},
-            tasksRun{taskQueueSystem->tasksRun} {
-        threadPoolSystem->threadsInit(taskQueueSystem->tasksInQueue);
+            threadPoolSystem{std::make_shared<ThreadPoolSystem>(crpDevice)} {
+        threadPoolSystem->threadsInit(taskQueueSystem->tasks);
         auto RuntimeRect = CrpGameObject::makeRectangle(crpDevice,
                                                         x, y, z, w, false);
         id = RuntimeRect.getId();

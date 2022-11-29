@@ -1,7 +1,6 @@
 #include "thread_pool_system.hpp"
 #include "function/global/global_context.hpp"
 #include "resources/manager/game_object_manager.hpp"
-#include "resources/manager/move_task_manager.hpp"
 #include "runtime_system.hpp"
 #include "task_queue_system.hpp"
 #include <iostream>
@@ -60,7 +59,6 @@ namespace crp {
                             return this->stop ||
                                    globalContext.runTimeSystem->taskQueueSystem->isSorted();
                         });
-//                        std::cout<<"#"<<std::endl;
                         if (stop)return;
                         {
                             std::lock_guard<std::mutex> taskMut(globalContext.runTimeSystem->taskQueueSystem->taskMut);
@@ -68,7 +66,6 @@ namespace crp {
                             task.run(globalContext.runTimeSystem->points[i]);
                             tasks.pop_front();
                         }
-//                        globalContext.runTimeSystem->taskQueueSystem->sortTasks();
                         --availableThreadNum;
                     }
                     globalContext.moveTaskManager->addMoveTask(threads[i], globalContext.runTimeSystem->points[i]);
@@ -82,8 +79,8 @@ namespace crp {
                         if (stop)return;
                     }
                     task.task();
+                    *task.ready = true;
                     globalContext.runTimeSystem->taskQueueSystem->addDeleteTask(task);
-//                    std::cout << "#" << std::endl;
                     globalContext.moveTaskManager->addMoveTask(threads[i], points[i]);
                     {
                         std::unique_lock<std::mutex> lock(this->resetMut);

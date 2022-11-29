@@ -11,23 +11,53 @@
 #include "render/crp_frame_info.hpp"
 #include "function/global/global_context.hpp"
 #include "resources/manager/move_task_manager.hpp"
+#include "runtime_system.hpp"
 
 namespace crp {
-    class Thread;
+    template<typename Fun, typename... Args>
+    class TaskResult {
+    public:
+        TaskResult(std::future<typename std::invoke_result<Fun, Args...>::type> &result,
+                   std::shared_ptr<bool> &r, bool &lock)
+                : result{std::move(result)}, ready{r}, lockTaskQueue{lock} {
+        }
+
+        std::shared_ptr<bool> ready;
+        bool &lockTaskQueue;
+        bool finished;
+
+        std::future<typename std::invoke_result<Fun, Args...>::type> result;
+
+        std::optional<typename std::invoke_result<Fun, Args...>::type> getResult(bool shouldWait) {
+            if (!*ready && shouldWait)
+                lockTaskQueue = true;
+            if (finished)return std::optional<typename std::invoke_result<Fun, Args...>::type>();
+            if (*ready) {
+                lockTaskQueue = false;
+                finished = true;
+                return result.get();
+            }
+            return std::optional<typename std::invoke_result<Fun, Args...>::type>();
+        }
+    };
 
     class Task : public Rectangle {
     public:
-        Task(std::function<void()> fun, Rectangle &rec) : task{std::move(fun)}, Rectangle(rec) {};
+        Task(std::function<void()> fun, Rectangle &rec) : task{std::move(fun)}, Rectangle{rec} {
+            ready = std::make_shared<bool>(false);
+        };
 
         Task() {};
         std::function<void()> task;
+
+        std::shared_ptr<bool> ready{};
 
         void run(glm::vec3 &point);
     };
 
     class TaskQueueSystem {
     public:
-        TaskQueueSystem(CrpDevice &crpDevice);
+        explicit TaskQueueSystem(CrpDevice &crpDevice);
 
         void addDeleteTask(Rectangle &task);
 
@@ -35,12 +65,18 @@ namespace crp {
 
         void sortTasks();
 
+        void lock();
+
+        void unlock();
+
         bool isSorted();
 
+        bool isTaskInQueue(Task &task) {
+            return fabs(task.center.x - points[0].x) < STRICT_EPS;
+        }
+
         std::vector<glm::vec3> points;
-        std::list<Task> tasksInQueue;
-        std::queue<Task> tasksRun;
-        std::queue<Task> tasksWait;
+        std::list<Task> tasks;
         std::list<std::unique_ptr<std::pair<GameObjectManager::id_t, float>>> deleteTasks;
         std::vector<GameObjectManager::id_t> shouldDelete;
         std::mutex taskMut;
@@ -52,17 +88,18 @@ namespace crp {
         float taskWidth, taskHeight;
         GameObjectManager::id_t id;
         CrpDevice &crpDevice;
+        bool locked{};
+
     public:
         //thread_pool
         template<typename Fun, typename... Args>
-        std::future<typename std::invoke_result<Fun, Args...>::type>
+        std::optional<TaskResult<Fun, Args...>>
         add(Fun &&fun, Args &&...args) {
-//            std::cout<<tasksWait.size()<<std::endl;
-//            if (tasksWait.size() == MAX_TASK_NUM)
-//                return nullptr;
             using result_type = typename std::invoke_result<Fun, Args...>::type;
             using task = std::packaged_task<result_type()>;
 
+            if (locked)
+                return std::optional<TaskResult<Fun, Args...>>();
             Rectangle rec;
             rec.movable = true;
             rec.center = taskInitPosition;
@@ -82,8 +119,11 @@ namespace crp {
             auto t = std::make_shared<task>(std::bind(std::forward<Fun>(fun), std::forward<Args>(args)...));
             auto ret = t->get_future();
 
-            tasksWait.emplace([t] { (*t)(); }, rec);
-            return ret;
+            {
+                std::lock_guard<std::mutex> lock(this->taskMut);
+                tasks.emplace_back([t] { (*t)(); }, rec);
+                return TaskResult<Fun, Args...>(ret, tasks.back().ready, locked);
+            }
         }
     };
 }

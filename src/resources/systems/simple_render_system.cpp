@@ -64,7 +64,7 @@ namespace crp {
     }
 
 
-    void SimpleRenderSystem::renderGameObjects(FrameInfo &frameInfo) {
+    void SimpleRenderSystem::tick(FrameInfo &frameInfo) {
         crpPipeline->bind(frameInfo.commandBuffer);
 
         vkCmdBindDescriptorSets(

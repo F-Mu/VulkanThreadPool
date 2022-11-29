@@ -1,5 +1,4 @@
 #include "task_queue_system.hpp"
-#include "render/first_app.hpp"
 #include "function/global/global_context.hpp"
 #include "resources/manager/move_task_manager.hpp"
 #include "resources/manager/game_object_manager.hpp"
@@ -24,8 +23,6 @@ namespace crp {
         //init
         taskInitPosition = points.back();
         taskInitPosition.x += 1;
-//        PRINT(taskInitPosition);
-
     }
 
     void TaskQueueSystem::tick(FrameInfo &frameInfo) {
@@ -49,30 +46,19 @@ namespace crp {
     }
 
     void TaskQueueSystem::sortTasks() {
-        if (!tasksInQueue.empty()) {
-            int cnt = -1;
-            {
-                std::lock_guard<std::mutex> lock(this->taskMut);
-                for (auto &i: tasksInQueue) {
-                    ++cnt;
-                    if (i.move)continue;
-//                    if(i.points.size()!=4)std::cout<<"#"<<std::endl;
-                    if (STRICT_EQUAL(i.center, points[cnt]))continue;
-//                    std::cout<<"#"<<std::endl;
-                    globalContext.moveTaskManager->addMoveTask(i, points[cnt], FRAME_TIME / 5);
-                }
+        std::lock_guard<std::mutex> lock(this->taskMut);
+        int cnt = -1;
+        for (auto &i: tasks) {
+            ++cnt;
+            if (cnt == TASK_NUM)return;
+            if (i.move)continue;
+            if (STRICT_EQUAL(i.center, points[cnt]))continue;
+            if (isTaskInQueue(i))
+                globalContext.moveTaskManager->addMoveTask(i, points[cnt], FRAME_TIME / 5);
+            else {
+                std::vector<glm::vec3> target = {points[TASK_NUM - 1], points[cnt]};
+                globalContext.moveTaskManager->addMoveTask(i, target);
             }
-        }
-
-        while (tasksInQueue.size() < TASK_NUM && !tasksWait.empty()) {
-            auto now = std::move(tasksWait.front());
-            tasksWait.pop();
-            std::vector<glm::vec3> target = {points[TASK_NUM - 1], points[tasksInQueue.size()]};
-            {
-                std::lock_guard<std::mutex> lock(this->taskMut);
-                tasksInQueue.emplace_back(now);
-            }
-            globalContext.moveTaskManager->addMoveTask(tasksInQueue.back(), target);
         }
     }
 
@@ -81,9 +67,16 @@ namespace crp {
     }
 
     bool TaskQueueSystem::isSorted() {
-        if (tasksInQueue.empty())return false;
-        return !tasksInQueue.front().move;
-//        return STRICT_EQUAL(tasksInQueue.front().center, points[0]);
+        if (tasks.empty())return false;
+        return !tasks.front().move;
+    }
+
+    void TaskQueueSystem::lock() {
+        locked = true;
+    }
+
+    void TaskQueueSystem::unlock() {
+        locked = false;
     }
 
     void Task::run(glm::vec3 &point) {
@@ -91,7 +84,6 @@ namespace crp {
         destinations.emplace_back(MID(center[0], point[0]), center[1], TASK_LAYER);
         destinations.emplace_back(MID(center[0], point[0]), point[1], TASK_LAYER);
         destinations.emplace_back(point[0], point[1], TASK_LAYER);
-//        std::cout<<this->move<<' '<<globalContext.runTimeSystem->taskQueueSystem->isSorted()<<std::endl;
         globalContext.moveTaskManager->addMoveTask(*this, destinations);
     }
 }

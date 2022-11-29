@@ -17,6 +17,6 @@ namespace crp {
         void tick(FrameInfo &frameInfo);
 
     private:
-        std::list<std::unique_ptr<TaskToMove>> moveTasks;
+        std::list<std::unique_ptr<MoveTask>> moveTasks;
     };
 }
