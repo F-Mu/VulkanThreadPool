@@ -48,6 +48,8 @@ namespace crp {
         makeRectangle(CrpDevice &device, const std::vector<glm::vec3> &v, const glm::vec3 &center, bool fill,
                       glm::vec3 color = glm::vec3(1.f));
 
+        void updateRectangle(CrpDevice &device);
+
         CrpGameObject(const CrpGameObject &) = delete;
 
         CrpGameObject &operator=(const CrpGameObject &) = delete;

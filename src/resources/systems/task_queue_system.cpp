@@ -34,10 +34,15 @@ namespace crp {
                 it = deleteTasks.erase(it);
                 continue;
             }
-            frameInfo.gameObjects.find(deleteTask->first)
-                    ->second.transform.scale -= SCALE / FRAME_TIME;
+            auto &task = frameInfo.gameObjects.find(deleteTask->first)->second;
+            auto lower = taskWidth / FRAME_TIME;
+            task.rectangle->x[0] += lower;
+            task.rectangle->z[0] += lower;
+            task.updateRectangle(crpDevice);
+//            frameInfo.gameObjects.find(deleteTask->first)
+//                    ->second.transform.scale -= SCALE / FRAME_TIME;
             --deleteTask->second;
-            if (deleteTask->second == 0) {
+            if (deleteTask->second == 0 || task.rectangle->x[0] >= task.rectangle->y[0]) {
                 globalContext.gameObjectManager->deleteById(deleteTask->first);
                 it = deleteTasks.erase(it);
             } else

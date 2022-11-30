@@ -129,4 +129,16 @@ namespace crp {
         gameObj.transform.translation = center;
         return gameObj;
     }
+
+    void CrpGameObject::updateRectangle(CrpDevice &device) {
+        const auto &x = rectangle->x, y = rectangle->y, z = rectangle->z, w = rectangle->w;
+        if (rectangle->fill)
+            model = CrpModel::createModelFromVertices(device,
+                                                      fun(x, y, z, w, color)
+            );
+        else
+            model = CrpModel::createModelFromVertices(device,
+                                                      fun2(x, y, z, w, color)
+            );
+    }
 }

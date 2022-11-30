@@ -54,6 +54,10 @@ https://github.com/blurrypiano/littleVulkanEngine/tree/master
 
 + 把底层宏更改为const常量和inline函数
 
+**v1.2**
+
++ 将任务执行结束动画由缩放变为横移，待接入粒子系统
+
 **待实现（可能也不会实现）：**
 
 + 更好的异步执行（暂时没有思路）
@@ -66,3 +70,4 @@ https://github.com/blurrypiano/littleVulkanEngine/tree/master
 
 + v1.0大改后未进行良好的测试，可能有bug（这版写起来感觉有点掌控不住）
 
++ 接入粒子系统，将横移动画变为从左下到右上的删除动画
