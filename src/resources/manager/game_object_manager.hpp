@@ -5,7 +5,6 @@
 #include "function/framework/crp_game_obejct.hpp"
 
 namespace crp {
-
     class GameObjectManager {
     public:
         using id_t = unsigned int;
@@ -16,7 +15,7 @@ namespace crp {
 
         void tick();
 
-        void registerGO(const std::shared_ptr<CrpGameObject>&gameObject);
+        void registerGO(const std::shared_ptr<CrpGameObject> &gameObject);
 
         void addGameObject(const id_t &id, const CrpGameObject &gameObject);
 

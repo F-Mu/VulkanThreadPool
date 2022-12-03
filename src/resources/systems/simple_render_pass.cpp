@@ -15,12 +15,6 @@
 #include "core/push_constant.hpp"
 
 namespace crp {
-//
-//    struct SimplePushConstantData {
-//        glm::mat4 modelMatrix{1.f};
-//        glm::mat4 normalMatrix{1.f};
-//    };
-
     SimpleRenderPass::SimpleRenderPass(CrpDevice &device, VkRenderPass renderPass,
                                        VkDescriptorSetLayout globalSetLayout) : crpDevice{device} {
         createPipelineLayout(globalSetLayout);

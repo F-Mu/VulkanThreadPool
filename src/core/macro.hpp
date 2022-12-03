@@ -29,4 +29,5 @@ namespace crp {
 
 #define PRINT(vec) std::cout<<'('<<(vec)[0]<<','<<(vec)[1]<<','<<(vec)[2]<<')'<<std::endl
 #define PRINT4(vec) std::cout<<'('<<(vec)[0]<<','<<(vec)[1]<<','<<(vec)[2]<<','<<(vec)[3]<<')'<<std::endl
+#define LOG(message) std::cout<<message<<std::endl;
 }

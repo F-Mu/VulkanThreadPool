@@ -8,17 +8,14 @@ namespace crp {
         glfwTerminate();
     }
 
-
-    WindowSystem::WindowSystem() {
-        init();
-    }
-
-    void WindowSystem::init() {
+    void WindowSystem::initialize(WindowCreateInfo create_info) {
         glfwInit();
         glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
         glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
 
-        window = glfwCreateWindow(WIDTH, HEIGHT, windowName.c_str(), nullptr, nullptr);
+        width=create_info.width;
+        height=create_info.height;
+        window = glfwCreateWindow(create_info.width, create_info.height, create_info.title, nullptr, nullptr);
         glfwSetWindowUserPointer(window, this);
         glfwSetFramebufferSizeCallback(window, framebufferResizeCallback);
     }

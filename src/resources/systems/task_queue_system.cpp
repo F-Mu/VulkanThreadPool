@@ -14,6 +14,7 @@ namespace crp {
         float hCut = (down - up) / float(TASK_NUM);
         float yFirst = (up + hCut + up) / 2;
 
+        //initTask
         Task::taskWidth = right - left - .075f;
         Task::taskHeight = (hCut - .05f);
 
@@ -24,7 +25,6 @@ namespace crp {
         for (int i = 0; i < TASK_NUM; ++i) {
             points[i] = {mid, yFirst + hCut * i, TASK_LAYER};
         }
-        //init
         Task::initPosition = points.back();
         Task::initPosition.x += 1;
         Task::meshPoints = {
@@ -54,6 +54,7 @@ namespace crp {
             }
         }
     }
+
     bool TaskQueueSystem::isSorted() {
         if (tasks.empty())return false;
         return !tasks.front().isMove();

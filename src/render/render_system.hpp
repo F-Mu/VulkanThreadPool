@@ -11,7 +11,6 @@
 namespace crp {
     class RenderSystem {
     public:
-
         RenderSystem(WindowSystem &window, CrpDevice &device);
 
         ~RenderSystem();
@@ -57,11 +56,11 @@ namespace crp {
 
         WindowSystem &crpWindow;
         CrpDevice &crpDevice;
-        std::unique_ptr<CrpSwapChain> crpSwapChain;
-        std::vector<VkCommandBuffer> commandBuffers;
+        std::unique_ptr<CrpSwapChain> crpSwapChain{};
+        std::vector<VkCommandBuffer> commandBuffers{};
 
-        uint32_t currentImageIndex;
-        int currentFrameIndex;
-        bool isFrameStarted;
+        uint32_t currentImageIndex{};
+        int currentFrameIndex{};
+        bool isFrameStarted{};
     };
 }

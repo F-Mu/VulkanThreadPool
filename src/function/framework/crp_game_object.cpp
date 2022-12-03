@@ -4,11 +4,9 @@
 #include <iostream>
 
 namespace crp {
-
     void CrpGameObject::tick() {
         for (auto &component: components) {
             component->tick();
         }
     }
-
 }

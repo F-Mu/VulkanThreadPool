@@ -7,14 +7,6 @@ namespace crp {
     fillMesh(const std::vector<glm::vec3> &points, const glm::vec3 &color, const glm::mat4 &modelMatrix) {
         std::vector<Vertex> vertices;
         for (auto point: points) {
-//            PRINT(point);
-//            if(modelMatrix[3][2]==THREAD_LAYER) {
-//                std::cout << "!!" << std::endl;
-//                for(int i=0;i<3;++i)std::cout<<modelMatrix[3][i]<<std::endl;
-//                PRINT(point);
-//                PRINT4(modelMatrix * glm::vec4(point, 1.));
-//                std::cout << "!!" << std::endl;
-//            }
             vertices.emplace_back(modelMatrix * glm::vec4(point, 1.), color);
         }
         return vertices;
@@ -22,7 +14,7 @@ namespace crp {
 
     std::vector<Vertex>
     unfilledMesh(std::vector<glm::vec3> &points, const glm::vec3 &color, const glm::mat4 &modelMatrix) {
-        const float offset = 0.001f;
+        const float offset = 0.0025f;
         std::vector<Vertex> vertices;
 
         for (int i = 0; i + 1 < points.size(); ++i) {

@@ -25,7 +25,6 @@ namespace crp {
         moveComponent->setDestination(destination, _time);
     }
 
-
     void Rectangle::Move(std::vector<glm::vec3> destinations, float _time) {
         auto moveComponent = gameObject->tryGetComponent(MoveComponent);
         if (!moveComponent)return;

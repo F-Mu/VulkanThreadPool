@@ -1,5 +1,5 @@
 #include "render_system.hpp"
-
+#include "core/macro.hpp"
 
 //std
 #include <stdexcept>
@@ -8,8 +8,6 @@
 #include <iostream>
 
 namespace crp {
-
-
     RenderSystem::RenderSystem(WindowSystem &window, CrpDevice &device) : crpWindow{window}, crpDevice{device} {
         recreateSwapChain();
         createCommandBuffers();

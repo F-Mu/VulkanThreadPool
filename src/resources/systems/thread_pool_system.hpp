@@ -50,8 +50,6 @@ namespace crp {
         std::mutex startMut;
         std::mutex resetMut;
         std::mutex runMut;
-//        std::queue<task_type> tasks;
-
         std::atomic<bool> stop;
         std::condition_variable start;
         std::condition_variable reset;

@@ -14,7 +14,6 @@ namespace crp {
 
         void getWorld();
         void getIndices();
-//        std::unique_ptr<CrpModel> model{};
         std::vector<glm::vec3> points{};
         std::vector<Vertex> worldPoints{};
         std::vector<uint32_t> worldIndices{};

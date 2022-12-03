@@ -6,9 +6,17 @@
 #include <string>
 
 namespace crp {
+    struct WindowCreateInfo {
+        int width{800};
+        int height{600};
+        const char *title{"ThreadPool"};
+        bool is_fullscreen{false};
+    };
+
     class WindowSystem {
     public:
-        WindowSystem();
+
+        WindowSystem() = default;
 
         ~WindowSystem();
 
@@ -28,19 +36,14 @@ namespace crp {
 
         void createWindowSurface(VkInstance instance, VkSurfaceKHR *surface);
 
+        void initialize(WindowCreateInfo create_info);
+
     private:
         static void framebufferResizeCallback(GLFWwindow *window, int width, int height);
 
-        void init();
-
-        static constexpr int WIDTH = 800;
-        static constexpr int HEIGHT = 600;
         int width;
         int height;
         bool framebufferResized = false;
-
-        std::string windowName{"ThreadPool"};
-
 
         GLFWwindow *window;
     };

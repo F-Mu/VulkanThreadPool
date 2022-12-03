@@ -17,7 +17,6 @@ namespace crp {
         int frameIndex;
         float frameTime;
         VkCommandBuffer commandBuffer;
-//        CrpCamera &camera;
         VkDescriptorSet globalDescriptorSet;
         GameObjectManager::Map &gameObjects;
     };

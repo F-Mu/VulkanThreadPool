@@ -22,7 +22,7 @@ namespace crp {
         float hCut = (down - up) / float(THREAD_NUM);
         float yFirst = (up + hCut + up) / 2;
         float threadWidth = right - left - .05f;
-        float threadHeight = (hCut - .1f);
+        float threadHeight = (hCut - .05f);
         float l = -threadWidth / 2, r = threadWidth / 2,
                 u = -threadHeight / 2, d = threadHeight / 2;
         std::vector<glm::vec3> meshPoints = {
