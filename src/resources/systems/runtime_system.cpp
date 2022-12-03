@@ -6,14 +6,11 @@
 #include <cmath>
 
 namespace crp {
-    RuntimeSystem::RuntimeSystem(CrpDevice &crpDevice) :
+    RuntimeSystem::RuntimeSystem() :
             Rectangle{std::move(Rectangle::MakeRectangle({x, y, w, z}))},
-                      crpDevice{crpDevice},
                       taskQueueSystem{std::make_shared<TaskQueueSystem>()},
-                      threadPoolSystem{std::make_shared<ThreadPoolSystem>(crpDevice)} {
+                      threadPoolSystem{std::make_shared<ThreadPoolSystem>()} {
         threadPoolSystem->threadsInit(taskQueueSystem->tasks);
-//        globalContext.gameObjectManager->gameObjects[getId()] = *this;
-//        globalContext.gameObjectManager->gameObjects.emplace(getId(), gameObject->shared_from_this());
 
         float mid = (left + right) / 2;
         points.resize(THREAD_NUM);
@@ -24,8 +21,8 @@ namespace crp {
         }
     }
 
-    void RuntimeSystem::tick(FrameInfo &frameInfo) {
-        taskQueueSystem->tick(frameInfo);
+    void RuntimeSystem::tick() {
+        taskQueueSystem->tick();
         threadPoolSystem->tick();
         if (!taskQueueSystem->isSorted())return;
         if (threadPoolSystem->availableNum() != 0)
@@ -37,5 +34,4 @@ namespace crp {
         threadPoolSystem.reset();
         taskQueueSystem.reset();
     }
-
 }

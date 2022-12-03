@@ -8,19 +8,16 @@
 #include <map>
 
 namespace crp {
-    ThreadPoolSystem::ThreadPoolSystem(CrpDevice &crpDevice)
+    ThreadPoolSystem::ThreadPoolSystem()
             :
             Rectangle(std::move(Rectangle::MakeRectangle({x, y, w, z}))),
-            stop{false}, crpDevice{crpDevice} {
-//        setPosition(x,y,z,w);
-//        globalContext.gameObjectManager->gameObjects.emplace(getId(), gameObject->shared_from_this());
+            stop{false} {
         points.resize(THREAD_NUM);
         threadPoolInit();
     }
 
     void ThreadPoolSystem::threadPoolInit() {
         //thread_pool
-//        threads.resize(THREAD_NUM);
         float mid = (left + right) / 2;
         float hCut = (down - up) / float(THREAD_NUM);
         float yFirst = (up + hCut + up) / 2;
@@ -35,17 +32,10 @@ namespace crp {
                 {r, d, 0},
         };
         for (int i = 0; i < THREAD_NUM; ++i) {
-            threads.emplace_back(Thread(crpDevice, meshPoints, THREAD_COLOR, true, true));
+            threads.emplace_back(Thread(meshPoints, THREAD_COLOR, true, true));
             points[i] = {mid, yFirst + hCut * i, THREAD_LAYER};
 
             threads[i].setPosition(points[i]);
-//            threads[i].center = points[i];
-//            auto ThreadRect = CrpGameObject::makeRectangle(crpDevice,
-//                                                           threads[i].points, {points[i].x, points[i].y, THREAD_LAYER},
-//                                                           true, {0, 0, .5f});
-//            threads[i].id = ThreadRect.getId();
-//            globalContext.gameObjectManager->gameObjects.emplace(threads[i].getId(),
-//                                                                 threads[i].gameObject->shared_from_this());
         }
     }
 

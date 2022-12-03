@@ -15,9 +15,9 @@ namespace crp {
 
     class RuntimeSystem : public Rectangle {
     public:
-        RuntimeSystem(CrpDevice &crpDevice);
+        RuntimeSystem();
 
-        void tick(FrameInfo &frameInfo);
+        void tick();
 
         void clear();
 
@@ -26,8 +26,7 @@ namespace crp {
         std::shared_ptr<ThreadPoolSystem> threadPoolSystem;
     private:
         static constexpr float up = -0.55f, down = 0.55f, left = -0.15f, right = 0.15f;
-        static constexpr glm::vec3 x{left, up, QUEUE_LAYER}, y{right, up, QUEUE_LAYER}, z{left, down, QUEUE_LAYER}, w{right, down,
-                                                                                                     QUEUE_LAYER};
-        CrpDevice &crpDevice;
+        static constexpr glm::vec3 x{left, up, QUEUE_LAYER}, y{right, up, QUEUE_LAYER}, z{left, down, QUEUE_LAYER}
+        , w{right, down, QUEUE_LAYER};
     };
 }

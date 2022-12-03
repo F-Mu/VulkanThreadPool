@@ -15,7 +15,7 @@ namespace crp {
                                                               globalResources->globalSetLayout->getDescriptorSetLayout());
 //        moveTaskManager = std::make_shared<MoveTaskManager>();
         gameObjectManager = std::make_shared<GameObjectManager>();
-        runTimeSystem = std::make_shared<RuntimeSystem>(*device);
+        runTimeSystem = std::make_shared<RuntimeSystem>();
     }
 
     void GlobalContext::shutdownEngine() {

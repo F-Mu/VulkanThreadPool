@@ -63,7 +63,6 @@ namespace crp {
 
 //            camera.setOrthographicProjection(-2, 2, -2, 2, -3, 3);
             renderSystem->beginFrame();
-//            if (renderSystem->nowCommandBuffer) {
             int frameIndex = renderSystem->getFrameIndex();
             FrameInfo frameInfo{
                     frameIndex,
@@ -79,14 +78,11 @@ namespace crp {
 
 
             //order here matters
-            runTimeSystem->tick(frameInfo);
+            runTimeSystem->tick();
             simpleRenderPass->tick(frameInfo);
-//                moveTaskManager->tick(frameInfo);
             renderSystem->endSwapChainRenderPass(renderSystem->nowCommandBuffer);
             renderSystem->endFrame();
-//            }
         }
-//        gameObjectManager->tick();
         globalContext.shutdownEngine();
     }
 

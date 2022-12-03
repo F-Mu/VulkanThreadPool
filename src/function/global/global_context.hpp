@@ -22,7 +22,6 @@ namespace crp {
     public:
         std::shared_ptr<RuntimeSystem> runTimeSystem;
         std::shared_ptr<GameObjectManager> gameObjectManager;
-//        std::shared_ptr<MoveTaskManager> moveTaskManager;
         std::shared_ptr<GlobalResources> globalResources;
         std::shared_ptr<SimpleRenderPass> simpleRenderPass;
         std::shared_ptr<WindowSystem> windowSystem;

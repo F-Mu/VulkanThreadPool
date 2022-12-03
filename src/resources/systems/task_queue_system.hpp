@@ -65,7 +65,7 @@ namespace crp {
     public:
         explicit TaskQueueSystem();
 
-        void tick(FrameInfo &frameInfo);
+        void tick();
 
         void sortTasks();
 
@@ -101,8 +101,6 @@ namespace crp {
                 return std::optional<TaskResult<Fun, Args...>>();
 
             auto t = std::make_shared<task>(std::bind(std::forward<Fun>(fun), std::forward<Args>(args)...));
-//            globalContext.gameObjectManager->gameObjects.emplace(rec.getId(),
-//                                                                 rec.gameObject->shared_from_this());
             auto ret = t->get_future();
             {
                 std::lock_guard<std::mutex> lock(this->taskMut);

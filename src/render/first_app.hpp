@@ -25,13 +25,5 @@ namespace crp {
 
     private:
         void test();
-
-//        WindowSystem crpWindow{WIDTH, HEIGHT, "ThreadPool"};
-//        CrpDevice crpDevice{crpWindow};
-//        RenderSystem crpRenderer{crpWindow, crpDevice};
-
-        //note: order of declarations matters
-//        std::unique_ptr<CrpDescriptorPool> globalPool{};
-//        CrpGameObject::Map gameObjects;
     };
 }

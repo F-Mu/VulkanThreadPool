@@ -35,7 +35,7 @@ namespace crp {
         };
     }
 
-    void TaskQueueSystem::tick(FrameInfo &frameInfo) {
+    void TaskQueueSystem::tick() {
         sortTasks();
     }
 
@@ -74,7 +74,6 @@ namespace crp {
         destinations.emplace_back(MID(center[0], point[0]), point[1], TASK_LAYER);
         destinations.emplace_back(point[0], point[1], TASK_LAYER);
         Move(destinations);
-//        globalContext.moveTaskManager->addMoveTask(*this, destinations);
     }
 
 }
