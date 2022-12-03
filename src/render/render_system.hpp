@@ -1,6 +1,6 @@
 #pragma once
 
-#include "crp_window.hpp"
+#include "window_system.hpp"
 #include "crp_device.hpp"
 #include "crp_swap_chain.hpp"
 //std
@@ -9,16 +9,16 @@
 #include <vector>
 
 namespace crp {
-    class CrpRenderer {
+    class RenderSystem {
     public:
 
-        CrpRenderer(CrpWindow &window, CrpDevice &device);
+        RenderSystem(WindowSystem &window, CrpDevice &device);
 
-        ~CrpRenderer();
+        ~RenderSystem();
 
-        CrpRenderer(const CrpRenderer &) = delete;
+        RenderSystem(const RenderSystem &) = delete;
 
-        CrpRenderer &operator=(const CrpRenderer &) = delete;
+        RenderSystem &operator=(const RenderSystem &) = delete;
 
         VkRenderPass getSwapChainRenderPass() const { return crpSwapChain->getRenderPass(); }
 
@@ -46,6 +46,8 @@ namespace crp {
 
         void endSwapChainRenderPass(VkCommandBuffer commandBuffer);
 
+        VkCommandBuffer nowCommandBuffer;
+
     private:
         void createCommandBuffers();
 
@@ -53,7 +55,7 @@ namespace crp {
 
         void recreateSwapChain();
 
-        CrpWindow &crpWindow;
+        WindowSystem &crpWindow;
         CrpDevice &crpDevice;
         std::unique_ptr<CrpSwapChain> crpSwapChain;
         std::vector<VkCommandBuffer> commandBuffers;

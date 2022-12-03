@@ -1,4 +1,4 @@
-#include "crp_renderer.hpp"
+#include "render_system.hpp"
 
 
 //std
@@ -10,16 +10,16 @@
 namespace crp {
 
 
-    CrpRenderer::CrpRenderer(CrpWindow &window, CrpDevice &device) : crpWindow{window}, crpDevice{device} {
+    RenderSystem::RenderSystem(WindowSystem &window, CrpDevice &device) : crpWindow{window}, crpDevice{device} {
         recreateSwapChain();
         createCommandBuffers();
     }
 
-    CrpRenderer::~CrpRenderer() {
+    RenderSystem::~RenderSystem() {
         freeCommandBuffers();
     }
 
-    void CrpRenderer::freeCommandBuffers() {
+    void RenderSystem::freeCommandBuffers() {
         vkFreeCommandBuffers(
                 crpDevice.device(),
                 crpDevice.getCommandPool(),
@@ -28,7 +28,7 @@ namespace crp {
         commandBuffers.clear();
     }
 
-    void CrpRenderer::recreateSwapChain() {
+    void RenderSystem::recreateSwapChain() {
         auto extent = crpWindow.getExtent();
         while (extent.width == 0 || extent.height == 0) {
             extent = crpWindow.getExtent();
@@ -48,7 +48,7 @@ namespace crp {
         }
     }
 
-    void CrpRenderer::createCommandBuffers() {
+    void RenderSystem::createCommandBuffers() {
         commandBuffers.resize(CrpSwapChain::MAX_FRAMES_IN_FLIGHT);
 
         VkCommandBufferAllocateInfo allocInfo{};
@@ -62,7 +62,7 @@ namespace crp {
         }
     }
 
-    VkCommandBuffer CrpRenderer::beginFrame() {
+    VkCommandBuffer RenderSystem::beginFrame() {
         assert(!isFrameStarted && "Can't call beginFrame While already in progress");
         auto result = crpSwapChain->acquireNextImage(&currentImageIndex);
 
@@ -76,24 +76,24 @@ namespace crp {
         }
 
         isFrameStarted = true;
-        auto commandBuffer = getCurrentCommandBuffer();
+        nowCommandBuffer = getCurrentCommandBuffer();
 
         VkCommandBufferBeginInfo beginInfo{};
         beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-        if (vkBeginCommandBuffer(commandBuffer, &beginInfo) != VK_SUCCESS) {
+        if (vkBeginCommandBuffer(nowCommandBuffer, &beginInfo) != VK_SUCCESS) {
             throw std::runtime_error("failed to begin recording command buffer!");
         }
-        return commandBuffer;
+        return nowCommandBuffer;
     }
 
-    void CrpRenderer::endFrame() {
+    void RenderSystem::endFrame() {
         assert(isFrameStarted && "Can't call endFrame While frame is not in progress");
-        auto commandBuffer = getCurrentCommandBuffer();
-        if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS) {
+
+        if (vkEndCommandBuffer(nowCommandBuffer) != VK_SUCCESS) {
             throw std::runtime_error("failed to record command buffer!");
         }
 
-        auto result = crpSwapChain->submitCommandBuffers(&commandBuffer, &currentImageIndex);
+        auto result = crpSwapChain->submitCommandBuffers(&nowCommandBuffer, &currentImageIndex);
         if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR ||
             crpWindow.wasWindowResized()) {
             crpWindow.resetWindowResizedFlag();
@@ -106,10 +106,10 @@ namespace crp {
         currentFrameIndex = (currentFrameIndex + 1) % CrpSwapChain::MAX_FRAMES_IN_FLIGHT;
     }
 
-    void CrpRenderer::beginSwapChainRenderPass(VkCommandBuffer commandBuffer) {
+    void RenderSystem::beginSwapChainRenderPass(VkCommandBuffer commandBuffer) {
         assert(isFrameStarted && "Can't call beginSwapChainRenderPass While frame is not in progress");
         assert(
-                commandBuffer == getCurrentCommandBuffer() &&
+                nowCommandBuffer == getCurrentCommandBuffer() &&
                 "Can't begin render pass on command buffer from a different frame");
         VkRenderPassBeginInfo renderPassInfo{};
         renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
@@ -140,10 +140,10 @@ namespace crp {
         vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
     }
 
-    void CrpRenderer::endSwapChainRenderPass(VkCommandBuffer commandBuffer) {
+    void RenderSystem::endSwapChainRenderPass(VkCommandBuffer commandBuffer) {
         assert(isFrameStarted && "Can't call endSwapChainRenderPass While frame is not in progress");
         assert(
-                commandBuffer == getCurrentCommandBuffer() &&
+                nowCommandBuffer == getCurrentCommandBuffer() &&
                 "Can't begin render pass on command buffer from a different frame");
         vkCmdEndRenderPass(commandBuffer);
     }

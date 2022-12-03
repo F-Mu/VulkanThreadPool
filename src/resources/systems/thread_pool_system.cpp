@@ -3,46 +3,49 @@
 #include "resources/manager/game_object_manager.hpp"
 #include "runtime_system.hpp"
 #include "task_queue_system.hpp"
+#include "function/framework/component/render_component.hpp"
 #include <iostream>
 #include <map>
 
 namespace crp {
     ThreadPoolSystem::ThreadPoolSystem(CrpDevice &crpDevice)
-            : stop{false}, crpDevice{crpDevice} {
-        auto ThreadPoolRect = CrpGameObject::makeRectangle(crpDevice,
-                                                           x, y, z, w, false);
-        id = ThreadPoolRect.getId();
-        globalContext.gameObjectManager->gameObjects.emplace(ThreadPoolRect.getId(), std::move(ThreadPoolRect));
+            :
+            Rectangle(std::move(Rectangle::MakeRectangle({x, y, w, z}))),
+            stop{false}, crpDevice{crpDevice} {
+//        setPosition(x,y,z,w);
+//        globalContext.gameObjectManager->gameObjects.emplace(getId(), gameObject->shared_from_this());
         points.resize(THREAD_NUM);
         threadPoolInit();
     }
 
     void ThreadPoolSystem::threadPoolInit() {
         //thread_pool
-        threads.resize(THREAD_NUM);
+//        threads.resize(THREAD_NUM);
         float mid = (left + right) / 2;
         float hCut = (down - up) / float(THREAD_NUM);
         float yFirst = (up + hCut + up) / 2;
-        float threadWidth = right - left - .1f;
+        float threadWidth = right - left - .05f;
         float threadHeight = (hCut - .1f);
+        float l = -threadWidth / 2, r = threadWidth / 2,
+                u = -threadHeight / 2, d = threadHeight / 2;
+        std::vector<glm::vec3> meshPoints = {
+                {l, u, 0},
+                {r, u, 0},
+                {l, d, 0},
+                {r, d, 0},
+        };
         for (int i = 0; i < THREAD_NUM; ++i) {
+            threads.emplace_back(Thread(crpDevice, meshPoints, THREAD_COLOR, true, true));
             points[i] = {mid, yFirst + hCut * i, THREAD_LAYER};
-            threads[i].movable = true;
-            threads[i].center = points[i];
-            threads[i].points.resize(4);
-            float l = -threadWidth / 2, r = threadWidth / 2,
-                    u = -threadHeight / 2, d = threadHeight / 2;
-            threads[i].points = {
-                    {l, u, 0},
-                    {r, u, 0},
-                    {l, d, 0},
-                    {r, d, 0},
-            };
-            auto ThreadRect = CrpGameObject::makeRectangle(crpDevice,
-                                                           threads[i].points, {points[i].x, points[i].y, THREAD_LAYER},
-                                                           true, {0, 0, .5f});
-            threads[i].id = ThreadRect.getId();
-            globalContext.gameObjectManager->gameObjects.emplace(ThreadRect.getId(), std::move(ThreadRect));
+
+            threads[i].setPosition(points[i]);
+//            threads[i].center = points[i];
+//            auto ThreadRect = CrpGameObject::makeRectangle(crpDevice,
+//                                                           threads[i].points, {points[i].x, points[i].y, THREAD_LAYER},
+//                                                           true, {0, 0, .5f});
+//            threads[i].id = ThreadRect.getId();
+//            globalContext.gameObjectManager->gameObjects.emplace(threads[i].getId(),
+//                                                                 threads[i].gameObject->shared_from_this());
         }
     }
 
@@ -51,7 +54,7 @@ namespace crp {
         for (int i = 0; i < THREAD_NUM; ++i) {
             threads[i].th = std::thread([this, i, &tasks] {
                 while (!this->stop) {
-                    Task task;
+                    std::shared_ptr<Task> task;
                     {
                         std::unique_lock<std::mutex> lock(this->startMut);
                         this->start.wait(lock, [this] {
@@ -62,30 +65,30 @@ namespace crp {
                         if (stop)return;
                         {
                             std::lock_guard<std::mutex> taskMut(globalContext.runTimeSystem->taskQueueSystem->taskMut);
-                            task = std::move(tasks.front());
-                            task.run(globalContext.runTimeSystem->points[i]);
+                            task = std::make_shared<Task>(std::move(tasks.front()));
+                            task->run(globalContext.runTimeSystem->points[i]);
                             tasks.pop_front();
                         }
                         --availableThreadNum;
                     }
-                    globalContext.moveTaskManager->addMoveTask(threads[i], globalContext.runTimeSystem->points[i]);
+                    threads[i].Move(globalContext.runTimeSystem->points[i]);
                     {
                         std::unique_lock<std::mutex> lock(runMut);
                         this->run.wait(lock, [this, i, &task] {
                             return this->stop ||
-                                   (STRICT_EQUAL(threads[i].center, globalContext.runTimeSystem->points[i])
-                                    && STRICT_EQUAL(task.center, threads[i].center));
+                                   (STRICT_EQUAL(threads[i].getCenter(), globalContext.runTimeSystem->points[i])
+                                    && STRICT_EQUAL(task->getCenter(), threads[i].getCenter()));
                         });
                         if (stop)return;
                     }
-                    task.task();
-                    *task.ready = true;
-                    globalContext.runTimeSystem->taskQueueSystem->addDeleteTask(task);
-                    globalContext.moveTaskManager->addMoveTask(threads[i], points[i]);
+                    task->task();
+                    *task->ready = true;
+                    task->setDelete();
+                    threads[i].Move(points[i]);
                     {
                         std::unique_lock<std::mutex> lock(this->resetMut);
                         this->reset.wait(lock, [this, i] {
-                            return this->stop || threads[i].center == points[i];
+                            return this->stop || threads[i].getCenter() == points[i];
                         });
                         if (stop)return;
                     }

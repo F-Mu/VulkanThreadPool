@@ -1,7 +1,7 @@
 #pragma once
 
-#include "render/crp_game_obejct.hpp"
-#include "render/crp_window.hpp"
+#include "function/framework/crp_game_obejct.hpp"
+#include "render/window_system.hpp"
 
 namespace crp {
     class KeyboardController {

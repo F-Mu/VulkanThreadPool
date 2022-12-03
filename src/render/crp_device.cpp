@@ -47,7 +47,7 @@ namespace crp {
     }
 
 // class member functions
-    CrpDevice::CrpDevice(CrpWindow &window) : window{window} {
+    CrpDevice::CrpDevice(WindowSystem &window) : window{window} {
         createInstance();
         setupDebugMessenger();
         createSurface();

@@ -2,27 +2,32 @@
 
 #include <memory>
 #include "render/crp_device.hpp"
+#include "resources/manager/game_object_manager.hpp"
+#include "resources/systems/thread_pool_system.hpp"
+#include "resources/systems/task_queue_system.hpp"
+#include "resources/systems/runtime_system.hpp"
+#include "render/window_system.hpp"
+#include "render/render_system.hpp"
+#include "render/global_resources.hpp"
+#include "resources/systems/simple_render_pass.hpp"
+
 namespace crp {
-    class ThreadPoolSystem;
-
-    class RuntimeSystem;
-
-    class GameObjectManager;
-
-    class TaskQueueSystem;
-
-    class MoveTaskManager;
 
     class GlobalContext {
     public:
-        void startEngine(CrpDevice &crpDevice);
+        void startEngine();
 
         void shutdownEngine();
 
     public:
         std::shared_ptr<RuntimeSystem> runTimeSystem;
         std::shared_ptr<GameObjectManager> gameObjectManager;
-        std::shared_ptr<MoveTaskManager> moveTaskManager;
+//        std::shared_ptr<MoveTaskManager> moveTaskManager;
+        std::shared_ptr<GlobalResources> globalResources;
+        std::shared_ptr<SimpleRenderPass> simpleRenderPass;
+        std::shared_ptr<WindowSystem> windowSystem;
+        std::shared_ptr<RenderSystem> renderSystem;
+        std::shared_ptr<CrpDevice> device;
         bool debug{};
     };
 

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "crp_window.hpp"
+#include "window_system.hpp"
 
 // std lib headers
 #include <string>
@@ -31,7 +31,7 @@ namespace crp {
         const bool enableValidationLayers = true;
 #endif
 
-        CrpDevice(CrpWindow &window);
+        CrpDevice(WindowSystem &window);
 
         ~CrpDevice();
 
@@ -121,7 +121,7 @@ namespace crp {
         VkInstance instance;
         VkDebugUtilsMessengerEXT debugMessenger;
         VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
-        CrpWindow &window;
+        WindowSystem &window;
         VkCommandPool commandPool;
 
         VkDevice device_;

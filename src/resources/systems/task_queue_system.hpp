@@ -7,11 +7,9 @@
 #include <utility>
 #include "render/crp_device.hpp"
 #include "core/macro.hpp"
-#include "core/rectangle.hpp"
+#include "function/framework/rectangle.hpp"
 #include "render/crp_frame_info.hpp"
 #include "function/global/global_context.hpp"
-#include "resources/manager/move_task_manager.hpp"
-#include "runtime_system.hpp"
 
 namespace crp {
     template<typename Fun, typename... Args>
@@ -41,25 +39,31 @@ namespace crp {
         }
     };
 
+
     class Task : public Rectangle {
     public:
-        Task(std::function<void()> fun, Rectangle &rec) : task{std::move(fun)}, Rectangle{rec} {
+        Task(std::function<void()> fun) :
+                task{std::move(fun)}, Rectangle{Rectangle::MakeRectangle(meshPoints, TASK_COLOR, true, true)} {
             ready = std::make_shared<bool>(false);
+            setPosition(initPosition);
         };
 
-        Task() {};
         std::function<void()> task;
 
         std::shared_ptr<bool> ready{};
 
         void run(glm::vec3 &point);
+
+        static glm::vec3 initPosition;
+        static float taskWidth, taskHeight;
+
+        static float l, r, u, d;
+        static std::vector<glm::vec3> meshPoints;
     };
 
-    class TaskQueueSystem {
+    class TaskQueueSystem : public Rectangle {
     public:
-        explicit TaskQueueSystem(CrpDevice &crpDevice);
-
-        void addDeleteTask(Rectangle &task);
+        explicit TaskQueueSystem();
 
         void tick(FrameInfo &frameInfo);
 
@@ -72,22 +76,17 @@ namespace crp {
         bool isSorted();
 
         bool isTaskInQueue(Task &task) {
-            return fabs(task.center.x - points[0].x) < STRICT_EPS;
+            return fabs(task.getCenter().x - points[0].x) < STRICT_EPS;
         }
 
         std::vector<glm::vec3> points;
         std::list<Task> tasks;
-        std::list<std::unique_ptr<std::pair<GameObjectManager::id_t, float>>> deleteTasks;
-        std::vector<GameObjectManager::id_t> shouldDelete;
         std::mutex taskMut;
     private:
-        float up = -1.1f, down = 1.1f, left = 1.f, right = 1.5f;
-        glm::vec3 x{left, up, QUEUE_LAYER}, y{right, up, QUEUE_LAYER}, z{left, down, QUEUE_LAYER}, w{right, down,
-                                                                                                     QUEUE_LAYER};
-        glm::vec3 taskInitPosition;
-        float taskWidth, taskHeight;
-        GameObjectManager::id_t id;
-        CrpDevice &crpDevice;
+        static constexpr float up = -0.55f, down = 0.55f, left = 0.5f, right = 0.75f;
+        static constexpr glm::vec3 x{left, up, QUEUE_LAYER}, y{right, up, QUEUE_LAYER}, z{left, down, QUEUE_LAYER}, w{
+                right, down,
+                QUEUE_LAYER};
         bool locked{};
 
     public:
@@ -100,28 +99,14 @@ namespace crp {
 
             if (locked)
                 return std::optional<TaskResult<Fun, Args...>>();
-            Rectangle rec;
-            rec.movable = true;
-            rec.center = taskInitPosition;
-            rec.points.resize(4);
-            float l = -taskWidth / 2, r = taskWidth / 2,
-                    u = -taskHeight / 2, d = taskHeight / 2;
-            rec.points = {
-                    {l, u, 0},
-                    {r, u, 0},
-                    {l, d, 0},
-                    {r, d, 0},
-            };
-            auto TaskRect = CrpGameObject::makeRectangle(crpDevice, rec.points,
-                                                         {rec.center.x, rec.center.y, TASK_LAYER}, true, {0, .5f, .5f});
-            rec.id = TaskRect.getId();
-            globalContext.gameObjectManager->gameObjects.emplace(TaskRect.getId(), std::move(TaskRect));
-            auto t = std::make_shared<task>(std::bind(std::forward<Fun>(fun), std::forward<Args>(args)...));
-            auto ret = t->get_future();
 
+            auto t = std::make_shared<task>(std::bind(std::forward<Fun>(fun), std::forward<Args>(args)...));
+//            globalContext.gameObjectManager->gameObjects.emplace(rec.getId(),
+//                                                                 rec.gameObject->shared_from_this());
+            auto ret = t->get_future();
             {
                 std::lock_guard<std::mutex> lock(this->taskMut);
-                tasks.emplace_back([t] { (*t)(); }, rec);
+                tasks.emplace_back([t] { (*t)(); });
                 return TaskResult<Fun, Args...>(ret, tasks.back().ready, locked);
             }
         }

@@ -1,19 +1,20 @@
 #pragma once
 #define GLFW_INCLUDE_VULKAN
+
 #include <vulkan/vulkan.h>
 #include <GLFW/glfw3.h>
 #include <string>
 
 namespace crp {
-    class CrpWindow {
+    class WindowSystem {
     public:
-        CrpWindow(int w, int h, std::string name);
+        WindowSystem();
 
-        ~CrpWindow();
+        ~WindowSystem();
 
-        CrpWindow(const CrpWindow &) = delete;
+        WindowSystem(const WindowSystem &) = delete;
 
-        CrpWindow &operator=(const CrpWindow &) = delete;
+        WindowSystem &operator=(const WindowSystem &) = delete;
 
         bool shouldClose() { return glfwWindowShouldClose(window); }
 
@@ -30,13 +31,15 @@ namespace crp {
     private:
         static void framebufferResizeCallback(GLFWwindow *window, int width, int height);
 
-        void initWindow();
+        void init();
 
+        static constexpr int WIDTH = 800;
+        static constexpr int HEIGHT = 600;
         int width;
         int height;
         bool framebufferResized = false;
 
-        std::string windowName;
+        std::string windowName{"ThreadPool"};
 
 
         GLFWwindow *window;

@@ -3,26 +3,26 @@
 #include "render/crp_camera.hpp"
 #include "render/crp_pipeline.hpp"
 #include "render/crp_device.hpp"
-#include "render/crp_game_obejct.hpp"
+#include "function/framework/crp_game_obejct.hpp"
 #include "render/crp_frame_info.hpp"
 //std
 #include <memory>
 #include <vector>
 
 namespace crp {
-    class SimpleRenderSystem {
+    class SimpleRenderPass {
     public:
-        SimpleRenderSystem(CrpDevice &device, VkRenderPass renderPass,VkDescriptorSetLayout globalSetLayout);
+        SimpleRenderPass(CrpDevice &device, VkRenderPass renderPass, VkDescriptorSetLayout globalSetLayout);
 
-        ~SimpleRenderSystem();
+        ~SimpleRenderPass();
 
-        SimpleRenderSystem(const SimpleRenderSystem &) = delete;
+        SimpleRenderPass(const SimpleRenderPass &) = delete;
 
-        SimpleRenderSystem &operator=(const SimpleRenderSystem &) = delete;
+        SimpleRenderPass &operator=(const SimpleRenderPass &) = delete;
 
         void tick(FrameInfo &frameInfo);
 
-    private:
+//    private:
         void createPipelineLayout(VkDescriptorSetLayout globalSetLayout);
 
         void createPipeline(VkRenderPass renderPass);

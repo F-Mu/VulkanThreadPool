@@ -1,10 +1,10 @@
 #pragma once
 
-#include "crp_window.hpp"
+#include "window_system.hpp"
 #include "crp_device.hpp"
 #include "crp_swap_chain.hpp"
-#include "crp_game_obejct.hpp"
-#include "crp_renderer.hpp"
+#include "function/framework/crp_game_obejct.hpp"
+#include "render_system.hpp"
 #include "crp_descriptors.hpp"
 //std
 #include <memory>
@@ -13,9 +13,6 @@
 namespace crp {
     class FirstApp {
     public:
-        static constexpr int WIDTH = 800;
-        static constexpr int HEIGHT = 600;
-
         FirstApp();
 
         ~FirstApp();
@@ -29,12 +26,12 @@ namespace crp {
     private:
         void test();
 
-        CrpWindow crpWindow{WIDTH, HEIGHT, "ThreadPool"};
-        CrpDevice crpDevice{crpWindow};
-        CrpRenderer crpRenderer{crpWindow, crpDevice};
+//        WindowSystem crpWindow{WIDTH, HEIGHT, "ThreadPool"};
+//        CrpDevice crpDevice{crpWindow};
+//        RenderSystem crpRenderer{crpWindow, crpDevice};
 
         //note: order of declarations matters
-        std::unique_ptr<CrpDescriptorPool> globalPool{};
+//        std::unique_ptr<CrpDescriptorPool> globalPool{};
 //        CrpGameObject::Map gameObjects;
     };
 }

@@ -1,4 +1,4 @@
-#include "simple_render_system.hpp"
+#include "simple_render_pass.hpp"
 
 //libs
 #define GLM_FORCE_RADIANS
@@ -11,25 +11,27 @@
 #include <array>
 #include <cassert>
 #include <iostream>
+#include "function/framework/component/render_component.hpp"
+#include "core/push_constant.hpp"
 
 namespace crp {
+//
+//    struct SimplePushConstantData {
+//        glm::mat4 modelMatrix{1.f};
+//        glm::mat4 normalMatrix{1.f};
+//    };
 
-    struct SimplePushConstantData {
-        glm::mat4 modelMatrix{1.f};
-        glm::mat4 normalMatrix{1.f};
-    };
-
-    SimpleRenderSystem::SimpleRenderSystem(CrpDevice &device, VkRenderPass renderPass,
-                                           VkDescriptorSetLayout globalSetLayout) : crpDevice{device} {
+    SimpleRenderPass::SimpleRenderPass(CrpDevice &device, VkRenderPass renderPass,
+                                       VkDescriptorSetLayout globalSetLayout) : crpDevice{device} {
         createPipelineLayout(globalSetLayout);
         createPipeline(renderPass);
     }
 
-    SimpleRenderSystem::~SimpleRenderSystem() {
+    SimpleRenderPass::~SimpleRenderPass() {
         vkDestroyPipelineLayout(crpDevice.device(), pipelineLayout, nullptr);
     }
 
-    void SimpleRenderSystem::createPipelineLayout(VkDescriptorSetLayout globalSetLayout) {
+    void SimpleRenderPass::createPipelineLayout(VkDescriptorSetLayout globalSetLayout) {
         VkPushConstantRange pushConstantRange{};
         pushConstantRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
         pushConstantRange.offset = 0;
@@ -48,7 +50,7 @@ namespace crp {
         }
     }
 
-    void SimpleRenderSystem::createPipeline(VkRenderPass renderPass) {
+    void SimpleRenderPass::createPipeline(VkRenderPass renderPass) {
         assert(pipelineLayout != nullptr && "Cannot create pipeline before pipeline Layout");
 
         PipelineConfigInfo pipelineConfig{};
@@ -64,7 +66,7 @@ namespace crp {
     }
 
 
-    void SimpleRenderSystem::tick(FrameInfo &frameInfo) {
+    void SimpleRenderPass::tick(FrameInfo &frameInfo) {
         crpPipeline->bind(frameInfo.commandBuffer);
 
         vkCmdBindDescriptorSets(
@@ -76,23 +78,23 @@ namespace crp {
                 0, nullptr);
 
         for (auto &kv: frameInfo.gameObjects) {
-            auto &obj = kv.second;
-
-            if (obj.model == nullptr)continue;
-            SimplePushConstantData push{};
-            push.modelMatrix = obj.transform.mat4();
-            push.normalMatrix = obj.transform.normalMatrix();
-
-            vkCmdPushConstants(
-                    frameInfo.commandBuffer,
-                    pipelineLayout,
-                    VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
-                    0,
-                    sizeof(SimplePushConstantData),
-                    &push
-            );
-            obj.model->bind(frameInfo.commandBuffer);
-            obj.model->draw(frameInfo.commandBuffer);
+            kv.second->tick();
+//            obj->render();
+//            if (obj.model == nullptr)continue;
+//            SimplePushConstantData push{};
+//            push.modelMatrix = obj.transform.mat4();
+//            push.normalMatrix = obj.transform.normalMatrix();
+//
+//            vkCmdPushConstants(
+//                    frameInfo.commandBuffer,
+//                    pipelineLayout,
+//                    VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
+//                    0,
+//                    sizeof(SimplePushConstantData),
+//                    &push
+//            );
+//            obj.model->bind(frameInfo.commandBuffer);
+//            obj.model->draw(frameInfo.commandBuffer);
         }
     }
 }

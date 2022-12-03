@@ -1,10 +1,10 @@
 #include "crp_pipeline.hpp"
-#include "crp_model.hpp"
 //std
 #include <fstream>
 #include <stdexcept>
 #include <iostream>
 #include <cassert>
+#include "core/vertex.hpp"
 
 #ifndef ENGINE_DIR
 #define ENGINE_DIR "../"
@@ -195,8 +195,8 @@ namespace crp {
         configInfo.dynamicStateInfo.dynamicStateCount = static_cast<uint32_t >(configInfo.dynamicStateEnables.size());
         configInfo.dynamicStateInfo.flags = 0;
 
-        configInfo.bindingDescriptions = CrpModel::Vertex::getBindingDescriptions();
-        configInfo.attributeDescriptions = CrpModel::Vertex::getAttributeDescriptions();
+        configInfo.bindingDescriptions = Vertex::getBindingDescriptions();
+        configInfo.attributeDescriptions = Vertex::getAttributeDescriptions();
     }
 
     void CrpPipeline::bind(VkCommandBuffer commandBuffer) {

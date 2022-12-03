@@ -1,25 +1,35 @@
 #include "global_context.hpp"
-#include "resources/manager/game_object_manager.hpp"
-#include "resources/systems/thread_pool_system.hpp"
-#include "resources/systems/task_queue_system.hpp"
-#include "resources/systems/runtime_system.hpp"
-#include "resources/manager/move_task_manager.hpp"
+
 namespace crp {
     class CrpDevice;
 
     GlobalContext globalContext;
 
-    void GlobalContext::startEngine(CrpDevice &crpDevice) {
-        moveTaskManager = std::make_shared<MoveTaskManager>();
+    void GlobalContext::startEngine() {
+        windowSystem = std::make_shared<WindowSystem>();
+        device = std::make_shared<CrpDevice>(*windowSystem);
+        renderSystem = std::make_shared<RenderSystem>(*windowSystem, *device);
+        globalResources = std::make_shared<GlobalResources>(*device);
+        simpleRenderPass = std::make_shared<SimpleRenderPass>(*device,
+                                                              renderSystem->getSwapChainRenderPass(),
+                                                              globalResources->globalSetLayout->getDescriptorSetLayout());
+//        moveTaskManager = std::make_shared<MoveTaskManager>();
         gameObjectManager = std::make_shared<GameObjectManager>();
-        runTimeSystem = std::make_shared<RuntimeSystem>(crpDevice);
+        runTimeSystem = std::make_shared<RuntimeSystem>(*device);
     }
 
     void GlobalContext::shutdownEngine() {
+        vkDeviceWaitIdle(device->device());
         runTimeSystem->clear();
         runTimeSystem.reset();
         gameObjectManager.reset();
-        moveTaskManager.reset();
+        simpleRenderPass.reset();
+        globalResources->clear();
+        globalResources.reset();
+//        moveTaskManager.reset();
+        renderSystem.reset();
+        device.reset();
+        windowSystem.reset();
     }
 
 }

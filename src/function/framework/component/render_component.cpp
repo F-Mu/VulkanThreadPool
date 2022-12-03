@@ -1,53 +1,39 @@
-#include "crp_model.hpp"
-
-#include "crp_utils.hpp"
-#include "core/macro.hpp"
-
-#define GLM_ENABLE_EXPERIMENTAL
-
-#include <glm/gtx/hash.hpp>
-#include <iostream>
-//std
-#include <cassert>
-#include <cstring>
-#include <unordered_map>
-
-#ifndef ENGINE_DIR
-#define ENGINE_DIR "../"
-#endif
-
-namespace std {
-    template<>
-    struct hash<crp::CrpModel::Vertex> {
-        size_t operator()(crp::CrpModel::Vertex const &vertex) const {
-            size_t seed = 0;
-            crp::hashCombine(seed, vertex.position, vertex.color, vertex.normal, vertex.uv);
-            return seed;
-        }
-    };
-}
-
+#include "render_component.hpp"
+#include "function/global/global_context.hpp"
+#include "function/framework/crp_game_obejct.hpp"
+#include "resources/systems/simple_render_pass.hpp"
+#include "mesh_component.hpp"
+#include "core/push_constant.hpp"
 namespace crp {
-
-
-    CrpModel::CrpModel(CrpDevice &device, const std::vector<Vertex> &vertices) : crpDevice{device} {
-        createVertexBuffers(vertices);
+    RenderComponent::RenderComponent(const std::weak_ptr<CrpGameObject> &parent, CrpDevice &device) :
+            Component(parent), crpDevice{device} {
+        type = "RenderComponent";
+        auto meshComponent = parent.lock()->tryGetComponentConst(MeshComponent);
+        if (!meshComponent)return;
+        if (meshComponent->worldPoints.empty())return;
+        createVertexBuffers(meshComponent->worldPoints);
+        if (meshComponent->worldIndices.empty())return;
+        createIndexBuffers(meshComponent->worldIndices);
     }
 
-    CrpModel::~CrpModel() {
-//        std::cout<<"#"<<std::endl;
+    RenderComponent::~RenderComponent() {
         vertexBuffer.reset();
         indexBuffer.reset();
     }
 
+//    void RenderComponent::update() {
+//        auto meshComponent = m_parent_object.lock()->tryGetComponent(MeshComponent);
+//        if (!meshComponent)return;
+//        meshComponent->tick();
+//        if (meshComponent->worldPoints.empty())return;
+//        vertexBuffer.reset();
+//        createVertexBuffers(meshComponent->worldPoints);
+//        if (meshComponent->worldIndices.empty())return;
+//        indexBuffer.reset();
+//        createIndexBuffers(meshComponent->worldIndices);
+//    }
 
-    std::unique_ptr<CrpModel> CrpModel::createModelFromVertices(
-            CrpDevice &device, const std::vector<Vertex> &vertices) {
-//        PRINT(vertices[0].position);
-        return std::make_unique<CrpModel>(device, vertices);
-    }
-
-    void CrpModel::createVertexBuffers(const std::vector<Vertex> &vertices) {
+    void RenderComponent::createVertexBuffers(const std::vector<Vertex> &vertices) {
         vertexCount = static_cast<uint32_t>(vertices.size());
         assert(vertexCount >= 3 && "Vertex count must be at least 3");
         VkDeviceSize bufferSize = sizeof(vertices[0]) * vertexCount;
@@ -74,7 +60,7 @@ namespace crp {
         crpDevice.copyBuffer(stagingBuffer.getBuffer(), vertexBuffer->getBuffer(), bufferSize);
     }
 
-    void CrpModel::createIndexBuffers(const std::vector<uint32_t> &indices) {
+    void RenderComponent::createIndexBuffers(const std::vector<uint32_t> &indices) {
         indexCount = static_cast<uint32_t>(indices.size());
         hasIndexBuffer = indexCount > 0;
 
@@ -107,7 +93,7 @@ namespace crp {
         crpDevice.copyBuffer(stagingBuffer.getBuffer(), indexBuffer->getBuffer(), bufferSize);
     }
 
-    void CrpModel::draw(VkCommandBuffer commandBuffer) {
+    void RenderComponent::draw(VkCommandBuffer commandBuffer) {
         if (hasIndexBuffer) {
             vkCmdDrawIndexed(commandBuffer, indexCount, 1, 0, 0, 0);
         } else {
@@ -115,7 +101,7 @@ namespace crp {
         }
     }
 
-    void CrpModel::bind(VkCommandBuffer commandBuffer) {
+    void RenderComponent::bind(VkCommandBuffer commandBuffer) {
         VkBuffer buffers[] = {vertexBuffer->getBuffer()};
         VkDeviceSize offsets[] = {0};
         vkCmdBindVertexBuffers(commandBuffer, 0, 1, buffers, offsets);
@@ -124,22 +110,22 @@ namespace crp {
         }
     }
 
-    std::vector<VkVertexInputBindingDescription> CrpModel::Vertex::getBindingDescriptions() {
-        std::vector<VkVertexInputBindingDescription> bindingDescriptions(1);
-        bindingDescriptions[0].binding = 0;
-        bindingDescriptions[0].stride = sizeof(Vertex);
-        bindingDescriptions[0].inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
-        return bindingDescriptions;
-    }
+    void RenderComponent::tick() {
+        auto transform = m_parent_object.lock()->tryGetComponent(TransformComponent);
+        SimplePushConstantData push{};
+        push.modelMatrix = transform->mat4();
+        push.normalMatrix = transform->normalMatrix();
 
-    std::vector<VkVertexInputAttributeDescription> CrpModel::Vertex::getAttributeDescriptions() {
-        std::vector<VkVertexInputAttributeDescription> attributeDescriptions{};
-
-        attributeDescriptions.push_back({0, 0, VK_FORMAT_R32G32B32_SFLOAT, offsetof(Vertex, position)});
-        attributeDescriptions.push_back({1, 0, VK_FORMAT_R32G32B32_SFLOAT, offsetof(Vertex, color)});
-        attributeDescriptions.push_back({2, 0, VK_FORMAT_R32G32B32_SFLOAT, offsetof(Vertex, normal)});
-        attributeDescriptions.push_back({3, 0, VK_FORMAT_R32G32_SFLOAT, offsetof(Vertex, uv)});
-        return attributeDescriptions;
+        vkCmdPushConstants(
+                globalContext.renderSystem->nowCommandBuffer,
+                globalContext.simpleRenderPass->pipelineLayout,
+                VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
+                0,
+                sizeof(SimplePushConstantData),
+                &push
+        );
+        bind(globalContext.renderSystem->nowCommandBuffer);
+        draw(globalContext.renderSystem->nowCommandBuffer);
     }
 
 }

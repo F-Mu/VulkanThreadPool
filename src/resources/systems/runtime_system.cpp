@@ -7,14 +7,13 @@
 
 namespace crp {
     RuntimeSystem::RuntimeSystem(CrpDevice &crpDevice) :
-            crpDevice{crpDevice},
-            taskQueueSystem{std::make_shared<TaskQueueSystem>(crpDevice)},
-            threadPoolSystem{std::make_shared<ThreadPoolSystem>(crpDevice)} {
+            Rectangle{std::move(Rectangle::MakeRectangle({x, y, w, z}))},
+                      crpDevice{crpDevice},
+                      taskQueueSystem{std::make_shared<TaskQueueSystem>()},
+                      threadPoolSystem{std::make_shared<ThreadPoolSystem>(crpDevice)} {
         threadPoolSystem->threadsInit(taskQueueSystem->tasks);
-        auto RuntimeRect = CrpGameObject::makeRectangle(crpDevice,
-                                                        x, y, z, w, false);
-        id = RuntimeRect.getId();
-        globalContext.gameObjectManager->gameObjects.emplace(RuntimeRect.getId(), std::move(RuntimeRect));
+//        globalContext.gameObjectManager->gameObjects[getId()] = *this;
+//        globalContext.gameObjectManager->gameObjects.emplace(getId(), gameObject->shared_from_this());
 
         float mid = (left + right) / 2;
         points.resize(THREAD_NUM);
