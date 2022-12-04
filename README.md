@@ -14,7 +14,7 @@ https://github.com/blurrypiano/littleVulkanEngine/tree/master
 
 + 去除3D特性（以后继续尝试添加）
 
-+ 更好的分层以及优化主循环（依旧模仿Piccolo小引擎，https://github.com/BoomingTech/Piccolo）
++ 更好的分层以及优化主循环（依旧模仿Piccolo小引擎)，https://github.com/BoomingTech/Piccolo
 
 + v1.2版本在另一个分支中
 
