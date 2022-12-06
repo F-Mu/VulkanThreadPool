@@ -1,6 +1,6 @@
 #pragma once
 
-#include "crp_device.hpp"
+#include "render_device.hpp"
 
 #include <string>
 #include <vector>
@@ -30,18 +30,18 @@ namespace crp {
         uint32_t subpass = 0;
     };
 
-    class CrpPipeline {
+    class RenderPipeline {
     public:
-        CrpPipeline(CrpDevice &device,
-                    const std::string &vertFilepath,
-                    const std::string &fragFilepath,
-                    const PipelineConfigInfo &configInfo);
+        RenderPipeline(RenderDevice &device,
+                       const std::string &vertFilepath,
+                       const std::string &fragFilepath,
+                       const PipelineConfigInfo &configInfo);
 
-        ~CrpPipeline();
+        ~RenderPipeline();
 
-        CrpPipeline(const CrpPipeline &) = delete;
+        RenderPipeline(const RenderPipeline &) = delete;
 
-        CrpPipeline &operator=(const CrpPipeline &) = delete;
+        RenderPipeline &operator=(const RenderPipeline &) = delete;
 
         void bind(VkCommandBuffer commandBuffer);
 
@@ -58,7 +58,7 @@ namespace crp {
 
         void createShaderModule(const std::vector<char> &code, VkShaderModule *shaderModule);
 
-        CrpDevice &crpDevice;
+        RenderDevice &renderDevice;
         VkPipeline graphicsPipeline;
         VkShaderModule vertShaderModule;
         VkShaderModule fragShaderModule;

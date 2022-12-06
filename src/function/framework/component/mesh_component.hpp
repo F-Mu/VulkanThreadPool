@@ -1,6 +1,6 @@
 #pragma once
 
-#include "render/crp_device.hpp"
+#include "render/render_device.hpp"
 #include "component.hpp"
 #include "core/vertex.hpp"
 #include <glm/glm.hpp>
@@ -9,13 +9,17 @@
 namespace crp {
     class MeshComponent : public Component {
     public:
-        MeshComponent(const std::weak_ptr<CrpGameObject> &parent, std::vector<glm::vec3> &_points, glm::vec3 &_color,
+        MeshComponent(const std::weak_ptr<GameObject> &parent, std::vector<glm::vec3> &_points, glm::vec3 &_color,
                       bool _fill);
 
         void getWorld();
+
         void getIndices();
+
+        void setPoints(std::vector<glm::vec3> &_points);
+
         std::vector<glm::vec3> points{};
-        std::vector<Vertex> worldPoints{};
+        std::vector<Vertex> vertexPoints{};
         std::vector<uint32_t> worldIndices{};
         glm::vec3 color;
         bool fill;

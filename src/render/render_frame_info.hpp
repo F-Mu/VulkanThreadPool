@@ -1,6 +1,6 @@
 #pragma once
 
-#include "crp_camera.hpp"
+#include "render_camera.hpp"
 #include "resources/manager/game_object_manager.hpp"
 
 #include <vulkan/vulkan.h>
@@ -13,7 +13,7 @@ namespace crp {
         alignas(16) glm::mat4 inverseView{1.f};
     };
 
-    struct FrameInfo {
+    struct RenderFrameInfo {
         int frameIndex;
         float frameTime;
         VkCommandBuffer commandBuffer;

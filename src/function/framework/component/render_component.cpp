@@ -1,46 +1,29 @@
 #include "render_component.hpp"
 #include "function/global/global_context.hpp"
-#include "function/framework/crp_game_obejct.hpp"
+#include "function/framework/game_object.hpp"
 #include "resources/systems/simple_render_pass.hpp"
 #include "mesh_component.hpp"
 #include "core/push_constant.hpp"
+
 namespace crp {
-    RenderComponent::RenderComponent(const std::weak_ptr<CrpGameObject> &parent, CrpDevice &device) :
-            Component(parent), crpDevice{device} {
-        type = "RenderComponent";
-        auto meshComponent = parent.lock()->tryGetComponentConst(MeshComponent);
-        if (!meshComponent)return;
-        if (meshComponent->worldPoints.empty())return;
-        createVertexBuffers(meshComponent->worldPoints);
-        if (meshComponent->worldIndices.empty())return;
-        createIndexBuffers(meshComponent->worldIndices);
+    Model::Model(const std::vector<Vertex> &vertices, const std::vector<uint32_t> &indices) {
+        createVertexBuffers(vertices);
+        createIndexBuffers(indices);
     }
 
-    RenderComponent::~RenderComponent() {
+    Model::~Model() {
         vertexBuffer.reset();
         indexBuffer.reset();
     }
 
-//    void RenderComponent::update() {
-//        auto meshComponent = m_parent_object.lock()->tryGetComponent(MeshComponent);
-//        if (!meshComponent)return;
-//        meshComponent->tick();
-//        if (meshComponent->worldPoints.empty())return;
-//        vertexBuffer.reset();
-//        createVertexBuffers(meshComponent->worldPoints);
-//        if (meshComponent->worldIndices.empty())return;
-//        indexBuffer.reset();
-//        createIndexBuffers(meshComponent->worldIndices);
-//    }
-
-    void RenderComponent::createVertexBuffers(const std::vector<Vertex> &vertices) {
+    void Model::createVertexBuffers(const std::vector<Vertex> &vertices) {
         vertexCount = static_cast<uint32_t>(vertices.size());
         assert(vertexCount >= 3 && "Vertex count must be at least 3");
         VkDeviceSize bufferSize = sizeof(vertices[0]) * vertexCount;
         uint32_t vertexSize = sizeof(vertices[0]);
 
-        CrpBuffer stagingBuffer{
-                crpDevice,
+        RenderBuffer stagingBuffer{
+                *globalContext.device,
                 vertexSize,
                 vertexCount,
                 VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
@@ -50,17 +33,17 @@ namespace crp {
         stagingBuffer.map();
         stagingBuffer.writeToBuffer((void *) vertices.data());
 
-        vertexBuffer = std::make_unique<CrpBuffer>(
-                crpDevice,
+        vertexBuffer = std::make_unique<RenderBuffer>(
+                *globalContext.device,
                 vertexSize,
                 vertexCount,
                 VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT,
                 VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT
         );
-        crpDevice.copyBuffer(stagingBuffer.getBuffer(), vertexBuffer->getBuffer(), bufferSize);
+        globalContext.device->copyBuffer(stagingBuffer.getBuffer(), vertexBuffer->getBuffer(), bufferSize);
     }
 
-    void RenderComponent::createIndexBuffers(const std::vector<uint32_t> &indices) {
+    void Model::createIndexBuffers(const std::vector<uint32_t> &indices) {
         indexCount = static_cast<uint32_t>(indices.size());
         hasIndexBuffer = indexCount > 0;
 
@@ -71,8 +54,8 @@ namespace crp {
         VkDeviceSize bufferSize = sizeof(indices[0]) * indexCount;
         uint32_t indexSize = sizeof(indices[0]);
 
-        CrpBuffer stagingBuffer{
-                crpDevice,
+        RenderBuffer stagingBuffer{
+                *globalContext.device,
                 indexSize,
                 indexCount,
                 VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
@@ -82,18 +65,17 @@ namespace crp {
         stagingBuffer.map();
         stagingBuffer.writeToBuffer((void *) indices.data());
 
-        indexBuffer = std::make_unique<CrpBuffer>(
-                crpDevice,
+        indexBuffer = std::make_unique<RenderBuffer>(
+                *globalContext.device,
                 indexSize,
                 indexCount,
                 VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT,
                 VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT
         );
-
-        crpDevice.copyBuffer(stagingBuffer.getBuffer(), indexBuffer->getBuffer(), bufferSize);
+        globalContext.device->copyBuffer(stagingBuffer.getBuffer(), indexBuffer->getBuffer(), bufferSize);
     }
 
-    void RenderComponent::draw(VkCommandBuffer commandBuffer) {
+    void Model::draw(VkCommandBuffer commandBuffer) {
         if (hasIndexBuffer) {
             vkCmdDrawIndexed(commandBuffer, indexCount, 1, 0, 0, 0);
         } else {
@@ -101,7 +83,7 @@ namespace crp {
         }
     }
 
-    void RenderComponent::bind(VkCommandBuffer commandBuffer) {
+    void Model::bind(VkCommandBuffer commandBuffer) {
         VkBuffer buffers[] = {vertexBuffer->getBuffer()};
         VkDeviceSize offsets[] = {0};
         vkCmdBindVertexBuffers(commandBuffer, 0, 1, buffers, offsets);
@@ -110,22 +92,45 @@ namespace crp {
         }
     }
 
+    RenderComponent::RenderComponent(const std::weak_ptr<GameObject> &parent) :
+            Component(parent) {
+        type = "RenderComponent";
+        auto meshComponent = parent.lock()->tryGetComponentConst(MeshComponent);
+        if (!meshComponent)return;
+        if (meshComponent->vertexPoints.empty())return;
+        if (meshComponent->worldIndices.empty())return;
+        model = std::make_shared<Model>(meshComponent->vertexPoints, meshComponent->worldIndices);
+    }
+
+    RenderComponent::~RenderComponent() {
+        model.reset();
+    }
+
+    void RenderComponent::update() {
+        auto meshComponent = m_parent_object.lock()->tryGetComponentConst(MeshComponent);
+        if (!meshComponent || !meshComponent->isDirty())return;
+        if (meshComponent->vertexPoints.empty())return;
+        if (meshComponent->worldIndices.empty())return;
+        model = std::make_shared<Model>(meshComponent->vertexPoints, meshComponent->worldIndices);
+    }
+
     void RenderComponent::tick() {
+        if (!model || isDirty())return;
+        update();
         auto transform = m_parent_object.lock()->tryGetComponent(TransformComponent);
         SimplePushConstantData push{};
         push.modelMatrix = transform->mat4();
         push.normalMatrix = transform->normalMatrix();
 
         vkCmdPushConstants(
-                globalContext.renderSystem->nowCommandBuffer,
+                *globalContext.renderSystem->nowCommandBuffer,
                 globalContext.simpleRenderPass->pipelineLayout,
                 VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
                 0,
                 sizeof(SimplePushConstantData),
                 &push
         );
-        bind(globalContext.renderSystem->nowCommandBuffer);
-        draw(globalContext.renderSystem->nowCommandBuffer);
+        model->bind(*globalContext.renderSystem->nowCommandBuffer);
+        model->draw(*globalContext.renderSystem->nowCommandBuffer);
     }
-
 }

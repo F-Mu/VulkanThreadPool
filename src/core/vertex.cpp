@@ -20,6 +20,6 @@ namespace crp {
         return attributeDescriptions;
     }
 
-    Vertex::Vertex(glm::vec4 _position, glm::vec3 _color, glm::vec3 _normal, glm::vec2 _uv) :
+    Vertex::Vertex(glm::vec3 _position, glm::vec3 _color, glm::vec3 _normal, glm::vec2 _uv) :
             position{_position}, color{_color}, normal{_normal}, uv{_uv} {}
 }

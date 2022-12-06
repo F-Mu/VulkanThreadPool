@@ -1,6 +1,7 @@
 #include "transform_component.hpp"
 #include "core/macro.hpp"
 #include <iostream>
+
 namespace crp {
     // Matrix corrsponds to Translate * Ry * Rx * Rz * Scale
     // Rotations correspond to Tait-bryan angles of Y(1), X(2), Z(3)

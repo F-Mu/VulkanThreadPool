@@ -1,6 +1,6 @@
 #pragma once
 
-#include "function/framework/crp_game_obejct.hpp"
+#include "function/framework/game_object.hpp"
 #include "render/window_system.hpp"
 
 namespace crp {
@@ -25,7 +25,7 @@ namespace crp {
             int debug = GLFW_KEY_M;
         };
 
-        void moveInPlaneXZ(GLFWwindow *window, float dt, CrpGameObject &gameObject);
+        void moveInPlaneXZ(GLFWwindow *window, float dt, GameObject &gameObject);
 
         void addTask(GLFWwindow *window);
 

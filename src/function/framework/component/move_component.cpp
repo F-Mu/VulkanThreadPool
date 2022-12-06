@@ -1,6 +1,6 @@
 #include "move_component.hpp"
 #include "transform_component.hpp"
-#include "function/framework/crp_game_obejct.hpp"
+#include "function/framework/game_object.hpp"
 
 namespace crp {
     void MoveComponent::tick() {
@@ -14,7 +14,7 @@ namespace crp {
         }
     }
 
-    MoveComponent::MoveComponent(const std::weak_ptr<CrpGameObject> &parent)
+    MoveComponent::MoveComponent(const std::weak_ptr<GameObject> &parent)
             : Component(parent),
               center{m_parent_object.lock()->tryGetComponent(TransformComponent)->translation} {
         type = "MoveComponent";

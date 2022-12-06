@@ -26,10 +26,10 @@ namespace crp {
         float l = -threadWidth / 2, r = threadWidth / 2,
                 u = -threadHeight / 2, d = threadHeight / 2;
         std::vector<glm::vec3> meshPoints = {
-                {l, u, 0},
                 {r, u, 0},
-                {l, d, 0},
+                {l, u, 0},
                 {r, d, 0},
+                {l, d, 0},
         };
         for (int i = 0; i < THREAD_NUM; ++i) {
             threads.emplace_back(Thread(meshPoints, THREAD_COLOR, true, true));

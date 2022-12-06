@@ -12,20 +12,22 @@
 #include <iostream>
 
 namespace crp {
-    class CrpGameObject : public std::enable_shared_from_this<CrpGameObject> {
+    class GameObject : public std::enable_shared_from_this<GameObject> {
     public:
-        static CrpGameObject createGameObject() {
+        static GameObject createGameObject() {
             static id_t currentId = 0;
             return {currentId++};
         }
 
-        CrpGameObject(const CrpGameObject &) = default;
+        virtual ~GameObject();
 
-        CrpGameObject &operator=(const CrpGameObject &) = default;
+        GameObject(const GameObject &) = default;
 
-        CrpGameObject(CrpGameObject &&) = default;
+        GameObject &operator=(const GameObject &) = default;
 
-        CrpGameObject &operator=(CrpGameObject &&) = default;
+        GameObject(GameObject &&) = default;
+
+        GameObject &operator=(GameObject &&) = default;
 
         template<typename TComponent>
         TComponent *tryGetComponent(const std::string &component_type_name) {
@@ -60,13 +62,16 @@ namespace crp {
 
         std::list<std::shared_ptr<Component>> components;
 
+        void setShouldTick(bool cond) { shouldTick = cond; }
 
 #define tryGetComponent(COMPONENT_TYPE) tryGetComponent<COMPONENT_TYPE>(#COMPONENT_TYPE)
 #define tryGetComponentConst(COMPONENT_TYPE) tryGetComponentConst<const COMPONENT_TYPE>(#COMPONENT_TYPE)
 
     private:
-        CrpGameObject(id_t objId) : id{objId} {}
+        GameObject(id_t objId) : id{objId} {}
 
         id_t id;
+
+        bool shouldTick{true};
     };
 }

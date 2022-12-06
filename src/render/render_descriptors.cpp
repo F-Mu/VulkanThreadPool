@@ -1,4 +1,4 @@
-#include "crp_descriptors.hpp"
+#include "render_descriptors.hpp"
 
 // std
 #include <cassert>
@@ -8,7 +8,7 @@ namespace crp {
 
 // *************** Descriptor Set Layout Builder *********************
 
-    CrpDescriptorSetLayout::Builder &CrpDescriptorSetLayout::Builder::addBinding(
+    RenderDescriptorSetLayout::Builder &RenderDescriptorSetLayout::Builder::addBinding(
             uint32_t binding,
             VkDescriptorType descriptorType,
             VkShaderStageFlags stageFlags,
@@ -23,15 +23,15 @@ namespace crp {
         return *this;
     }
 
-    std::unique_ptr<CrpDescriptorSetLayout> CrpDescriptorSetLayout::Builder::build() const {
-        return std::make_unique<CrpDescriptorSetLayout>(crpDevice, bindings);
+    std::unique_ptr<RenderDescriptorSetLayout> RenderDescriptorSetLayout::Builder::build() const {
+        return std::make_unique<RenderDescriptorSetLayout>(renderDevice, bindings);
     }
 
 // *************** Descriptor Set Layout *********************
 
-    CrpDescriptorSetLayout::CrpDescriptorSetLayout(
-            CrpDevice &crpDevice, std::unordered_map<uint32_t, VkDescriptorSetLayoutBinding> bindings)
-            : crpDevice{crpDevice}, bindings{bindings} {
+    RenderDescriptorSetLayout::RenderDescriptorSetLayout(
+            RenderDevice &device, std::unordered_map<uint32_t, VkDescriptorSetLayoutBinding> bindings)
+            : renderDevice{device}, bindings{bindings} {
         std::vector<VkDescriptorSetLayoutBinding> setLayoutBindings{};
         for (auto kv : bindings) {
             setLayoutBindings.push_back(kv.second);
@@ -43,7 +43,7 @@ namespace crp {
         descriptorSetLayoutInfo.pBindings = setLayoutBindings.data();
 
         if (vkCreateDescriptorSetLayout(
-                crpDevice.device(),
+                device.device(),
                 &descriptorSetLayoutInfo,
                 nullptr,
                 &descriptorSetLayout) != VK_SUCCESS) {
@@ -51,40 +51,40 @@ namespace crp {
         }
     }
 
-    CrpDescriptorSetLayout::~CrpDescriptorSetLayout() {
-        vkDestroyDescriptorSetLayout(crpDevice.device(), descriptorSetLayout, nullptr);
+    RenderDescriptorSetLayout::~RenderDescriptorSetLayout() {
+        vkDestroyDescriptorSetLayout(renderDevice.device(), descriptorSetLayout, nullptr);
     }
 
 // *************** Descriptor Pool Builder *********************
 
-    CrpDescriptorPool::Builder &CrpDescriptorPool::Builder::addPoolSize(
+    RenderDescriptorPool::Builder &RenderDescriptorPool::Builder::addPoolSize(
             VkDescriptorType descriptorType, uint32_t count) {
         poolSizes.push_back({descriptorType, count});
         return *this;
     }
 
-    CrpDescriptorPool::Builder &CrpDescriptorPool::Builder::setPoolFlags(
+    RenderDescriptorPool::Builder &RenderDescriptorPool::Builder::setPoolFlags(
             VkDescriptorPoolCreateFlags flags) {
         poolFlags = flags;
         return *this;
     }
-    CrpDescriptorPool::Builder &CrpDescriptorPool::Builder::setMaxSets(uint32_t count) {
+    RenderDescriptorPool::Builder &RenderDescriptorPool::Builder::setMaxSets(uint32_t count) {
         maxSets = count;
         return *this;
     }
 
-    std::unique_ptr<CrpDescriptorPool> CrpDescriptorPool::Builder::build() const {
-        return std::make_unique<CrpDescriptorPool>(crpDevice, maxSets, poolFlags, poolSizes);
+    std::unique_ptr<RenderDescriptorPool> RenderDescriptorPool::Builder::build() const {
+        return std::make_unique<RenderDescriptorPool>(renderDevice, maxSets, poolFlags, poolSizes);
     }
 
 // *************** Descriptor Pool *********************
 
-    CrpDescriptorPool::CrpDescriptorPool(
-            CrpDevice &crpDevice,
+    RenderDescriptorPool::RenderDescriptorPool(
+            RenderDevice &device,
             uint32_t maxSets,
             VkDescriptorPoolCreateFlags poolFlags,
             const std::vector<VkDescriptorPoolSize> &poolSizes)
-            : crpDevice{crpDevice} {
+            : renderDevice{device} {
         VkDescriptorPoolCreateInfo descriptorPoolInfo{};
         descriptorPoolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
         descriptorPoolInfo.poolSizeCount = static_cast<uint32_t>(poolSizes.size());
@@ -92,17 +92,17 @@ namespace crp {
         descriptorPoolInfo.maxSets = maxSets;
         descriptorPoolInfo.flags = poolFlags;
 
-        if (vkCreateDescriptorPool(crpDevice.device(), &descriptorPoolInfo, nullptr, &descriptorPool) !=
+        if (vkCreateDescriptorPool(device.device(), &descriptorPoolInfo, nullptr, &descriptorPool) !=
             VK_SUCCESS) {
             throw std::runtime_error("failed to create descriptor pool!");
         }
     }
 
-    CrpDescriptorPool::~CrpDescriptorPool() {
-        vkDestroyDescriptorPool(crpDevice.device(), descriptorPool, nullptr);
+    RenderDescriptorPool::~RenderDescriptorPool() {
+        vkDestroyDescriptorPool(renderDevice.device(), descriptorPool, nullptr);
     }
 
-    bool CrpDescriptorPool::allocateDescriptor(
+    bool RenderDescriptorPool::allocateDescriptor(
             const VkDescriptorSetLayout descriptorSetLayout, VkDescriptorSet &descriptor) const {
         VkDescriptorSetAllocateInfo allocInfo{};
         allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
@@ -112,30 +112,30 @@ namespace crp {
 
         // Might want to create a "DescriptorPoolManager" class that handles this case, and builds
         // a new pool whenever an old pool fills up. But this is beyond our current scope
-        if (vkAllocateDescriptorSets(crpDevice.device(), &allocInfo, &descriptor) != VK_SUCCESS) {
+        if (vkAllocateDescriptorSets(renderDevice.device(), &allocInfo, &descriptor) != VK_SUCCESS) {
             return false;
         }
         return true;
     }
 
-    void CrpDescriptorPool::freeDescriptors(std::vector<VkDescriptorSet> &descriptors) const {
+    void RenderDescriptorPool::freeDescriptors(std::vector<VkDescriptorSet> &descriptors) const {
         vkFreeDescriptorSets(
-                crpDevice.device(),
+                renderDevice.device(),
                 descriptorPool,
                 static_cast<uint32_t>(descriptors.size()),
                 descriptors.data());
     }
 
-    void CrpDescriptorPool::resetPool() {
-        vkResetDescriptorPool(crpDevice.device(), descriptorPool, 0);
+    void RenderDescriptorPool::resetPool() {
+        vkResetDescriptorPool(renderDevice.device(), descriptorPool, 0);
     }
 
 // *************** Descriptor Writer *********************
 
-    CrpDescriptorWriter::CrpDescriptorWriter(CrpDescriptorSetLayout &setLayout, CrpDescriptorPool &pool)
+    RenderDescriptorWriter::RenderDescriptorWriter(RenderDescriptorSetLayout &setLayout, RenderDescriptorPool &pool)
             : setLayout{setLayout}, pool{pool} {}
 
-    CrpDescriptorWriter &CrpDescriptorWriter::writeBuffer(
+    RenderDescriptorWriter &RenderDescriptorWriter::writeBuffer(
             uint32_t binding, VkDescriptorBufferInfo *bufferInfo) {
         assert(setLayout.bindings.count(binding) == 1 && "Layout does not contain specified binding");
 
@@ -156,7 +156,7 @@ namespace crp {
         return *this;
     }
 
-    CrpDescriptorWriter &CrpDescriptorWriter::writeImage(
+    RenderDescriptorWriter &RenderDescriptorWriter::writeImage(
             uint32_t binding, VkDescriptorImageInfo *imageInfo) {
         assert(setLayout.bindings.count(binding) == 1 && "Layout does not contain specified binding");
 
@@ -177,7 +177,7 @@ namespace crp {
         return *this;
     }
 
-    bool CrpDescriptorWriter::build(VkDescriptorSet &set) {
+    bool RenderDescriptorWriter::build(VkDescriptorSet &set) {
         bool success = pool.allocateDescriptor(setLayout.getDescriptorSetLayout(), set);
         if (!success) {
             return false;
@@ -186,11 +186,11 @@ namespace crp {
         return true;
     }
 
-    void CrpDescriptorWriter::overwrite(VkDescriptorSet &set) {
+    void RenderDescriptorWriter::overwrite(VkDescriptorSet &set) {
         for (auto &write : writes) {
             write.dstSet = set;
         }
-        vkUpdateDescriptorSets(pool.crpDevice.device(), writes.size(), writes.data(), 0, nullptr);
+        vkUpdateDescriptorSets(pool.renderDevice.device(), writes.size(), writes.data(), 0, nullptr);
     }
 
 }  // namespace crp

@@ -2,35 +2,49 @@
 
 #include <memory>
 #include <glm/glm.hpp>
-#include "render/crp_device.hpp"
-#include "render/crp_buffer.hpp"
+#include "render/render_device.hpp"
+#include "render/render_buffer.hpp"
 #include "component.hpp"
 #include "core/vertex.hpp"
 
 namespace crp {
-    class RenderComponent : public Component {
+    class Model {
     public:
-        RenderComponent(const std::weak_ptr<CrpGameObject> &parent,CrpDevice &device);
-        ~RenderComponent();
+        Model(const std::vector<Vertex> &vertices, const std::vector<uint32_t> &indices);
+
+        ~Model();
+
+        Model(const Model &) = delete;
+
+        Model &operator=(const Model &) = delete;
 
         void bind(VkCommandBuffer commandBuffer);
 
         void draw(VkCommandBuffer commandBuffer);
-
-        void tick();
 
     private:
         void createVertexBuffers(const std::vector<Vertex> &vertices);
 
         void createIndexBuffers(const std::vector<uint32_t> &indices);
 
-        CrpDevice &crpDevice;
-
-        std::unique_ptr<CrpBuffer> vertexBuffer;
+        std::unique_ptr<RenderBuffer> vertexBuffer;
         uint32_t vertexCount;
 
         bool hasIndexBuffer = false;
-        std::unique_ptr<CrpBuffer> indexBuffer;
+        std::unique_ptr<RenderBuffer> indexBuffer;
         uint32_t indexCount;
+    };
+
+    class RenderComponent : public Component {
+    public:
+        RenderComponent(const std::weak_ptr<GameObject> &parent);
+
+        ~RenderComponent();
+
+        void update();
+
+        void tick();
+    private:
+        std::shared_ptr<Model> model{};
     };
 }

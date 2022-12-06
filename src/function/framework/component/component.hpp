@@ -4,18 +4,24 @@
 #include <utility>
 
 namespace crp {
-    class CrpGameObject;
+    class GameObject;
 
     class Component {
     public:
-        Component(std::weak_ptr<CrpGameObject> parent) : m_parent_object(std::move(parent)) {};
+        Component(std::weak_ptr<GameObject> parent) : m_parent_object(std::move(parent)) {};
 
-        std::weak_ptr<CrpGameObject> m_parent_object;
+        std::weak_ptr<GameObject> m_parent_object;
 
         virtual void tick() {};
 
         std::string getTypeName() { return type; }
 
+        bool isDirty() const { return is_dirty; }
+
+        void setDirty(bool cond) { is_dirty = cond; }
+
+    private:
+        bool is_dirty{false};
     protected:
         std::string type;
     };

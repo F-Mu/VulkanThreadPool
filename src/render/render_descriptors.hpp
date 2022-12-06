@@ -1,6 +1,6 @@
 #pragma once
 
-#include "crp_device.hpp"
+#include "render_device.hpp"
 
 // std
 #include <memory>
@@ -9,66 +9,66 @@
 
 namespace crp {
 
-    class CrpDescriptorSetLayout {
+    class RenderDescriptorSetLayout {
     public:
         class Builder {
         public:
-            Builder(CrpDevice &crpDevice) : crpDevice{crpDevice} {}
+            Builder(RenderDevice &device) : renderDevice{device} {}
 
             Builder &addBinding(
                     uint32_t binding,
                     VkDescriptorType descriptorType,
                     VkShaderStageFlags stageFlags,
                     uint32_t count = 1);
-            std::unique_ptr<CrpDescriptorSetLayout> build() const;
+            std::unique_ptr<RenderDescriptorSetLayout> build() const;
 
         private:
-            CrpDevice &crpDevice;
+            RenderDevice &renderDevice;
             std::unordered_map<uint32_t, VkDescriptorSetLayoutBinding> bindings{};
         };
 
-        CrpDescriptorSetLayout(
-                CrpDevice &crpDevice, std::unordered_map<uint32_t, VkDescriptorSetLayoutBinding> bindings);
-        ~CrpDescriptorSetLayout();
-        CrpDescriptorSetLayout(const CrpDescriptorSetLayout &) = delete;
-        CrpDescriptorSetLayout &operator=(const CrpDescriptorSetLayout &) = delete;
+        RenderDescriptorSetLayout(
+                RenderDevice &device, std::unordered_map<uint32_t, VkDescriptorSetLayoutBinding> bindings);
+        ~RenderDescriptorSetLayout();
+        RenderDescriptorSetLayout(const RenderDescriptorSetLayout &) = delete;
+        RenderDescriptorSetLayout &operator=(const RenderDescriptorSetLayout &) = delete;
 
         VkDescriptorSetLayout getDescriptorSetLayout() const { return descriptorSetLayout; }
 
     private:
-        CrpDevice &crpDevice;
+        RenderDevice &renderDevice;
         VkDescriptorSetLayout descriptorSetLayout;
         std::unordered_map<uint32_t, VkDescriptorSetLayoutBinding> bindings;
 
-        friend class CrpDescriptorWriter;
+        friend class RenderDescriptorWriter;
     };
 
-    class CrpDescriptorPool {
+    class RenderDescriptorPool {
     public:
         class Builder {
         public:
-            Builder(CrpDevice &crpDevice) : crpDevice{crpDevice} {}
+            Builder(RenderDevice &crpDevice) : renderDevice{crpDevice} {}
 
             Builder &addPoolSize(VkDescriptorType descriptorType, uint32_t count);
             Builder &setPoolFlags(VkDescriptorPoolCreateFlags flags);
             Builder &setMaxSets(uint32_t count);
-            std::unique_ptr<CrpDescriptorPool> build() const;
+            std::unique_ptr<RenderDescriptorPool> build() const;
 
         private:
-            CrpDevice &crpDevice;
+            RenderDevice &renderDevice;
             std::vector<VkDescriptorPoolSize> poolSizes{};
             uint32_t maxSets = 1000;
             VkDescriptorPoolCreateFlags poolFlags = 0;
         };
 
-        CrpDescriptorPool(
-                CrpDevice &crpDevice,
+        RenderDescriptorPool(
+                RenderDevice &device,
                 uint32_t maxSets,
                 VkDescriptorPoolCreateFlags poolFlags,
                 const std::vector<VkDescriptorPoolSize> &poolSizes);
-        ~CrpDescriptorPool();
-        CrpDescriptorPool(const CrpDescriptorPool &) = delete;
-        CrpDescriptorPool &operator=(const CrpDescriptorPool &) = delete;
+        ~RenderDescriptorPool();
+        RenderDescriptorPool(const RenderDescriptorPool &) = delete;
+        RenderDescriptorPool &operator=(const RenderDescriptorPool &) = delete;
 
         bool allocateDescriptor(
                 const VkDescriptorSetLayout descriptorSetLayout, VkDescriptorSet &descriptor) const;
@@ -78,25 +78,25 @@ namespace crp {
         void resetPool();
 
     private:
-        CrpDevice &crpDevice;
+        RenderDevice &renderDevice;
         VkDescriptorPool descriptorPool;
 
-        friend class CrpDescriptorWriter;
+        friend class RenderDescriptorWriter;
     };
 
-    class CrpDescriptorWriter {
+    class RenderDescriptorWriter {
     public:
-        CrpDescriptorWriter(CrpDescriptorSetLayout &setLayout, CrpDescriptorPool &pool);
+        RenderDescriptorWriter(RenderDescriptorSetLayout &setLayout, RenderDescriptorPool &pool);
 
-        CrpDescriptorWriter &writeBuffer(uint32_t binding, VkDescriptorBufferInfo *bufferInfo);
-        CrpDescriptorWriter &writeImage(uint32_t binding, VkDescriptorImageInfo *imageInfo);
+        RenderDescriptorWriter &writeBuffer(uint32_t binding, VkDescriptorBufferInfo *bufferInfo);
+        RenderDescriptorWriter &writeImage(uint32_t binding, VkDescriptorImageInfo *imageInfo);
 
         bool build(VkDescriptorSet &set);
         void overwrite(VkDescriptorSet &set);
 
     private:
-        CrpDescriptorSetLayout &setLayout;
-        CrpDescriptorPool &pool;
+        RenderDescriptorSetLayout &setLayout;
+        RenderDescriptorPool &pool;
         std::vector<VkWriteDescriptorSet> writes;
     };
 

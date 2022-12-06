@@ -7,7 +7,7 @@
 namespace crp {
     class TransformComponent : public Component {
     public:
-        TransformComponent(const std::weak_ptr<CrpGameObject> &parent) :
+        TransformComponent(const std::weak_ptr<GameObject> &parent) :
                 Component(parent) { type = "TransformComponent"; }
 
         glm::vec3 translation{};

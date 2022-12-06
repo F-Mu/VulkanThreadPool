@@ -2,22 +2,22 @@
 
 #include <list>
 #include <map>
-#include "function/framework/crp_game_obejct.hpp"
+#include "function/framework/game_object.hpp"
 
 namespace crp {
     class GameObjectManager {
     public:
         using id_t = unsigned int;
-        using Map = std::unordered_map<id_t, std::shared_ptr<CrpGameObject>>;
+        using Map = std::unordered_map<id_t, std::shared_ptr<GameObject>>;
         Map gameObjects;
 
         void deleteById(id_t id);
 
         void tick();
 
-        void registerGO(const std::shared_ptr<CrpGameObject> &gameObject);
+        void registerGO(const std::shared_ptr<GameObject> &gameObject);
 
-        void addGameObject(const id_t &id, const CrpGameObject &gameObject);
+        void addGameObject(const id_t &id, const GameObject &gameObject);
 
     private:
         std::list<id_t> deleteTasks;

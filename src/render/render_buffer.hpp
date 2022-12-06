@@ -1,24 +1,24 @@
 #pragma once
 
-#include "crp_device.hpp"
+#include "render_device.hpp"
 
 namespace crp {
 
-    class CrpBuffer {
+    class RenderBuffer {
     public:
-        CrpBuffer(
-                CrpDevice &device,
+        RenderBuffer(
+                RenderDevice &device,
                 VkDeviceSize instanceSize,
                 uint32_t instanceCount,
                 VkBufferUsageFlags usageFlags,
                 VkMemoryPropertyFlags memoryPropertyFlags,
                 VkDeviceSize minOffsetAlignment = 1);
 
-        ~CrpBuffer();
+        ~RenderBuffer();
 
-        CrpBuffer(const CrpBuffer &) = delete;
+        RenderBuffer(const RenderBuffer &) = delete;
 
-        CrpBuffer &operator=(const CrpBuffer &) = delete;
+        RenderBuffer &operator=(const RenderBuffer &) = delete;
 
         VkResult map(VkDeviceSize size = VK_WHOLE_SIZE, VkDeviceSize offset = 0);
 
@@ -59,7 +59,7 @@ namespace crp {
     private:
         static VkDeviceSize getAlignment(VkDeviceSize instanceSize, VkDeviceSize minOffsetAlignment);
 
-        CrpDevice &crpDevice;
+        RenderDevice &renderDevice;
         void *mapped = nullptr;
         VkBuffer buffer = VK_NULL_HANDLE;
         VkDeviceMemory memory = VK_NULL_HANDLE;

@@ -5,10 +5,10 @@
 #include <list>
 #include <future>
 #include <utility>
-#include "render/crp_device.hpp"
+#include "render/render_device.hpp"
 #include "core/macro.hpp"
 #include "function/framework/rectangle.hpp"
-#include "render/crp_frame_info.hpp"
+#include "render/render_frame_info.hpp"
 #include "function/global/global_context.hpp"
 
 namespace crp {

@@ -5,7 +5,7 @@
 
 namespace crp {
     void crp::KeyboardController::moveInPlaneXZ(
-            GLFWwindow *window, float dt, crp::CrpGameObject &gameObject) {
+            GLFWwindow *window, float dt, crp::GameObject &gameObject) {
 //        glm::vec3 rotate(0);
 //        if (glfwGetKey(window, keys.lookRight) == GLFW_PRESS)rotate.y += 1.f;
 //        if (glfwGetKey(window, keys.lookLeft) == GLFW_PRESS)rotate.y -= 1.f;

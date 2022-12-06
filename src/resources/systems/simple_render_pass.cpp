@@ -15,14 +15,14 @@
 #include "core/push_constant.hpp"
 
 namespace crp {
-    SimpleRenderPass::SimpleRenderPass(CrpDevice &device, VkRenderPass renderPass,
-                                       VkDescriptorSetLayout globalSetLayout) : crpDevice{device} {
+    SimpleRenderPass::SimpleRenderPass(RenderDevice &device, VkRenderPass renderPass,
+                                       VkDescriptorSetLayout globalSetLayout) : renderDevice{device} {
         createPipelineLayout(globalSetLayout);
         createPipeline(renderPass);
     }
 
     SimpleRenderPass::~SimpleRenderPass() {
-        vkDestroyPipelineLayout(crpDevice.device(), pipelineLayout, nullptr);
+        vkDestroyPipelineLayout(renderDevice.device(), pipelineLayout, nullptr);
     }
 
     void SimpleRenderPass::createPipelineLayout(VkDescriptorSetLayout globalSetLayout) {
@@ -39,7 +39,8 @@ namespace crp {
         pipelineLayoutInfo.pSetLayouts = descriptorSetLayouts.data();
         pipelineLayoutInfo.pushConstantRangeCount = 1;
         pipelineLayoutInfo.pPushConstantRanges = &pushConstantRange;
-        if (vkCreatePipelineLayout(crpDevice.device(), &pipelineLayoutInfo, nullptr, &pipelineLayout) != VK_SUCCESS) {
+//        pipelineLayoutInfo.pPushConstantRanges = nullptr;
+        if (vkCreatePipelineLayout(renderDevice.device(), &pipelineLayoutInfo, nullptr, &pipelineLayout) != VK_SUCCESS) {
             throw std::runtime_error("failed to create pipeline layout");
         }
     }
@@ -48,11 +49,11 @@ namespace crp {
         assert(pipelineLayout != nullptr && "Cannot create pipeline before pipeline Layout");
 
         PipelineConfigInfo pipelineConfig{};
-        CrpPipeline::defaultPipelineConfigInfo(pipelineConfig);
+        RenderPipeline::defaultPipelineConfigInfo(pipelineConfig);
         pipelineConfig.renderPass = renderPass;
         pipelineConfig.pipelineLayout = pipelineLayout;
-        crpPipeline = std::make_unique<CrpPipeline>(
-                crpDevice,
+        renderPipeline = std::make_unique<RenderPipeline>(
+                renderDevice,
                 "shaders/simple_shader.vert.spv",
                 "shaders/simple_shader.frag.spv",
                 pipelineConfig
@@ -60,8 +61,8 @@ namespace crp {
     }
 
 
-    void SimpleRenderPass::tick(FrameInfo &frameInfo) {
-        crpPipeline->bind(frameInfo.commandBuffer);
+    void SimpleRenderPass::tick(RenderFrameInfo &frameInfo) {
+        renderPipeline->bind(frameInfo.commandBuffer);
 
         vkCmdBindDescriptorSets(
                 frameInfo.commandBuffer,

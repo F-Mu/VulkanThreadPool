@@ -27,10 +27,10 @@ namespace crp {
     }
 
     void WindowSystem::framebufferResizeCallback(GLFWwindow *window, int width, int height) {
-        auto crpWindow = reinterpret_cast<WindowSystem *>(glfwGetWindowUserPointer(window));
-        crpWindow->framebufferResized = true;
-        crpWindow->width = width;
-        crpWindow->height = height;
+        auto windowSystem = reinterpret_cast<WindowSystem *>(glfwGetWindowUserPointer(window));
+        windowSystem->framebufferResized = true;
+        windowSystem->width = width;
+        windowSystem->height = height;
     }
 
 }

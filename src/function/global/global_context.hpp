@@ -1,7 +1,7 @@
 #pragma once
 
 #include <memory>
-#include "render/crp_device.hpp"
+#include "render/render_device.hpp"
 #include "resources/manager/game_object_manager.hpp"
 #include "resources/systems/thread_pool_system.hpp"
 #include "resources/systems/task_queue_system.hpp"
@@ -26,7 +26,7 @@ namespace crp {
         std::shared_ptr<SimpleRenderPass> simpleRenderPass;
         std::shared_ptr<WindowSystem> windowSystem;
         std::shared_ptr<RenderSystem> renderSystem;
-        std::shared_ptr<CrpDevice> device;
+        std::shared_ptr<RenderDevice> device;
         bool debug{};
     };
 

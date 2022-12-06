@@ -23,7 +23,7 @@ namespace crp {
         bool isComplete() { return graphicsFamilyHasValue && presentFamilyHasValue; }
     };
 
-    class CrpDevice {
+    class RenderDevice {
     public:
 #ifdef NDEBUG
         const bool enableValidationLayers = false;
@@ -31,18 +31,18 @@ namespace crp {
         const bool enableValidationLayers = true;
 #endif
 
-        CrpDevice(WindowSystem &window);
+        RenderDevice(WindowSystem &window);
 
-        ~CrpDevice();
+        ~RenderDevice();
 
         // Not copyable or movable
-        CrpDevice(const CrpDevice &) = delete;
+        RenderDevice(const RenderDevice &) = delete;
 
-        CrpDevice& operator=(const CrpDevice &) = delete;
+        RenderDevice& operator=(const RenderDevice &) = delete;
 
-        CrpDevice(CrpDevice &&) = delete;
+        RenderDevice(RenderDevice &&) = delete;
 
-        CrpDevice &operator=(CrpDevice &&) = delete;
+        RenderDevice &operator=(RenderDevice &&) = delete;
 
         VkCommandPool getCommandPool() { return commandPool; }
 

@@ -5,11 +5,12 @@
  * https://github.com/SaschaWillems/Vulkan/blob/master/base/VulkanBuffer.h
  */
 
-#include "crp_buffer.hpp"
+#include "render_buffer.hpp"
 
 // std
 #include <cassert>
 #include <cstring>
+#include <iostream>
 
 namespace crp {
 
@@ -22,21 +23,21 @@ namespace crp {
  *
  * @return VkResult of the buffer mapping call
  */
-    VkDeviceSize CrpBuffer::getAlignment(VkDeviceSize instanceSize, VkDeviceSize minOffsetAlignment) {
+    VkDeviceSize RenderBuffer::getAlignment(VkDeviceSize instanceSize, VkDeviceSize minOffsetAlignment) {
         if (minOffsetAlignment > 0) {
             return (instanceSize + minOffsetAlignment - 1) & ~(minOffsetAlignment - 1);
         }
         return instanceSize;
     }
 
-    CrpBuffer::CrpBuffer(
-            CrpDevice &device,
+    RenderBuffer::RenderBuffer(
+            RenderDevice &device,
             VkDeviceSize instanceSize,
             uint32_t instanceCount,
             VkBufferUsageFlags usageFlags,
             VkMemoryPropertyFlags memoryPropertyFlags,
             VkDeviceSize minOffsetAlignment)
-            : crpDevice{device},
+            : renderDevice{device},
               instanceSize{instanceSize},
               instanceCount{instanceCount},
               usageFlags{usageFlags},
@@ -46,10 +47,10 @@ namespace crp {
         device.createBuffer(bufferSize, usageFlags, memoryPropertyFlags, buffer, memory);
     }
 
-    CrpBuffer::~CrpBuffer() {
+    RenderBuffer::~RenderBuffer() {
         unmap();
-        vkDestroyBuffer(crpDevice.device(), buffer, nullptr);
-        vkFreeMemory(crpDevice.device(), memory, nullptr);
+        vkDestroyBuffer(renderDevice.device(), buffer, nullptr);
+        vkFreeMemory(renderDevice.device(), memory, nullptr);
     }
 
 /**
@@ -61,9 +62,9 @@ namespace crp {
  *
  * @return VkResult of the buffer mapping call
  */
-    VkResult CrpBuffer::map(VkDeviceSize size, VkDeviceSize offset) {
+    VkResult RenderBuffer::map(VkDeviceSize size, VkDeviceSize offset) {
         assert(buffer && memory && "Called map on buffer before create");
-        return vkMapMemory(crpDevice.device(), memory, offset, size, 0, &mapped);
+        return vkMapMemory(renderDevice.device(), memory, offset, size, 0, &mapped);
     }
 
 /**
@@ -71,9 +72,9 @@ namespace crp {
  *
  * @note Does not return a result as vkUnmapMemory can't fail
  */
-    void CrpBuffer::unmap() {
+    void RenderBuffer::unmap() {
         if (mapped) {
-            vkUnmapMemory(crpDevice.device(), memory);
+            vkUnmapMemory(renderDevice.device(), memory);
             mapped = nullptr;
         }
     }
@@ -87,20 +88,20 @@ namespace crp {
  * @param offset (Optional) Byte offset from beginning of mapped region
  *
  */
-    void CrpBuffer::writeToBuffer(void *data, VkDeviceSize size, VkDeviceSize offset) {
+    void RenderBuffer::writeToBuffer(void *data, VkDeviceSize size, VkDeviceSize offset) {
         assert(mapped && "Cannot copy to unmapped buffer");
 
         if (size == VK_WHOLE_SIZE) {
             memcpy(mapped, data, bufferSize);
         } else {
-            char *memOffset = (char *)mapped;
+            char *memOffset = (char *) mapped;
             memOffset += offset;
             memcpy(memOffset, data, size);
         }
     }
 
 /**
- * Flush a memory range of the buffer to make it visible to the device
+ * Flush a memory range of the buffer to make it visible to the renderDevice
  *
  * @note Only required for non-coherent memory
  *
@@ -110,13 +111,13 @@ namespace crp {
  *
  * @return VkResult of the flush call
  */
-    VkResult CrpBuffer::flush(VkDeviceSize size, VkDeviceSize offset) {
+    VkResult RenderBuffer::flush(VkDeviceSize size, VkDeviceSize offset) {
         VkMappedMemoryRange mappedRange = {};
         mappedRange.sType = VK_STRUCTURE_TYPE_MAPPED_MEMORY_RANGE;
         mappedRange.memory = memory;
         mappedRange.offset = offset;
         mappedRange.size = size;
-        return vkFlushMappedMemoryRanges(crpDevice.device(), 1, &mappedRange);
+        return vkFlushMappedMemoryRanges(renderDevice.device(), 1, &mappedRange);
     }
 
 /**
@@ -130,13 +131,13 @@ namespace crp {
  *
  * @return VkResult of the invalidate call
  */
-    VkResult CrpBuffer::invalidate(VkDeviceSize size, VkDeviceSize offset) {
+    VkResult RenderBuffer::invalidate(VkDeviceSize size, VkDeviceSize offset) {
         VkMappedMemoryRange mappedRange = {};
         mappedRange.sType = VK_STRUCTURE_TYPE_MAPPED_MEMORY_RANGE;
         mappedRange.memory = memory;
         mappedRange.offset = offset;
         mappedRange.size = size;
-        return vkInvalidateMappedMemoryRanges(crpDevice.device(), 1, &mappedRange);
+        return vkInvalidateMappedMemoryRanges(renderDevice.device(), 1, &mappedRange);
     }
 
 /**
@@ -147,7 +148,7 @@ namespace crp {
  *
  * @return VkDescriptorBufferInfo of specified offset and range
  */
-    VkDescriptorBufferInfo CrpBuffer::descriptorInfo(VkDeviceSize size, VkDeviceSize offset) {
+    VkDescriptorBufferInfo RenderBuffer::descriptorInfo(VkDeviceSize size, VkDeviceSize offset) {
         return VkDescriptorBufferInfo{
                 buffer,
                 offset,
@@ -162,17 +163,17 @@ namespace crp {
  * @param index Used in offset calculation
  *
  */
-    void CrpBuffer::writeToIndex(void *data, int index) {
+    void RenderBuffer::writeToIndex(void *data, int index) {
         writeToBuffer(data, instanceSize, index * alignmentSize);
     }
 
 /**
- *  Flush the memory range at index * alignmentSize of the buffer to make it visible to the device
+ *  Flush the memory range at index * alignmentSize of the buffer to make it visible to the renderDevice
  *
  * @param index Used in offset calculation
  *
  */
-    VkResult CrpBuffer::flushIndex(int index) { return flush(alignmentSize, index * alignmentSize); }
+    VkResult RenderBuffer::flushIndex(int index) { return flush(alignmentSize, index * alignmentSize); }
 
 /**
  * Create a buffer info descriptor
@@ -181,7 +182,7 @@ namespace crp {
  *
  * @return VkDescriptorBufferInfo for instance at index
  */
-    VkDescriptorBufferInfo CrpBuffer::descriptorInfoForIndex(int index) {
+    VkDescriptorBufferInfo RenderBuffer::descriptorInfoForIndex(int index) {
         return descriptorInfo(alignmentSize, index * alignmentSize);
     }
 
@@ -194,7 +195,7 @@ namespace crp {
  *
  * @return VkResult of the invalidate call
  */
-    VkResult CrpBuffer::invalidateIndex(int index) {
+    VkResult RenderBuffer::invalidateIndex(int index) {
         return invalidate(alignmentSize, index * alignmentSize);
     }
 

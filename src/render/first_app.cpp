@@ -1,8 +1,10 @@
 #include "first_app.hpp"
 #include "function/controller/keyboard_controller.hpp"
 #include "resources/systems/simple_render_pass.hpp"
-#include "crp_buffer.hpp"
+#include "render_buffer.hpp"
 #include "function/global/global_context.hpp"
+#include "function/framework/component/mesh_component.hpp"
+#include "function/framework/component/render_component.hpp"
 //libs
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
@@ -47,19 +49,19 @@ namespace crp {
             controller.addTask(windowSystem->getGLFWwindow());
             if (renderSystem->beginFrame()) {
                 int frameIndex = renderSystem->getFrameIndex();
-                FrameInfo frameInfo{
+                RenderFrameInfo frameInfo{
                         frameIndex,
                         frameTime,
-                        renderSystem->nowCommandBuffer,
+                        *renderSystem->nowCommandBuffer,
                         globalResources->globalDescriptorSets[frameIndex],
                         globalContext.gameObjectManager->gameObjects,
                 };
                 //render
-                renderSystem->beginSwapChainRenderPass(renderSystem->nowCommandBuffer);
+                renderSystem->beginSwapChainRenderPass();
                 //order here matters
                 runTimeSystem->tick();
                 simpleRenderPass->tick(frameInfo);
-                renderSystem->endSwapChainRenderPass(renderSystem->nowCommandBuffer);
+                renderSystem->endSwapChainRenderPass();
                 renderSystem->endFrame();
             }
         }
@@ -70,8 +72,12 @@ namespace crp {
 //        auto &runTimeSystem = globalContext.runTimeSystem;
 //        auto &taskQueueSystem = globalContext.runTimeSystem->taskQueueSystem;
 //        auto &threadPoolSystem = globalContext.runTimeSystem->threadPoolSystem;
-//        auto &moveTaskManager = globalContext.moveTaskManager;
 //        auto &gameObjectManager = globalContext.gameObjectManager;
+//        auto &windowSystem = globalContext.windowSystem;
+//        auto &device = *globalContext.device;
+//        auto &renderSystem = globalContext.renderSystem;
+//        auto &simpleRenderPass = globalContext.simpleRenderPass;
+//        auto &globalResources = globalContext.globalResources;
     }
 
 }

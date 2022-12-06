@@ -28,10 +28,10 @@ namespace crp {
         Task::initPosition = points.back();
         Task::initPosition.x += 1;
         Task::meshPoints = {
-                {Task::l, Task::u, 0},
                 {Task::r, Task::u, 0},
-                {Task::l, Task::d, 0},
+                {Task::l, Task::u, 0},
                 {Task::r, Task::d, 0},
+                {Task::l, Task::d, 0},
         };
     }
 

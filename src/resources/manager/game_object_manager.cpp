@@ -10,10 +10,10 @@ namespace crp {
         for (auto &i: gameObjects)i.second->tick();
     }
 
-    void GameObjectManager::addGameObject(const id_t &id, const CrpGameObject &gameObject) {
+    void GameObjectManager::addGameObject(const id_t &id, const GameObject &gameObject) {
     }
 
-    void GameObjectManager::registerGO(const std::shared_ptr<CrpGameObject> &gameObject) {
+    void GameObjectManager::registerGO(const std::shared_ptr<GameObject> &gameObject) {
         gameObjects.emplace(gameObject->getId(), gameObject);
     }
 }

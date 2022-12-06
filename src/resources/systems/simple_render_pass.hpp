@@ -1,10 +1,10 @@
 #pragma once
 
-#include "render/crp_camera.hpp"
-#include "render/crp_pipeline.hpp"
-#include "render/crp_device.hpp"
-#include "function/framework/crp_game_obejct.hpp"
-#include "render/crp_frame_info.hpp"
+#include "render/render_camera.hpp"
+#include "render/render_pipeline.hpp"
+#include "render/render_device.hpp"
+#include "function/framework/game_object.hpp"
+#include "render/render_frame_info.hpp"
 //std
 #include <memory>
 #include <vector>
@@ -12,7 +12,7 @@
 namespace crp {
     class SimpleRenderPass {
     public:
-        SimpleRenderPass(CrpDevice &device, VkRenderPass renderPass, VkDescriptorSetLayout globalSetLayout);
+        SimpleRenderPass(RenderDevice &device, VkRenderPass renderPass, VkDescriptorSetLayout globalSetLayout);
 
         ~SimpleRenderPass();
 
@@ -20,15 +20,15 @@ namespace crp {
 
         SimpleRenderPass &operator=(const SimpleRenderPass &) = delete;
 
-        void tick(FrameInfo &frameInfo);
+        void tick(RenderFrameInfo &frameInfo);
 
 //    private:
         void createPipelineLayout(VkDescriptorSetLayout globalSetLayout);
 
         void createPipeline(VkRenderPass renderPass);
 
-        CrpDevice &crpDevice;
-        std::unique_ptr<CrpPipeline> crpPipeline;
+        RenderDevice &renderDevice;
+        std::unique_ptr<RenderPipeline> renderPipeline;
         VkPipelineLayout pipelineLayout;
     };
 }

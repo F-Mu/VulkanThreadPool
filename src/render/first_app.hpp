@@ -1,11 +1,11 @@
 #pragma once
 
 #include "window_system.hpp"
-#include "crp_device.hpp"
-#include "crp_swap_chain.hpp"
-#include "function/framework/crp_game_obejct.hpp"
+#include "render_device.hpp"
+#include "render_swap_chain.hpp"
+#include "function/framework/game_object.hpp"
 #include "render_system.hpp"
-#include "crp_descriptors.hpp"
+#include "render_descriptors.hpp"
 //std
 #include <memory>
 #include <vector>

@@ -9,7 +9,7 @@
 #include <glm/glm.hpp>
 
 namespace crp {
-    class CrpCamera {
+    class RenderCamera {
     public:
         void setOrthographicProjection(
                 float left, float right, float top, float bottom, float near, float far);

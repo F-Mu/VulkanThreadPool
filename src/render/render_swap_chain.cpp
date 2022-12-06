@@ -1,4 +1,4 @@
-#include "crp_swap_chain.hpp"
+#include "render_swap_chain.hpp"
 
 // std
 #include <array>
@@ -11,12 +11,12 @@
 
 namespace crp {
 
-    CrpSwapChain::CrpSwapChain(CrpDevice &deviceRef, VkExtent2D extent)
+    RenderSwapChain::RenderSwapChain(RenderDevice &deviceRef, VkExtent2D extent)
             : device{deviceRef}, windowExtent{extent} {
         init();
     }
 
-    CrpSwapChain::CrpSwapChain(CrpDevice &deviceRef, VkExtent2D extent, std::shared_ptr<CrpSwapChain> previous)
+    RenderSwapChain::RenderSwapChain(RenderDevice &deviceRef, VkExtent2D extent, std::shared_ptr<RenderSwapChain> previous)
             : device{deviceRef}, windowExtent{extent}, oldSwapChain(previous) {
         init();
 
@@ -24,7 +24,7 @@ namespace crp {
         oldSwapChain = nullptr;
     }
 
-    void CrpSwapChain::init() {
+    void RenderSwapChain::init() {
         createSwapChain();
         createImageViews();
         createRenderPass();
@@ -33,7 +33,7 @@ namespace crp {
         createSyncObjects();
     }
 
-    CrpSwapChain::~CrpSwapChain() {
+    RenderSwapChain::~RenderSwapChain() {
         for (auto imageView: swapChainImageViews) {
             vkDestroyImageView(device.device(), imageView, nullptr);
         }
@@ -64,7 +64,7 @@ namespace crp {
         }
     }
 
-    VkResult CrpSwapChain::acquireNextImage(uint32_t *imageIndex) {
+    VkResult RenderSwapChain::acquireNextImage(uint32_t *imageIndex) {
         vkWaitForFences(
                 device.device(),
                 1,
@@ -83,7 +83,7 @@ namespace crp {
         return result;
     }
 
-    VkResult CrpSwapChain::submitCommandBuffers(
+    VkResult RenderSwapChain::submitCommandBuffers(
             const VkCommandBuffer *buffers, uint32_t *imageIndex) {
         if (imagesInFlight[*imageIndex] != VK_NULL_HANDLE) {
             vkWaitForFences(device.device(), 1, &imagesInFlight[*imageIndex], VK_TRUE, UINT64_MAX);
@@ -131,7 +131,7 @@ namespace crp {
         return result;
     }
 
-    void CrpSwapChain::createSwapChain() {
+    void RenderSwapChain::createSwapChain() {
         SwapChainSupportDetails swapChainSupport = device.getSwapChainSupport();
 
         VkSurfaceFormatKHR surfaceFormat = chooseSwapSurfaceFormat(swapChainSupport.formats);
@@ -192,7 +192,7 @@ namespace crp {
         swapChainExtent = extent;
     }
 
-    void CrpSwapChain::createImageViews() {
+    void RenderSwapChain::createImageViews() {
         swapChainImageViews.resize(swapChainImages.size());
         for (size_t i = 0; i < swapChainImages.size(); i++) {
             VkImageViewCreateInfo viewInfo{};
@@ -213,7 +213,7 @@ namespace crp {
         }
     }
 
-    void CrpSwapChain::createRenderPass() {
+    void RenderSwapChain::createRenderPass() {
         VkAttachmentDescription depthAttachment{};
         depthAttachment.format = findDepthFormat();
         depthAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
@@ -274,7 +274,7 @@ namespace crp {
         }
     }
 
-    void CrpSwapChain::createFramebuffers() {
+    void RenderSwapChain::createFramebuffers() {
         swapChainFramebuffers.resize(imageCount());
         for (size_t i = 0; i < imageCount(); i++) {
             std::array<VkImageView, 2> attachments = {swapChainImageViews[i], depthImageViews[i]};
@@ -299,7 +299,7 @@ namespace crp {
         }
     }
 
-    void CrpSwapChain::createDepthResources() {
+    void RenderSwapChain::createDepthResources() {
         VkFormat depthFormat = findDepthFormat();
         swapChainDepthFormat = depthFormat;
         VkExtent2D swapChainExtent = getSwapChainExtent();
@@ -348,7 +348,7 @@ namespace crp {
         }
     }
 
-    void CrpSwapChain::createSyncObjects() {
+    void RenderSwapChain::createSyncObjects() {
         imageAvailableSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
         renderFinishedSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
         inFlightFences.resize(MAX_FRAMES_IN_FLIGHT);
@@ -372,7 +372,7 @@ namespace crp {
         }
     }
 
-    VkSurfaceFormatKHR CrpSwapChain::chooseSwapSurfaceFormat(
+    VkSurfaceFormatKHR RenderSwapChain::chooseSwapSurfaceFormat(
             const std::vector<VkSurfaceFormatKHR> &availableFormats) {
         for (const auto &availableFormat: availableFormats) {
             if (availableFormat.format == VK_FORMAT_B8G8R8A8_SRGB &&
@@ -384,7 +384,7 @@ namespace crp {
         return availableFormats[0];
     }
 
-    VkPresentModeKHR CrpSwapChain::chooseSwapPresentMode(
+    VkPresentModeKHR RenderSwapChain::chooseSwapPresentMode(
             const std::vector<VkPresentModeKHR> &availablePresentModes) {
         for (const auto &availablePresentMode: availablePresentModes) {
             if (availablePresentMode == VK_PRESENT_MODE_MAILBOX_KHR) {
@@ -404,7 +404,7 @@ namespace crp {
         return VK_PRESENT_MODE_FIFO_KHR;
     }
 
-    VkExtent2D CrpSwapChain::chooseSwapExtent(const VkSurfaceCapabilitiesKHR &capabilities) {
+    VkExtent2D RenderSwapChain::chooseSwapExtent(const VkSurfaceCapabilitiesKHR &capabilities) {
         if (capabilities.currentExtent.width != std::numeric_limits<uint32_t>::max()) {
             return capabilities.currentExtent;
         } else {
@@ -420,7 +420,7 @@ namespace crp {
         }
     }
 
-    VkFormat CrpSwapChain::findDepthFormat() {
+    VkFormat RenderSwapChain::findDepthFormat() {
         return device.findSupportedFormat(
                 {VK_FORMAT_D32_SFLOAT, VK_FORMAT_D32_SFLOAT_S8_UINT, VK_FORMAT_D24_UNORM_S8_UINT},
                 VK_IMAGE_TILING_OPTIMAL,

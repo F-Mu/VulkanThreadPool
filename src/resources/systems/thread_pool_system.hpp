@@ -7,10 +7,10 @@
 #include <thread>
 #include <list>
 #include <glm/glm.hpp>
-#include "function/framework/crp_game_obejct.hpp"
+#include "function/framework/game_object.hpp"
 #include "core/macro.hpp"
 #include "resources/manager/game_object_manager.hpp"
-#include "render/crp_frame_info.hpp"
+#include "render/render_frame_info.hpp"
 #include "function/framework/rectangle.hpp"
 
 namespace crp {

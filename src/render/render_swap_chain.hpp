@@ -1,6 +1,6 @@
 #pragma once
 
-#include "crp_device.hpp"
+#include "render_device.hpp"
 
 // vulkan headers
 #include <vulkan/vulkan.h>
@@ -12,19 +12,19 @@
 
 namespace crp {
 
-    class CrpSwapChain {
+    class RenderSwapChain {
     public:
         static constexpr int MAX_FRAMES_IN_FLIGHT = 2;
 
-        CrpSwapChain(CrpDevice &deviceRef, VkExtent2D extent);
+        RenderSwapChain(RenderDevice &deviceRef, VkExtent2D extent);
 
-        CrpSwapChain(CrpDevice &deviceRef, VkExtent2D extent, std::shared_ptr<CrpSwapChain> previous);
+        RenderSwapChain(RenderDevice &deviceRef, VkExtent2D extent, std::shared_ptr<RenderSwapChain> previous);
 
-        ~CrpSwapChain();
+        ~RenderSwapChain();
 
-        CrpSwapChain(const CrpSwapChain &) = delete;
+        RenderSwapChain(const RenderSwapChain &) = delete;
 
-        CrpSwapChain &operator=(const CrpSwapChain &) = delete;
+        RenderSwapChain &operator=(const RenderSwapChain &) = delete;
 
         VkFramebuffer getFrameBuffer(int index) { return swapChainFramebuffers[index]; }
 
@@ -52,7 +52,7 @@ namespace crp {
 
         VkResult submitCommandBuffers(const VkCommandBuffer *buffers, uint32_t *imageIndex);
 
-        bool compareSwapFormats(const CrpSwapChain &swapChain) const {
+        bool compareSwapFormats(const RenderSwapChain &swapChain) const {
             return swapChain.swapChainDepthFormat == swapChainDepthFormat &&
                    swapChain.swapChainImageFormat == swapChainImageFormat;
         }
@@ -94,11 +94,11 @@ namespace crp {
         std::vector<VkImage> swapChainImages;
         std::vector<VkImageView> swapChainImageViews;
 
-        CrpDevice &device;
+        RenderDevice &device;
         VkExtent2D windowExtent;
 
         VkSwapchainKHR swapChain;
-        std::shared_ptr<CrpSwapChain> oldSwapChain;
+        std::shared_ptr<RenderSwapChain> oldSwapChain;
         std::vector<VkSemaphore> imageAvailableSemaphores;
         std::vector<VkSemaphore> renderFinishedSemaphores;
         std::vector<VkFence> inFlightFences;

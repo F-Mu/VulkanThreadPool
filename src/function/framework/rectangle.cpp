@@ -11,12 +11,16 @@
 #include "component/delete_component.hpp"
 
 namespace crp {
+    Rectangle::~Rectangle() {
+        gameObject.reset();
+    }
+
     void Rectangle::init(std::vector<glm::vec3> &points, glm::vec3 color, bool fill, bool moveAble) {
         gameObject->addComponent<TransformComponent>();
         gameObject->addComponent<MeshComponent>(points, color, fill);
         if (moveAble)
             gameObject->addComponent<MoveComponent>();
-        gameObject->addComponent<RenderComponent>(*globalContext.device);
+        gameObject->addComponent<RenderComponent>();
     }
 
     void Rectangle::Move(glm::vec3 destination, float _time) {
@@ -31,13 +35,20 @@ namespace crp {
         moveComponent->setDestination(destinations, _time);
     }
 
-    Rectangle::Rectangle() : gameObject{std::make_shared<CrpGameObject>(CrpGameObject::createGameObject())} {}
+    Rectangle::Rectangle() : gameObject{std::make_shared<GameObject>(GameObject::createGameObject())} {}
 
     Rectangle Rectangle::MakeRectangle(std::vector<glm::vec3> points, glm::vec3 color, bool fill,
                                        bool moveAble) {
         Rectangle rectangle;
         rectangle.init(points, color, fill, moveAble);
         rectangle.registerManager();
+        for (int i = 1; i < points.size(); ++i) {
+            if (points[i].x == points[0].x) {
+                rectangle.height = fabs(points[i].y - points[0].y);
+            } else if (points[i].y == points[i].y) {
+                rectangle.width = fabs(points[i].x - points[0].x);
+            }
+        }
         return rectangle;
     }
 
@@ -45,8 +56,8 @@ namespace crp {
         return gameObject->tryGetComponentConst(TransformComponent)->translation;
     }
 
-    bool Rectangle::isMove() {
-        auto moveComponent = gameObject->tryGetComponent(MoveComponent);
+    bool Rectangle::isMove() const {
+        auto moveComponent = gameObject->tryGetComponentConst(MoveComponent);
         return moveComponent && moveComponent->move;
     }
 
@@ -61,6 +72,6 @@ namespace crp {
     void Rectangle::setDelete() {
         auto deleteComponent = gameObject->tryGetComponent(DeleteComponent);
         if (deleteComponent)return;
-        gameObject->addComponent<DeleteComponent>();
+        gameObject->addComponent<DeleteComponent>(width, height);
     }
 }

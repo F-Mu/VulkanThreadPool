@@ -1,8 +1,8 @@
 #pragma once
 
 #include "window_system.hpp"
-#include "crp_device.hpp"
-#include "crp_swap_chain.hpp"
+#include "render_device.hpp"
+#include "render_swap_chain.hpp"
 //std
 #include <cassert>
 #include <memory>
@@ -11,7 +11,7 @@
 namespace crp {
     class RenderSystem {
     public:
-        RenderSystem(WindowSystem &window, CrpDevice &device);
+        RenderSystem(WindowSystem &window, RenderDevice &device);
 
         ~RenderSystem();
 
@@ -19,9 +19,9 @@ namespace crp {
 
         RenderSystem &operator=(const RenderSystem &) = delete;
 
-        VkRenderPass getSwapChainRenderPass() const { return crpSwapChain->getRenderPass(); }
+        VkRenderPass getSwapChainRenderPass() const { return renderSwapChain->getRenderPass(); }
 
-        float getAspectRatio() const { return crpSwapChain->extentAspectRatio(); }
+        float getAspectRatio() const { return renderSwapChain->extentAspectRatio(); }
 
         bool isFrameInProgress() const {
             return isFrameStarted;
@@ -41,11 +41,11 @@ namespace crp {
 
         void endFrame();
 
-        void beginSwapChainRenderPass(VkCommandBuffer commandBuffer);
+        void beginSwapChainRenderPass();
 
-        void endSwapChainRenderPass(VkCommandBuffer commandBuffer);
+        void endSwapChainRenderPass();
 
-        VkCommandBuffer nowCommandBuffer;
+        std::shared_ptr<VkCommandBuffer> nowCommandBuffer;
 
     private:
         void createCommandBuffers();
@@ -54,9 +54,9 @@ namespace crp {
 
         void recreateSwapChain();
 
-        WindowSystem &crpWindow;
-        CrpDevice &crpDevice;
-        std::unique_ptr<CrpSwapChain> crpSwapChain{};
+        WindowSystem &windowSystem;
+        RenderDevice &renderDevice;
+        std::unique_ptr<RenderSwapChain> renderSwapChain{};
         std::vector<VkCommandBuffer> commandBuffers{};
 
         uint32_t currentImageIndex{};

@@ -1,4 +1,4 @@
-#include "crp_pipeline.hpp"
+#include "render_pipeline.hpp"
 //std
 #include <fstream>
 #include <stdexcept>
@@ -10,21 +10,21 @@
 #define ENGINE_DIR "../"
 #endif
 namespace crp {
-    CrpPipeline::CrpPipeline(CrpDevice &device,
-                             const std::string &vertFilepath,
-                             const std::string &fragFilepath,
-                             const PipelineConfigInfo &configInfo) : crpDevice{device} {
+    RenderPipeline::RenderPipeline(RenderDevice &device,
+                                   const std::string &vertFilepath,
+                                   const std::string &fragFilepath,
+                                   const PipelineConfigInfo &configInfo) : renderDevice{device} {
         createGraphicsPipeline(vertFilepath, fragFilepath, configInfo);
     }
 
-    CrpPipeline::~CrpPipeline() {
-        vkDestroyShaderModule(crpDevice.device(), vertShaderModule, nullptr);
-        vkDestroyShaderModule(crpDevice.device(), fragShaderModule, nullptr);
+    RenderPipeline::~RenderPipeline() {
+        vkDestroyShaderModule(renderDevice.device(), vertShaderModule, nullptr);
+        vkDestroyShaderModule(renderDevice.device(), fragShaderModule, nullptr);
 
-        vkDestroyPipeline(crpDevice.device(), graphicsPipeline, nullptr);
+        vkDestroyPipeline(renderDevice.device(), graphicsPipeline, nullptr);
     }
 
-    std::vector<char> CrpPipeline::readFile(const std::string &filepath) {
+    std::vector<char> RenderPipeline::readFile(const std::string &filepath) {
 //        std::string enginePath = ENGINE_DIR + filepath;
         std::string enginePath = filepath;
         std::ifstream file(enginePath, std::ios::ate | std::ios::binary);
@@ -41,9 +41,9 @@ namespace crp {
         return buffer;
     }
 
-    void CrpPipeline::createGraphicsPipeline(const std::string &vertFilepath,
-                                             const std::string &fragFilepath,
-                                             const PipelineConfigInfo &configInfo) {
+    void RenderPipeline::createGraphicsPipeline(const std::string &vertFilepath,
+                                                const std::string &fragFilepath,
+                                                const PipelineConfigInfo &configInfo) {
         assert(configInfo.pipelineLayout != VK_NULL_HANDLE &&
                "Cannot create graphics pipeline:: no pipelineLayout provided in configInfo");
         assert(configInfo.renderPass != VK_NULL_HANDLE &&
@@ -101,7 +101,7 @@ namespace crp {
 
         pipelineInfo.basePipelineIndex = -1;
         pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
-        if (vkCreateGraphicsPipelines(crpDevice.device(),
+        if (vkCreateGraphicsPipelines(renderDevice.device(),
                                       VK_NULL_HANDLE,
                                       1,
                                       &pipelineInfo,
@@ -111,19 +111,19 @@ namespace crp {
         }
     }
 
-    void CrpPipeline::createShaderModule(const std::vector<char> &code, VkShaderModule *shaderModule) {
+    void RenderPipeline::createShaderModule(const std::vector<char> &code, VkShaderModule *shaderModule) {
         VkShaderModuleCreateInfo createInfo{};
         createInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
         createInfo.codeSize = code.size();
         createInfo.pCode = reinterpret_cast<const uint32_t *>(code.data());
 
-        if (vkCreateShaderModule(crpDevice.device(), &createInfo, nullptr, shaderModule) != VK_SUCCESS) {
+        if (vkCreateShaderModule(renderDevice.device(), &createInfo, nullptr, shaderModule) != VK_SUCCESS) {
             throw std::runtime_error("failed to create shader module");
         }
     }
 
 
-    void CrpPipeline::defaultPipelineConfigInfo(PipelineConfigInfo &configInfo) {
+    void RenderPipeline::defaultPipelineConfigInfo(PipelineConfigInfo &configInfo) {
 //        PipelineConfigInfo configInfo{};
 
         configInfo.inputAssemblyInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
@@ -199,11 +199,11 @@ namespace crp {
         configInfo.attributeDescriptions = Vertex::getAttributeDescriptions();
     }
 
-    void CrpPipeline::bind(VkCommandBuffer commandBuffer) {
+    void RenderPipeline::bind(VkCommandBuffer commandBuffer) {
         vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline);
     }
 
-    void CrpPipeline::enableAlphaBlending(crp::PipelineConfigInfo &configInfo) {
+    void RenderPipeline::enableAlphaBlending(crp::PipelineConfigInfo &configInfo) {
         configInfo.colorBlendAttachment.blendEnable = VK_TRUE;
 
         configInfo.colorBlendAttachment.colorWriteMask =

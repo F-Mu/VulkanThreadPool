@@ -1,19 +1,19 @@
 #include "mesh_component.hpp"
 #include "transform_component.hpp"
-#include "function/framework/crp_game_obejct.hpp"
+#include "function/framework/game_object.hpp"
 
 namespace crp {
     std::vector<Vertex>
-    fillMesh(const std::vector<glm::vec3> &points, const glm::vec3 &color, const glm::mat4 &modelMatrix) {
+    fillMesh(const std::vector<glm::vec3> &points, const glm::vec3 &color) {
         std::vector<Vertex> vertices;
         for (auto point: points) {
-            vertices.emplace_back(modelMatrix * glm::vec4(point, 1.), color);
+            vertices.emplace_back(point, color);
         }
         return vertices;
     }
 
     std::vector<Vertex>
-    unfilledMesh(std::vector<glm::vec3> &points, const glm::vec3 &color, const glm::mat4 &modelMatrix) {
+    unfilledMesh(std::vector<glm::vec3> &points, const glm::vec3 &color) {
         const float offset = 0.0025f;
         std::vector<Vertex> vertices;
 
@@ -25,7 +25,7 @@ namespace crp {
             auto tmp = std::move(fillMesh(
                     {
                             points[i] - off, points[i] + off, points[i + 1] - off, points[i + 1] + off
-                    }, color, modelMatrix));
+                    }, color));
             vertices.insert(vertices.end(), tmp.begin(), tmp.end());
         }
 
@@ -35,12 +35,12 @@ namespace crp {
         auto tmp = std::move(fillMesh(
                 {
                         points.back() - off, points.back() + off, points[0] - off, points[0] + off
-                }, color, modelMatrix));
+                }, color));
         vertices.insert(vertices.end(), tmp.begin(), tmp.end());
         return vertices;
     }
 
-    MeshComponent::MeshComponent(const std::weak_ptr<CrpGameObject> &parent, std::vector<glm::vec3> &_points,
+    MeshComponent::MeshComponent(const std::weak_ptr<GameObject> &parent, std::vector<glm::vec3> &_points,
                                  glm::vec3 &_color, bool _fill)
             : Component(parent), points{_points}, color{_color}, fill{_fill} {
         type = "MeshComponent";
@@ -52,20 +52,22 @@ namespace crp {
     }
 
     void MeshComponent::getWorld() {
-        TransformComponent transformComponent = *m_parent_object.lock()->tryGetComponentConst(TransformComponent);
-        auto modelMatrix = transformComponent.mat4();
         if (fill) {
-            worldPoints = std::move(fillMesh(points, color, modelMatrix));
+            vertexPoints = std::move(fillMesh(points, color));
         } else {
-            worldPoints = std::move(unfilledMesh(points, color, modelMatrix));
+            vertexPoints = std::move(unfilledMesh(points, color));
         }
         getIndices();
     }
 
     void MeshComponent::getIndices() {
         worldIndices.clear();
-        for (int i = 0; i + 2 < worldPoints.size(); ++i) {
+        for (int i = 0; i + 2 < vertexPoints.size(); ++i) {
             for (int j = i; j <= i + 2; ++j)worldIndices.emplace_back(j);
         }
+    }
+
+    void MeshComponent::setPoints(std::vector<glm::vec3> &_points) {
+        points = std::move(points);
     }
 }

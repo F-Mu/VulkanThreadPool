@@ -3,8 +3,8 @@
 #include <glm/glm.hpp>
 #include <vector>
 #include "core/macro.hpp"
-#include "crp_game_obejct.hpp"
-#include "render/crp_device.hpp"
+#include "game_object.hpp"
+#include "render/render_device.hpp"
 #include <iostream>
 
 namespace crp {
@@ -15,6 +15,7 @@ namespace crp {
                       bool fill = false,
                       bool moveAble = false);
 
+        ~Rectangle();
 
         void Move(glm::vec3 destinations, float _time = FRAME_TIME);
 
@@ -29,14 +30,17 @@ namespace crp {
 
         glm::vec3 getCenter() const;
 
-        bool isMove();
+        bool isMove() const;
 
-        std::shared_ptr<CrpGameObject> gameObject;
+        std::shared_ptr<GameObject> gameObject;
 
         void registerManager();
 
         void setDelete();
 
+        float width{};
+
+        float height{};
     private:
         Rectangle();
     };
