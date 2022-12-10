@@ -13,11 +13,11 @@ namespace crp {
 
         void deleteById(id_t id);
 
+        void endTick();
+
         void tick();
 
         void registerGO(const std::shared_ptr<GameObject> &gameObject);
-
-        void addGameObject(const id_t &id, const GameObject &gameObject);
 
     private:
         std::list<id_t> deleteTasks;

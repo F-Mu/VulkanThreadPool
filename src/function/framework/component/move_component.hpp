@@ -8,17 +8,17 @@
 namespace crp {
     class MoveComponent : public Component {
     public:
-        glm::vec3 direction;
+        glm::vec3 direction{};
         std::vector<glm::vec3> destinations;
         std::vector<float> times;
-        bool move;
+        bool move{};
         glm::vec3 &center;
 
         void setDestination(glm::vec3 &_destination, float _time = FRAME_TIME);
 
         void setDestination(std::vector<glm::vec3> &_destinations, float _time = FRAME_TIME);
 
-        MoveComponent(const std::weak_ptr<GameObject> &parent);
+        explicit MoveComponent(const std::weak_ptr<GameObject> &parent);
 
         void MoveToPoint(glm::vec3 &destination);
 
@@ -37,10 +37,10 @@ namespace crp {
             return false;
         };
 
-        void tick();
+        void tick() override;
 
 //    private:
         int now = 0;
-        float speed;
+        float speed{};
     };
 }

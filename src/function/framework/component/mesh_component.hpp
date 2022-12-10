@@ -24,6 +24,6 @@ namespace crp {
         glm::vec3 color;
         bool fill;
 
-        void tick();
+        void tick() override;
     };
 }

@@ -20,7 +20,7 @@ namespace crp {
 
         void bind(VkCommandBuffer commandBuffer);
 
-        void draw(VkCommandBuffer commandBuffer);
+        void draw(VkCommandBuffer commandBuffer) const;
 
     private:
         void createVertexBuffers(const std::vector<Vertex> &vertices);
@@ -37,13 +37,13 @@ namespace crp {
 
     class RenderComponent : public Component {
     public:
-        RenderComponent(const std::weak_ptr<GameObject> &parent);
+        explicit RenderComponent(const std::weak_ptr<GameObject> &parent);
 
         ~RenderComponent();
 
         void update();
 
-        void tick();
+        void tick() override;
     private:
         std::shared_ptr<Model> model{};
     };

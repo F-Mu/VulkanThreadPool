@@ -49,16 +49,16 @@ namespace crp {
             return nullptr;
         }
 
-
+        //《Effective Modern C++》条款21:优先选用make系列，而非直接使用new
+        //去掉new而使用make_share，将可变参数变为万能引，并加上完美转发
         template<typename TComponent, typename ...Args>
-        void addComponent(Args &...args) {
-            auto now = new TComponent(weak_from_this(), args...);
-            components.emplace_back(now);
+        void addComponent(Args &&...args) {
+            components.emplace_back(std::make_shared<TComponent>(weak_from_this(), std::forward<Args>(args)...));
         }
 
         void tick();
 
-        id_t getId() { return id; }
+        id_t getId() const { return id; }
 
         std::list<std::shared_ptr<Component>> components;
 

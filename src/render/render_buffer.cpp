@@ -49,6 +49,7 @@ namespace crp {
 
     RenderBuffer::~RenderBuffer() {
         unmap();
+//        std::cout<<&buffer<<std::endl;
         vkDestroyBuffer(renderDevice.device(), buffer, nullptr);
         vkFreeMemory(renderDevice.device(), memory, nullptr);
     }

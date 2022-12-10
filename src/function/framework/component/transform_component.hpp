@@ -3,15 +3,16 @@
 #include <glm/glm.hpp>
 #include "component.hpp"
 #include "string"
+#include "core/macro.hpp"
 
 namespace crp {
     class TransformComponent : public Component {
     public:
-        TransformComponent(const std::weak_ptr<GameObject> &parent) :
+        explicit TransformComponent(const std::weak_ptr<GameObject> &parent) :
                 Component(parent) { type = "TransformComponent"; }
 
         glm::vec3 translation{};
-        glm::vec3 scale{1.f, 1.f, 1.f};
+        glm::vec3 scale{SCALE};
         glm::vec3 rotation{};
 
         // Matrix corrsponds to Translate * Ry * Rx * Rz * Scale
@@ -23,6 +24,6 @@ namespace crp {
 
         void setPosition(glm::vec3 point);
 
-        void tick();
+        void tick() override;
     };
 }

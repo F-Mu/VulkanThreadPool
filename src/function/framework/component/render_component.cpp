@@ -1,8 +1,8 @@
 #include "render_component.hpp"
 #include "function/global/global_context.hpp"
 #include "function/framework/game_object.hpp"
-#include "resources/systems/simple_render_pass.hpp"
 #include "mesh_component.hpp"
+#include "delete_component.hpp"
 #include "core/push_constant.hpp"
 
 namespace crp {
@@ -75,7 +75,7 @@ namespace crp {
         globalContext.device->copyBuffer(stagingBuffer.getBuffer(), indexBuffer->getBuffer(), bufferSize);
     }
 
-    void Model::draw(VkCommandBuffer commandBuffer) {
+    void Model::draw(VkCommandBuffer commandBuffer) const {
         if (hasIndexBuffer) {
             vkCmdDrawIndexed(commandBuffer, indexCount, 1, 0, 0, 0);
         } else {
@@ -107,6 +107,9 @@ namespace crp {
     }
 
     void RenderComponent::update() {
+        auto deleteComponent = m_parent_object.lock()->tryGetComponentConst(DeleteComponent);
+        if (deleteComponent && deleteComponent->isFinished())
+            model = nullptr;
         auto meshComponent = m_parent_object.lock()->tryGetComponentConst(MeshComponent);
         if (!meshComponent || !meshComponent->isDirty())return;
         if (meshComponent->vertexPoints.empty())return;
@@ -115,8 +118,9 @@ namespace crp {
     }
 
     void RenderComponent::tick() {
-        if (!model || isDirty())return;
+//        if (!model || isDirty())return;
         update();
+        if (!model)return;
         auto transform = m_parent_object.lock()->tryGetComponent(TransformComponent);
         SimplePushConstantData push{};
         push.modelMatrix = transform->mat4();

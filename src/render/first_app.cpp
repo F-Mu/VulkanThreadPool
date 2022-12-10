@@ -1,6 +1,6 @@
 #include "first_app.hpp"
 #include "function/controller/keyboard_controller.hpp"
-#include "resources/systems/simple_render_pass.hpp"
+#include "render/pass/simple_render_pass.hpp"
 #include "render_buffer.hpp"
 #include "function/global/global_context.hpp"
 #include "function/framework/component/mesh_component.hpp"
@@ -61,8 +61,11 @@ namespace crp {
                 //order here matters
                 runTimeSystem->tick();
                 simpleRenderPass->tick(frameInfo);
+                gameObjectManager->tick();
                 renderSystem->endSwapChainRenderPass();
                 renderSystem->endFrame();
+
+//                gameObjectManager->endTick();
             }
         }
         globalContext.shutdownEngine();

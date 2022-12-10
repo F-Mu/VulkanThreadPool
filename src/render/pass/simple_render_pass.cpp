@@ -5,12 +5,10 @@
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
 
 #include <glm/glm.hpp>
-#include <glm/gtc/constants.hpp>
 //std
 #include <stdexcept>
 #include <array>
 #include <cassert>
-#include <iostream>
 #include "function/framework/component/render_component.hpp"
 #include "core/push_constant.hpp"
 
@@ -40,7 +38,8 @@ namespace crp {
         pipelineLayoutInfo.pushConstantRangeCount = 1;
         pipelineLayoutInfo.pPushConstantRanges = &pushConstantRange;
 //        pipelineLayoutInfo.pPushConstantRanges = nullptr;
-        if (vkCreatePipelineLayout(renderDevice.device(), &pipelineLayoutInfo, nullptr, &pipelineLayout) != VK_SUCCESS) {
+        if (vkCreatePipelineLayout(renderDevice.device(), &pipelineLayoutInfo, nullptr, &pipelineLayout) !=
+            VK_SUCCESS) {
             throw std::runtime_error("failed to create pipeline layout");
         }
     }
@@ -71,9 +70,5 @@ namespace crp {
                 0, 1,
                 &frameInfo.globalDescriptorSet,
                 0, nullptr);
-
-        for (auto &kv: frameInfo.gameObjects) {
-            kv.second->tick();
-        }
     }
 }

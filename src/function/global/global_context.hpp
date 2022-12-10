@@ -9,7 +9,7 @@
 #include "render/window_system.hpp"
 #include "render/render_system.hpp"
 #include "render/global_resources.hpp"
-#include "resources/systems/simple_render_pass.hpp"
+#include "render/pass/simple_render_pass.hpp"
 
 namespace crp {
 

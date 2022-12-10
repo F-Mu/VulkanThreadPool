@@ -8,7 +8,7 @@ namespace crp {
 
     class Component {
     public:
-        Component(std::weak_ptr<GameObject> parent) : m_parent_object(std::move(parent)) {};
+        explicit Component(std::weak_ptr<GameObject> parent) : m_parent_object(std::move(parent)) {};
 
         std::weak_ptr<GameObject> m_parent_object;
 
@@ -16,7 +16,7 @@ namespace crp {
 
         std::string getTypeName() { return type; }
 
-        bool isDirty() const { return is_dirty; }
+        [[nodiscard]] bool isDirty() const { return is_dirty; }
 
         void setDirty(bool cond) { is_dirty = cond; }
 

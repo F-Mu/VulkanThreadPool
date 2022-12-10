@@ -7,7 +7,7 @@
 
 namespace crp {
     RuntimeSystem::RuntimeSystem() :
-            Rectangle{std::move(Rectangle::MakeRectangle({x, y, w, z}))},
+            Rectangle{Rectangle::MakeRectangle({x, y, w, z})},
                       taskQueueSystem{std::make_shared<TaskQueueSystem>()},
                       threadPoolSystem{std::make_shared<ThreadPoolSystem>()} {
         threadPoolSystem->threadsInit(taskQueueSystem->tasks);

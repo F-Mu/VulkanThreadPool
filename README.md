@@ -36,13 +36,19 @@ https://github.com/blurrypiano/littleVulkanEngine/tree/master
 
 + 为Component类加入dirty机制
 
+**v2.3**
+
++ 根据C++书籍提供的一些条款进行小改动
+
++ 将render_pass归类
+
 **待实现（可能也不会实现）：**
 
 + 更好的异步执行（Job System）
 
 + 尝试更更好的分层
 
-+ 任务执行完删除资源（原来的接口被删了）
++ 任务执行完删除资源（验证层报错，不会改，接口已实现）
 
 + 继续模仿Piccolo小引擎优化主循环
 

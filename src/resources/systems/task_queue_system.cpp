@@ -57,7 +57,7 @@ namespace crp {
 
     bool TaskQueueSystem::isSorted() {
         if (tasks.empty())return false;
-        return !tasks.front().isMove();
+        return (!tasks.front().isMove()) && (STRICT_EQUAL(tasks.front().getCenter(), points[0]));
     }
 
     void TaskQueueSystem::lock() {
@@ -76,5 +76,4 @@ namespace crp {
         destinations.emplace_back(point[0], point[1], TASK_LAYER);
         Move(destinations);
     }
-
 }

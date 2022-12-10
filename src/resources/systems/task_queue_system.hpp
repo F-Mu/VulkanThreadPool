@@ -15,7 +15,7 @@ namespace crp {
     template<typename Fun, typename... Args>
     class TaskResult {
     public:
-        TaskResult(std::future<typename std::invoke_result<Fun, Args...>::type> &result,
+        TaskResult(std::future<std::invoke_result_t<Fun, Args...>> &result,
                    std::shared_ptr<bool> &r, bool &lock)
                 : result{std::move(result)}, ready{r}, lockTaskQueue{lock} {
         }

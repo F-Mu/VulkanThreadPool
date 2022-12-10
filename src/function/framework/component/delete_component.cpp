@@ -1,5 +1,4 @@
 #include "delete_component.hpp"
-#include "transform_component.hpp"
 #include "function/framework/game_object.hpp"
 #include "mesh_component.hpp"
 #include "render_component.hpp"
@@ -11,6 +10,7 @@ namespace crp {
             m_parent_object.lock()->tryGetComponent(RenderComponent)->setDirty(true);
             mesh->setDirty(false);
             m_parent_object.lock()->setShouldTick(false);
+            finished = true;
             return;
         }
         mesh->setDirty(true);
@@ -22,10 +22,8 @@ namespace crp {
             mesh->points[3].y -= height / halfTime;
             mesh->points[4].x += width / halfTime;
         } else {
-            if (mesh->points.size() > 3) {
-                mesh->points.pop_back();
-                mesh->points.pop_back();
-            }
+            mesh->points[4].y -= height / halfTime;
+            mesh->points[3].x += width / halfTime;
             mesh->points[2].y -= height / halfTime;
             mesh->points[1].x += width / halfTime;
         }
