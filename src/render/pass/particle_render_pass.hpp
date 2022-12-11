@@ -10,22 +10,24 @@
 #include <vector>
 
 namespace crp {
-    struct PushConstantData {
-        glm::mat4 modelMatrix{1.f};
-        glm::mat4 normalMatrix{1.f};
+    struct ParticlePushConstants {
+        glm::vec4 position{};
+        glm::vec4 color{};
     };
 
-    class SimpleRenderPass {
+    class ParticleRenderPass {
     public:
-        SimpleRenderPass(RenderDevice &device, VkRenderPass renderPass, VkDescriptorSetLayout globalSetLayout);
+        ParticleRenderPass(RenderDevice &device, VkRenderPass renderPass, VkDescriptorSetLayout globalSetLayout);
 
-        ~SimpleRenderPass();
+        ~ParticleRenderPass();
 
-        SimpleRenderPass(const SimpleRenderPass &) = delete;
+        ParticleRenderPass(const ParticleRenderPass &) = delete;
 
-        SimpleRenderPass &operator=(const SimpleRenderPass &) = delete;
+        ParticleRenderPass &operator=(const ParticleRenderPass &) = delete;
 
-        void tick(RenderFrameInfo &frameInfo);
+        void tick();
+
+        void bind(const ParticlePushConstants &con);
 
 //    private:
         void createPipelineLayout(VkDescriptorSetLayout globalSetLayout);
@@ -35,5 +37,6 @@ namespace crp {
         RenderDevice &renderDevice;
         std::unique_ptr<RenderPipeline> renderPipeline;
         VkPipelineLayout pipelineLayout;
+        std::list<ParticlePushConstants> resources;
     };
 }

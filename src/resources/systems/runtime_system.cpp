@@ -1,9 +1,7 @@
 #include "runtime_system.hpp"
 #include "task_queue_system.hpp"
 #include "thread_pool_system.hpp"
-#include "function/global/global_context.hpp"
 #include "resources/manager/game_object_manager.hpp"
-#include <cmath>
 
 namespace crp {
     RuntimeSystem::RuntimeSystem() :

@@ -1,6 +1,6 @@
 #include "rectangle.hpp"
 
-#include <utility>
+#include "component/particle_component.hpp"
 #include "component/component.hpp"
 #include "component/transform_component.hpp"
 #include "component/move_component.hpp"
@@ -73,5 +73,6 @@ namespace crp {
         auto deleteComponent = gameObject->tryGetComponent(DeleteComponent);
         if (deleteComponent)return;
         gameObject->addComponent<DeleteComponent>(width, height);
+        gameObject->addComponent<ParticleComponent>();
     }
 }

@@ -2,11 +2,12 @@
 #include "function/framework/game_object.hpp"
 #include "mesh_component.hpp"
 #include "render_component.hpp"
+#include "particle_component.hpp"
 
 namespace crp {
     void DeleteComponent::tick() {
         auto mesh = m_parent_object.lock()->tryGetComponent(MeshComponent);
-        if (time <= 0) {
+        if (time == MAX_TIME) {
             m_parent_object.lock()->tryGetComponent(RenderComponent)->setDirty(true);
             mesh->setDirty(false);
             m_parent_object.lock()->setShouldTick(false);
@@ -14,11 +15,18 @@ namespace crp {
             return;
         }
         mesh->setDirty(true);
-        if (time == FRAME_TIME) {
+        if (time == 0) {
             mesh->points.emplace_back(mesh->points.back());
         }
-        float halfTime = FRAME_TIME / 2;
-        if (time > FRAME_TIME / 2) {
+        auto particleCom = m_parent_object.lock()->tryGetComponent(ParticleComponent);
+        auto direction = mesh->points[4] - mesh->points[3];
+        auto now = mesh->points[3];
+        for (int i = 0; i <= time; i++) {
+            particleCom->addParticleEmitter(now);
+            now += direction / static_cast<float>(time);
+        }
+        float halfTime = static_cast<float>(MAX_TIME) / 2;
+        if (time < MAX_TIME / 2) {
             mesh->points[3].y -= height / halfTime;
             mesh->points[4].x += width / halfTime;
         } else {
@@ -29,7 +37,7 @@ namespace crp {
         }
 //        auto transform = m_parent_object.lock()->tryGetComponent(TransformComponent);
 //        transform->scale -= SCALE / FRAME_TIME;
-        --time;
+        ++time;
     }
 
     DeleteComponent::DeleteComponent(const std::weak_ptr<GameObject> &parent, float width, float height)

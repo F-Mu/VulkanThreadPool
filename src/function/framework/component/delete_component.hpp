@@ -13,7 +13,8 @@ namespace crp {
         [[nodiscard]] bool isFinished() const { return finished; }
 
     private:
-        float time = FRAME_TIME;
+        static constexpr int MAX_TIME = static_cast<int>(FRAME_TIME);
+        int time{0};
         float width;
         float height;
         bool finished{false};

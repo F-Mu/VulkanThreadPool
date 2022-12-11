@@ -8,8 +8,9 @@
 */
 namespace crp {
     static constexpr float QUEUE_LAYER = 0.1;
-    static constexpr float TASK_LAYER = 0.2;
-    static constexpr float THREAD_LAYER = 0.3;
+    static constexpr float PARTICLE_LAYER = 0.2;
+    static constexpr float TASK_LAYER = 0.3;
+    static constexpr float THREAD_LAYER = 0.4;
     constexpr int TASK_NUM = 8;
     constexpr int THREAD_NUM = 5;
     constexpr glm::vec3 SCALE{1.f, 1.f, 1.f};

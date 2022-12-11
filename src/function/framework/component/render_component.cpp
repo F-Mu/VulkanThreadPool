@@ -3,7 +3,6 @@
 #include "function/framework/game_object.hpp"
 #include "mesh_component.hpp"
 #include "delete_component.hpp"
-#include "core/push_constant.hpp"
 
 namespace crp {
     Model::Model(const std::vector<Vertex> &vertices, const std::vector<uint32_t> &indices) {
@@ -122,7 +121,7 @@ namespace crp {
         update();
         if (!model)return;
         auto transform = m_parent_object.lock()->tryGetComponent(TransformComponent);
-        SimplePushConstantData push{};
+        PushConstantData push{};
         push.modelMatrix = transform->mat4();
         push.normalMatrix = transform->normalMatrix();
 
@@ -131,7 +130,7 @@ namespace crp {
                 globalContext.simpleRenderPass->pipelineLayout,
                 VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
                 0,
-                sizeof(SimplePushConstantData),
+                sizeof(PushConstantData),
                 &push
         );
         model->bind(*globalContext.renderSystem->nowCommandBuffer);

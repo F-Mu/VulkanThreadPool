@@ -1,6 +1,7 @@
 #include "first_app.hpp"
 #include "function/controller/keyboard_controller.hpp"
 #include "render/pass/simple_render_pass.hpp"
+#include "render/pass/particle_render_pass.hpp"
 #include "render_buffer.hpp"
 #include "function/global/global_context.hpp"
 #include "function/framework/component/mesh_component.hpp"
@@ -32,6 +33,7 @@ namespace crp {
         auto &device = *globalContext.device;
         auto &renderSystem = globalContext.renderSystem;
         auto &simpleRenderPass = globalContext.simpleRenderPass;
+        auto &particleRenderPass = globalContext.particleRenderPass;
         auto &globalResources = globalContext.globalResources;
         KeyboardController controller{};
 
@@ -62,6 +64,7 @@ namespace crp {
                 runTimeSystem->tick();
                 simpleRenderPass->tick(frameInfo);
                 gameObjectManager->tick();
+                particleRenderPass->tick();
                 renderSystem->endSwapChainRenderPass();
                 renderSystem->endFrame();
 

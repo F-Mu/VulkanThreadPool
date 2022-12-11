@@ -16,6 +16,9 @@ namespace crp {
         simpleRenderPass = std::make_shared<SimpleRenderPass>(*device,
                                                               renderSystem->getSwapChainRenderPass(),
                                                               globalResources->globalSetLayout->getDescriptorSetLayout());
+        particleRenderPass = std::make_shared<ParticleRenderPass>(*device,
+                                                                  renderSystem->getSwapChainRenderPass(),
+                                                                  globalResources->globalSetLayout->getDescriptorSetLayout());
         gameObjectManager = std::make_shared<GameObjectManager>();
         runTimeSystem = std::make_shared<RuntimeSystem>();
     }
@@ -25,6 +28,7 @@ namespace crp {
         runTimeSystem->clear();
         runTimeSystem.reset();
         gameObjectManager.reset();
+        particleRenderPass.reset();
         simpleRenderPass.reset();
         globalResources->clear();
         globalResources.reset();

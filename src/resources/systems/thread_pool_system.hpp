@@ -1,36 +1,20 @@
 #pragma once
 
-#include <utility>
-#include <vector>
-#include <future>
-#include <queue>
-#include <thread>
-#include <list>
 #include <glm/glm.hpp>
 #include "function/framework/game_object.hpp"
 #include "core/macro.hpp"
 #include "resources/manager/game_object_manager.hpp"
 #include "render/render_frame_info.hpp"
 #include "function/framework/rectangle.hpp"
+#include "resources/res_type/thread.hpp"
 
 namespace crp {
-
-    class Thread : public Rectangle {
-    public:
-        Thread(std::vector<glm::vec3> points, glm::vec3 color = {1., 1., 1.}, bool fill = false,
-               bool moveAble = false) :
-                Rectangle(std::move(Rectangle::MakeRectangle(std::move(points), color, fill, moveAble))) {};
-        std::thread th;
-    };
-
     class RuntimeSystem;
 
     class Task;
 
     class ThreadPoolSystem : public Rectangle {
     public:
-        friend RuntimeSystem;
-
         ThreadPoolSystem();
 
         void clear();
@@ -41,7 +25,7 @@ namespace crp {
 
         void threadsInit(std::list<Task> &tasks);
 
-        int availableNum() { return availableThreadNum; }
+        int availableNum() const { return availableThreadNum; }
 
         std::vector<glm::vec3> points;
         std::vector<Thread> threads;
@@ -58,8 +42,6 @@ namespace crp {
         static constexpr float up = -0.55f, down = 0.55f, left = -0.75f, right = -0.5f;
         static constexpr glm::vec3 x{left, up, QUEUE_LAYER}, y{right, up, QUEUE_LAYER}, z{left, down, QUEUE_LAYER}, w{
                 right, down, QUEUE_LAYER};
-        int availableThreadNum;
-    public:
-
+        int availableThreadNum{};
     };
 }

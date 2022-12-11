@@ -10,6 +10,7 @@
 #include "render/render_system.hpp"
 #include "render/global_resources.hpp"
 #include "render/pass/simple_render_pass.hpp"
+#include "render/pass/particle_render_pass.hpp"
 
 namespace crp {
 
@@ -24,6 +25,7 @@ namespace crp {
         std::shared_ptr<GameObjectManager> gameObjectManager;
         std::shared_ptr<GlobalResources> globalResources;
         std::shared_ptr<SimpleRenderPass> simpleRenderPass;
+        std::shared_ptr<ParticleRenderPass> particleRenderPass;
         std::shared_ptr<WindowSystem> windowSystem;
         std::shared_ptr<RenderSystem> renderSystem;
         std::shared_ptr<RenderDevice> device;

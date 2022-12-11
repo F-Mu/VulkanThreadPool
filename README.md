@@ -42,6 +42,10 @@ https://github.com/blurrypiano/littleVulkanEngine/tree/master
 
 + 将render_pass归类
 
+**v3.0**
+
++ 添加了一个极其丑陋的删除粒子动画（甚至算不上粒子）
+
 **待实现（可能也不会实现）：**
 
 + 更好的异步执行（Job System）
@@ -52,10 +56,10 @@ https://github.com/blurrypiano/littleVulkanEngine/tree/master
 
 + 继续模仿Piccolo小引擎优化主循环
 
-+ 接入粒子系统，更新物体
++ 更好的粒子系统（搞不明白）
 
 + 求出多面体的凸包，而不是严格限制顶点顺序（不想写）
 
-  + 白框（即空矩形）需按边顺序放点
+    + 白框（即空矩形）需按边顺序放点
 
-  + 满矩形需按右上、左上、右下、左下的顺序放点（主要为了task的删除动画）
+    + 满矩形需按右上、左上、右下、左下的顺序放点（主要为了task的删除动画）

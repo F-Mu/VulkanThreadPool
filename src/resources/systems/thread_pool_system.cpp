@@ -1,16 +1,14 @@
 #include "thread_pool_system.hpp"
 #include "function/global/global_context.hpp"
 #include "resources/manager/game_object_manager.hpp"
-#include "runtime_system.hpp"
-#include "task_queue_system.hpp"
 #include "function/framework/component/render_component.hpp"
+#include "resources/res_type/thread.hpp"
 #include <iostream>
 #include <map>
 
 namespace crp {
-    ThreadPoolSystem::ThreadPoolSystem()
-            :
-            Rectangle(std::move(Rectangle::MakeRectangle({x, y, w, z}))),
+    ThreadPoolSystem::ThreadPoolSystem() :
+            Rectangle(Rectangle::MakeRectangle({x, y, w, z})),
             stop{false} {
         points.resize(THREAD_NUM);
         threadPoolInit();
