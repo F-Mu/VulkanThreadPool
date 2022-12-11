@@ -47,8 +47,8 @@ namespace crp {
 
     class ParticleComponent : public Component {
     public:
-        explicit ParticleComponent(const std::weak_ptr<GameObject> &parent) :
-                Component(parent) { type = "ParticleComponent"; }
+        explicit ParticleComponent(const std::weak_ptr<GameObject> &parent, const std::string &type) :
+                Component(parent, type) {}
 
         void addParticleEmitter(const glm::vec3 &position);
 

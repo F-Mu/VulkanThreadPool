@@ -8,8 +8,8 @@
 namespace crp {
     class TransformComponent : public Component {
     public:
-        explicit TransformComponent(const std::weak_ptr<GameObject> &parent) :
-                Component(parent) { type = "TransformComponent"; }
+        explicit TransformComponent(const std::weak_ptr<GameObject> &parent, const std::string &type) :
+                Component(parent, type) {}
 
         glm::vec3 translation{};
         glm::vec3 scale{SCALE};

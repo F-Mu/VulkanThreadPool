@@ -39,9 +39,4 @@ namespace crp {
 //        transform->scale -= SCALE / FRAME_TIME;
         ++time;
     }
-
-    DeleteComponent::DeleteComponent(const std::weak_ptr<GameObject> &parent, float width, float height)
-            : Component(parent), width{width}, height{height} {
-        type = "DeleteComponent";
-    }
 }

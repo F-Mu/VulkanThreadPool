@@ -16,11 +16,11 @@ namespace crp {
     }
 
     void Rectangle::init(std::vector<glm::vec3> &points, glm::vec3 color, bool fill, bool moveAble) {
-        gameObject->addComponent<TransformComponent>();
-        gameObject->addComponent<MeshComponent>(points, color, fill);
+        gameObject->addComponent(TransformComponent);
+        gameObject->addComponent(MeshComponent, points, color, fill);
         if (moveAble)
-            gameObject->addComponent<MoveComponent>();
-        gameObject->addComponent<RenderComponent>();
+            gameObject->addComponent(MoveComponent);
+        gameObject->addComponent(RenderComponent);
     }
 
     void Rectangle::Move(glm::vec3 destination, float _time) {
@@ -72,7 +72,7 @@ namespace crp {
     void Rectangle::setDelete() {
         auto deleteComponent = gameObject->tryGetComponent(DeleteComponent);
         if (deleteComponent)return;
-        gameObject->addComponent<DeleteComponent>(width, height);
-        gameObject->addComponent<ParticleComponent>();
+        gameObject->addComponent(DeleteComponent, width, height);
+        gameObject->addComponent(ParticleComponent);
     }
 }

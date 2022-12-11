@@ -91,9 +91,8 @@ namespace crp {
         }
     }
 
-    RenderComponent::RenderComponent(const std::weak_ptr<GameObject> &parent) :
-            Component(parent) {
-        type = "RenderComponent";
+    RenderComponent::RenderComponent(const std::weak_ptr<GameObject> &parent, const std::string &type) :
+            Component(parent, type) {
         auto meshComponent = parent.lock()->tryGetComponentConst(MeshComponent);
         if (!meshComponent)return;
         if (meshComponent->vertexPoints.empty())return;

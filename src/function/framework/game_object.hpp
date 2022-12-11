@@ -52,8 +52,8 @@ namespace crp {
         //《Effective Modern C++》条款21:优先选用make系列，而非直接使用new
         //去掉new而使用make_share，将可变参数变为万能引，并加上完美转发
         template<typename TComponent, typename ...Args>
-        void addComponent(Args &&...args) {
-            components.emplace_back(std::make_shared<TComponent>(weak_from_this(), std::forward<Args>(args)...));
+        void addComponent(const std::string &type, Args &&...args) {
+            components.emplace_back(std::make_shared<TComponent>(weak_from_this(), type, std::forward<Args>(args)...));
         }
 
         void tick();
@@ -66,7 +66,7 @@ namespace crp {
 
 #define tryGetComponent(COMPONENT_TYPE) tryGetComponent<COMPONENT_TYPE>(#COMPONENT_TYPE)
 #define tryGetComponentConst(COMPONENT_TYPE) tryGetComponentConst<const COMPONENT_TYPE>(#COMPONENT_TYPE)
-
+#define addComponent(COMPONENT_TYPE, ...) addComponent<COMPONENT_TYPE>(#COMPONENT_TYPE,##__VA_ARGS__)
     private:
         GameObject(id_t objId) : id{objId} {}
 

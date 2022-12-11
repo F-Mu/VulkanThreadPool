@@ -40,10 +40,9 @@ namespace crp {
         return vertices;
     }
 
-    MeshComponent::MeshComponent(const std::weak_ptr<GameObject> &parent, std::vector<glm::vec3> &_points,
+    MeshComponent::MeshComponent(const std::weak_ptr<GameObject> &parent,const std::string &type, std::vector<glm::vec3> &_points,
                                  glm::vec3 &_color, bool _fill)
-            : Component(parent), points{_points}, color{_color}, fill{_fill} {
-        type = "MeshComponent";
+            : Component(parent,type), points{_points}, color{_color}, fill{_fill} {
         getWorld();
     }
 

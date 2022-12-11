@@ -18,7 +18,7 @@ namespace crp {
 
         void setDestination(std::vector<glm::vec3> &_destinations, float _time = FRAME_TIME);
 
-        explicit MoveComponent(const std::weak_ptr<GameObject> &parent);
+        explicit MoveComponent(const std::weak_ptr<GameObject> &parent, const std::string &type);
 
         void MoveToPoint(glm::vec3 &destination);
 

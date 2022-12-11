@@ -58,6 +58,8 @@ https://github.com/blurrypiano/littleVulkanEngine/tree/master
 
 + 调整ParticleComponent的参数，使其效果更佳（但还是很丑陋）
 
++ 模仿GetComponent调整Component的添加方式，默认实现type，使Component更有扩展性
+
 **待实现（可能也不会实现）：**
 
 + 更好的异步执行（Job System）

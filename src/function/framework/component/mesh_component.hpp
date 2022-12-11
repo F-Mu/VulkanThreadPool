@@ -9,8 +9,8 @@
 namespace crp {
     class MeshComponent : public Component {
     public:
-        MeshComponent(const std::weak_ptr<GameObject> &parent, std::vector<glm::vec3> &_points, glm::vec3 &_color,
-                      bool _fill);
+        MeshComponent(const std::weak_ptr<GameObject> &parent, const std::string &type,
+                      std::vector<glm::vec3> &_points, glm::vec3 &_color, bool _fill);
 
         void getWorld();
 

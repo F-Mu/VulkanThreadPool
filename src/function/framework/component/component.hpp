@@ -8,7 +8,8 @@ namespace crp {
 
     class Component {
     public:
-        explicit Component(std::weak_ptr<GameObject> parent) : m_parent_object(std::move(parent)) {};
+        explicit Component(std::weak_ptr<GameObject> parent, std::string type) : m_parent_object{std::move(parent)},
+                                                                                 type{std::move(type)} {};
 
         std::weak_ptr<GameObject> m_parent_object;
 

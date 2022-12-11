@@ -14,10 +14,9 @@ namespace crp {
         }
     }
 
-    MoveComponent::MoveComponent(const std::weak_ptr<GameObject> &parent)
-            : Component(parent),
+    MoveComponent::MoveComponent(const std::weak_ptr<GameObject> &parent,const std::string &type)
+            : Component(parent,type),
               center{m_parent_object.lock()->tryGetComponent(TransformComponent)->translation} {
-        type = "MoveComponent";
     }
 
     void MoveComponent::MoveToPoint(glm::vec3 &destination) {

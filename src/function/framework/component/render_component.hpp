@@ -37,7 +37,7 @@ namespace crp {
 
     class RenderComponent : public Component {
     public:
-        explicit RenderComponent(const std::weak_ptr<GameObject> &parent);
+        explicit RenderComponent(const std::weak_ptr<GameObject> &parent,const std::string &type);
 
         ~RenderComponent();
 
