@@ -19,7 +19,7 @@ namespace crp {
 
         [[nodiscard]] int getLife() const { return life; }
 
-        constexpr static int MAX_LIFE = 3;
+        constexpr static int MAX_LIFE = 8;
     private:
         int life{MAX_LIFE};
         glm::vec4 position;

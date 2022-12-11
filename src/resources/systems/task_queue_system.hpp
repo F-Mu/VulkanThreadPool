@@ -6,6 +6,7 @@
 #include "render/render_frame_info.hpp"
 #include "function/global/global_context.hpp"
 #include "resources/res_type/task.hpp"
+
 namespace crp {
     class TaskQueueSystem : public Rectangle {
     public:
@@ -45,8 +46,12 @@ namespace crp {
 
             if (locked)
                 return std::optional<TaskResult<Fun, Args...>>();
-
-            auto t = std::make_shared<task>(std::bind(std::forward<Fun>(fun), std::forward<Args>(args)...));
+            //条款34:优先选用lambda式，而非std::bin
+            //此处使用C++20捕获模版不定实参
+            auto t = std::make_shared<task>(
+                    [fun = std::forward<Fun>(fun), ...args = std::forward<Args>(args)]() -> decltype(auto) {
+                        return fun(args...);
+                    });
             auto ret = t->get_future();
             {
                 std::lock_guard<std::mutex> lock(this->taskMut);

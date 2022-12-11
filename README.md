@@ -8,6 +8,8 @@ https://github.com/blurrypiano/littleVulkanEngine/tree/master
 
 按1～5可以生成执行时间为1～5秒的睡眠任务
 
+同时用来实验C++书籍中的条款
+
 **v2.0**
 
 + 大重构（感谢学长给的基本架构）
@@ -45,6 +47,16 @@ https://github.com/blurrypiano/littleVulkanEngine/tree/master
 **v3.0**
 
 + 添加了一个极其丑陋的删除粒子动画（甚至算不上粒子）
+
++ 调整资源结构
+
+**v3.1**
+
++ 为了去除bind改用lambda（实现条款），改用C++20(C++20 deprecated了glm库某些特性，会报警告)
+
++ 修改README
+
++ 调整ParticleComponent的参数，使其效果更佳（但还是很丑陋）
 
 **待实现（可能也不会实现）：**
 
