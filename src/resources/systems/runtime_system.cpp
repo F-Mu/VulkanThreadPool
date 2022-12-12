@@ -6,10 +6,8 @@
 namespace crp {
     RuntimeSystem::RuntimeSystem() :
             Rectangle{Rectangle::MakeRectangle({x, y, w, z})},
-                      taskQueueSystem{std::make_shared<TaskQueueSystem>()},
-                      threadPoolSystem{std::make_shared<ThreadPoolSystem>()} {
-        threadPoolSystem->threadsInit(taskQueueSystem->tasks);
-
+            taskQueueSystem{std::make_shared<TaskQueueSystem>()},
+            threadPoolSystem{std::make_shared<ThreadPoolSystem>()} {
         float mid = (left + right) / 2;
         points.resize(THREAD_NUM);
         float hCut = (down - up) / float(THREAD_NUM);
@@ -17,6 +15,7 @@ namespace crp {
         for (int i = 0; i < THREAD_NUM; ++i) {
             points[i] = {mid, yFirst + hCut * i, THREAD_LAYER};
         }
+        threadPoolSystem->threadsInit(taskQueueSystem->tasks);
     }
 
     void RuntimeSystem::tick() {

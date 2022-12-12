@@ -15,6 +15,6 @@ void main() {
     if (dis >= 0.002) {
         discard;
     }
-    outColor = vec4(push.color.xyz*push.color.w,push.color.w);
-//    outColor=vec4(0.,1.,1.,0.);
+    outColor = push.color;
+    //    outColor=vec4(0.,1.,1.,0.);
 }

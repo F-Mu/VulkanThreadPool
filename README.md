@@ -10,6 +10,8 @@ https://github.com/blurrypiano/littleVulkanEngine/tree/master
 
 同时用来实验C++书籍中的条款
 
+存在简单的异步执行，更多说明在v1.2分支README中
+
 **v2.0**
 
 + 大重构（感谢学长给的基本架构）
@@ -28,7 +30,7 @@ https://github.com/blurrypiano/littleVulkanEngine/tree/master
 
 **v2.1**
 
-+ 修复BUG（大概）
++ 修复BUG（大概，原因系Window初始化时height和width还没生成，以及RenderSystem成员变量未正确初始化）
 
 **v2.2**
 
@@ -52,13 +54,21 @@ https://github.com/blurrypiano/littleVulkanEngine/tree/master
 
 **v3.1**
 
-+ 为了去除bind改用lambda（实现条款），改用C++20(C++20 deprecated了glm库某些特性，会报警告)
++ 为了去除bind改用lambda（实现条款），改用C++20(C++20 deprecated了volatile float，glm库会报警告)
 
 + 修改README
 
 + 调整ParticleComponent的参数，使其效果更佳（但还是很丑陋）
 
 + 模仿GetComponent调整Component的添加方式，默认实现type，使Component更有扩展性
+
+**v3.2**
+
++ 使粒子效果更好看，包括粒子颜色渐变，增加粒子以抗锯齿（我真的在努力做火焰效果了，其实也许红色拖影更好看？）
+
++ 修复了Task乱飞的bug（大概，此bug 100个Task也不一定会出现，所以未知是否修好）
+
++ 修改移动逻辑
 
 **待实现（可能也不会实现）：**
 
@@ -70,7 +80,7 @@ https://github.com/blurrypiano/littleVulkanEngine/tree/master
 
 + 继续模仿Piccolo小引擎优化主循环
 
-+ 更好的粒子系统（搞不明白）
++ 更好的粒子系统（搞不明白），更好的粒子系统tick逻辑
 
 + 求出多面体的凸包，而不是严格限制顶点顺序（不想写）
 

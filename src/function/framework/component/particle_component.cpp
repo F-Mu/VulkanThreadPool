@@ -29,12 +29,11 @@ namespace crp {
 
     void Particle::renderTick() {
         if (life == 0)return;
-//        globalContext.particleRenderPass->tick();
         ParticlePushConstants push{};
         push.position = position;
-        push.color = {color, static_cast<float>(getLife()) / MAX_LIFE};
+        color[1] *= (static_cast<float>(getLife()) / MAX_LIFE);//使得颜色从高温黄，变为低温红，逐渐降低G值占比
+        push.color = {color, 1.0};
         globalContext.particleRenderPass->bind(push);
-
         --life;
     }
 }

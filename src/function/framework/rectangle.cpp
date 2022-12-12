@@ -56,9 +56,9 @@ namespace crp {
         return gameObject->tryGetComponentConst(TransformComponent)->translation;
     }
 
-    bool Rectangle::isMove() const {
-        auto moveComponent = gameObject->tryGetComponentConst(MoveComponent);
-        return moveComponent && moveComponent->move;
+    bool Rectangle::isMove() {
+        auto moveComponent = gameObject->tryGetComponent(MoveComponent);
+        return moveComponent && (!moveComponent->isFinished());
     }
 
     void Rectangle::setPosition(glm::vec3 position) {

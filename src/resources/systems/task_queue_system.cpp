@@ -2,7 +2,7 @@
 
 namespace crp {
     TaskQueueSystem::TaskQueueSystem() :
-            Rectangle{std::move(Rectangle::MakeRectangle({x, y, w, z}))} {
+            Rectangle{Rectangle::MakeRectangle({x, y, w, z})} {
         float mid = (left + right) / 2;
         points.resize(TASK_NUM);
         float hCut = (down - up) / float(TASK_NUM);
@@ -50,6 +50,7 @@ namespace crp {
     }
 
     bool TaskQueueSystem::isSorted() {
+        std::lock_guard<std::mutex> lock(this->taskMut);
         if (tasks.empty())return false;
         return (!tasks.front().isMove()) && (STRICT_EQUAL(tasks.front().getCenter(), points[0]));
     }

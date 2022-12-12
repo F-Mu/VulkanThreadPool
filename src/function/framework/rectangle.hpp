@@ -30,7 +30,7 @@ namespace crp {
 
         glm::vec3 getCenter() const;
 
-        bool isMove() const;
+        bool isMove();
 
         std::shared_ptr<GameObject> gameObject;
 

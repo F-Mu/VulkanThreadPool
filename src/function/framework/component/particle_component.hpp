@@ -19,12 +19,12 @@ namespace crp {
 
         [[nodiscard]] int getLife() const { return life; }
 
-        constexpr static int MAX_LIFE = 8;
+        constexpr static int MAX_LIFE = 7;
     private:
         int life{MAX_LIFE};
         glm::vec4 position;
-        glm::vec3 color{1., 0., 0.};
-        glm::vec4 velocity{0.00001, -0.00001, 0, 0};
+        glm::vec3 color{1., .8, .0};
+        glm::vec4 velocity{0, -0, 0, 0};
     };
 
     class ParticleEmitter {

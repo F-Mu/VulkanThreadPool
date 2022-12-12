@@ -63,9 +63,7 @@ namespace crp {
                     {
                         std::unique_lock<std::mutex> lock(runMut);
                         this->run.wait(lock, [this, i, &task] {
-                            return this->stop ||
-                                   (STRICT_EQUAL(threads[i].getCenter(), globalContext.runTimeSystem->points[i])
-                                    && STRICT_EQUAL(task->getCenter(), threads[i].getCenter()));
+                            return this->stop || (!threads[i].isMove() && !task->isMove());
                         });
                         if (stop)return;
                     }
@@ -76,7 +74,7 @@ namespace crp {
                     {
                         std::unique_lock<std::mutex> lock(this->resetMut);
                         this->reset.wait(lock, [this, i] {
-                            return this->stop || threads[i].getCenter() == points[i];
+                            return this->stop || !threads[i].isMove();
                         });
                         if (stop)return;
                     }
