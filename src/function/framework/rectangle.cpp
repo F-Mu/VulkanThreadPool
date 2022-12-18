@@ -74,5 +74,7 @@ namespace crp {
         if (deleteComponent)return;
         gameObject->addComponent(DeleteComponent, width, height);
         gameObject->addComponent(ParticleComponent);
+        auto number = gameObject->tryGetComponent(NumberComponent);
+        if (number)number->setDirty(true);
     }
 }

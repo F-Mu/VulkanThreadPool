@@ -10,6 +10,7 @@
 #include <array>
 #include <cassert>
 #include "function/framework/component/render_component.hpp"
+#include "function/global/global_context.hpp"
 
 namespace crp {
     SimpleRenderPass::SimpleRenderPass(RenderDevice &device, VkRenderPass renderPass,
@@ -58,15 +59,32 @@ namespace crp {
         );
     }
 
-    void SimpleRenderPass::tick(RenderFrameInfo &frameInfo) {
-        renderPipeline->bind(frameInfo.commandBuffer);
+    void SimpleRenderPass::bind(PushConstantData &pushConstantData, std::shared_ptr<Model> &model) {
+        data.emplace_back(pushConstantData, model);
+    }
+
+    void SimpleRenderPass::tick() {
+        renderPipeline->bind(*globalContext.renderSystem->nowCommandBuffer);
 
         vkCmdBindDescriptorSets(
-                frameInfo.commandBuffer,
+                *globalContext.renderSystem->nowCommandBuffer,
                 VK_PIPELINE_BIND_POINT_GRAPHICS,
                 pipelineLayout,
                 0, 1,
-                &frameInfo.globalDescriptorSet,
+                &globalContext.globalResources->globalDescriptorSets[globalContext.renderSystem->getFrameIndex()],
                 0, nullptr);
+        for (auto &[pushData, model]: data) {
+            vkCmdPushConstants(
+                    *globalContext.renderSystem->nowCommandBuffer,
+                    globalContext.simpleRenderPass->pipelineLayout,
+                    VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
+                    0,
+                    sizeof(PushConstantData),
+                    &pushData
+            );
+            model->bind(*globalContext.renderSystem->nowCommandBuffer);
+            model->draw(*globalContext.renderSystem->nowCommandBuffer);
+        }
+        data.clear();
     }
 }

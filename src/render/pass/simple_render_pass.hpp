@@ -5,6 +5,7 @@
 #include "render/render_device.hpp"
 #include "function/framework/game_object.hpp"
 #include "render/render_frame_info.hpp"
+#include "render/render_model.hpp"
 //std
 #include <memory>
 #include <vector>
@@ -25,7 +26,9 @@ namespace crp {
 
         SimpleRenderPass &operator=(const SimpleRenderPass &) = delete;
 
-        void tick(RenderFrameInfo &frameInfo);
+        void tick();
+
+        void bind(PushConstantData &pushConstantData, std::shared_ptr<Model> &model);
 
 //    private:
         void createPipelineLayout(VkDescriptorSetLayout globalSetLayout);
@@ -35,5 +38,6 @@ namespace crp {
         RenderDevice &renderDevice;
         std::unique_ptr<RenderPipeline> renderPipeline;
         VkPipelineLayout pipelineLayout;
+        std::list<std::pair<PushConstantData, std::shared_ptr<Model>>> data;
     };
 }

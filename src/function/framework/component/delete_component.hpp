@@ -2,6 +2,7 @@
 
 #include "component.hpp"
 #include "core/macro.hpp"
+#include "number_component.hpp"
 
 namespace crp {
     class DeleteComponent : public Component {

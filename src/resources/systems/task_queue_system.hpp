@@ -26,6 +26,8 @@ namespace crp {
             return fabs(task.getCenter().x - points[0].x) < STRICT_EPS;
         }
 
+        void addSleepWork(long long time);//seconds使用long long
+
         std::vector<glm::vec3> points;
         std::list<Task> tasks;
         std::mutex taskMut;

@@ -15,7 +15,7 @@ namespace crp {
             return;
         }
         mesh->setDirty(true);
-        //将坐下的点复制一个出来变为五边形
+        //将左下的点复制一个出来变为五边形
         if (time == 0) {
             mesh->points.emplace_back(mesh->points.back());
         }
@@ -24,9 +24,10 @@ namespace crp {
         auto direction = mesh->points[4] - mesh->points[3];
         auto now = mesh->points[3];
         //使得将粒子数量翻倍，使得粒子更为稠密以达到抗锯齿的效果
-        for (int i = 0; i <= 2 * time; i++) {
+        const int count = time * 2;
+        for (int i = 0; i <= count; i++) {
             particleCom->addParticleEmitter(now);
-            now += direction / static_cast<float>(2 * time);
+            now += direction / static_cast<float>(count);
         }
         float halfTime = static_cast<float>(MAX_TIME) / 2;
         if (time < MAX_TIME / 2) {

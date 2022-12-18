@@ -26,8 +26,7 @@ namespace crp {
                 destinations.clear();
                 return true;
             }
-            if (EQUAL(center, destinations[now])) {
-                center = destinations[now];
+            if (FIX_EQUAL(center, destinations[now])) {
                 now = 0;
                 destinations.clear();
             }

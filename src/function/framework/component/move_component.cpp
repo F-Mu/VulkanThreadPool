@@ -6,8 +6,7 @@ namespace crp {
     void MoveComponent::tick() {
         if (isFinished())return;
         MoveToPoint(destinations[now]);
-        if (EQUAL(center, destinations[now])) {
-            center = destinations[now];
+        if (FIX_EQUAL(center, destinations[now])) {
             ++now;
             if (isFinished())return;
             auto dir = destinations[now] - destinations[now - 1];
@@ -25,9 +24,7 @@ namespace crp {
         int flag, pos, flag2;
         if (fabs(center[0] - destination[0]) < EPS)flag = center[1] - destination[1] > 0 ? 1 : -1, pos = 1;
         else flag = center[0] - destination[0] > 0 ? 1 : -1, pos = 0;
-        if (EQUAL(center, destination)) {
-            center[0] = destination[0];
-            center[1] = destination[1];
+        if (FIX_EQUAL(center, destination)) {
             return;
         }
         center += direction;
@@ -35,6 +32,9 @@ namespace crp {
         if (flag != flag2) {
             center[0] = destination[0];
             center[1] = destination[1];
+        }
+        if (FIX_EQUAL(center, destination)) {
+            return;
         }
     }
 

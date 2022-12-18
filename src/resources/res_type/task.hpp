@@ -3,6 +3,7 @@
 #include "optional"
 #include "future"
 #include "function/framework/rectangle.hpp"
+#include "function/framework/component/number_component.hpp"
 #include <glm/glm.hpp>
 
 namespace crp {
@@ -41,6 +42,25 @@ namespace crp {
             ready = std::make_shared<bool>(false);
             setPosition(initPosition);
         };
+
+        Task() : Rectangle{Rectangle::MakeRectangle(meshPoints, TASK_COLOR, true, true)} {
+            ready = std::make_shared<bool>(false);
+            setPosition(initPosition);
+        }
+
+        static Task makeSleepTask(long long time) {
+            Task now;
+            now.gameObject->addComponent(NumberComponent, now.width - 0.15, now.height - 0.025, time);
+            auto number = now.gameObject->tryGetComponent(NumberComponent);
+            using task = std::packaged_task<void()>;
+            auto t = std::make_shared<task>(
+                    [time = time, number = number]() {
+                        number->setBegin();
+                        std::this_thread::sleep_for(std::chrono::seconds(time));
+                    });
+            now.task = std::move([t] { (*t)(); });
+            return now;
+        }
 
         std::function<void()> task;
 

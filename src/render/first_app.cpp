@@ -62,8 +62,9 @@ namespace crp {
                 renderSystem->beginSwapChainRenderPass();
                 //order here matters
                 runTimeSystem->tick();
-                simpleRenderPass->tick(frameInfo);
                 gameObjectManager->tick();
+
+                simpleRenderPass->tick();
                 particleRenderPass->tick();
                 renderSystem->endSwapChainRenderPass();
                 renderSystem->endFrame();

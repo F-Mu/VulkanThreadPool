@@ -52,7 +52,7 @@ namespace crp {
     bool TaskQueueSystem::isSorted() {
         std::lock_guard<std::mutex> lock(this->taskMut);
         if (tasks.empty())return false;
-        return (!tasks.front().isMove()) && (STRICT_EQUAL(tasks.front().getCenter(), points[0]));
+        return (!tasks.front().isMove()) && (EQUAL(tasks.front().getCenter(), points[0]));
     }
 
     void TaskQueueSystem::lock() {
@@ -61,5 +61,13 @@ namespace crp {
 
     void TaskQueueSystem::unlock() {
         locked = false;
+    }
+
+    void TaskQueueSystem::addSleepWork(long long time) {
+        if (locked)return;
+        {
+            std::lock_guard<std::mutex> lock(this->taskMut);
+            tasks.emplace_back(Task::makeSleepTask(time));
+        }
     }
 }
