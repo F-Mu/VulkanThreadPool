@@ -15,6 +15,8 @@ namespace crp {
 
         virtual void tick() {};
 
+        virtual ~Component() = default;
+
         std::string getTypeName() { return type; }
 
         [[nodiscard]] bool isDirty() const { return is_dirty; }

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <glm/glm.hpp>
-/*
+/**
  #define -> const + inline《Effective C++》条款02:尽量以const,enum,inline替换#define
  inline -> inline + noexcept 《Effective Modern C++》条款14:只要函数不会发射异常，就为其加上noexcept声明
  const -> constexpr 《Effective Modern C++》条款15:只要有可能使用constexpr，就使用它

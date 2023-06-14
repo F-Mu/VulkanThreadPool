@@ -37,18 +37,26 @@ namespace crp {
     }
 
     void KeyboardController::addTask(GLFWwindow *window) {
-        if (glfwGetKey(window, keys.add1) == GLFW_PRESS)add[0] = true;
-        if (glfwGetKey(window, keys.add2) == GLFW_PRESS)add[1] = true;
-        if (glfwGetKey(window, keys.add3) == GLFW_PRESS)add[2] = true;
-        if (glfwGetKey(window, keys.add4) == GLFW_PRESS)add[3] = true;
-        if (glfwGetKey(window, keys.add5) == GLFW_PRESS)add[4] = true;
+        if (glfwGetKey(window, keys.add1) == GLFW_PRESS)add[1] = true;
+        if (glfwGetKey(window, keys.add2) == GLFW_PRESS)add[2] = true;
+        if (glfwGetKey(window, keys.add3) == GLFW_PRESS)add[3] = true;
+        if (glfwGetKey(window, keys.add4) == GLFW_PRESS)add[4] = true;
+        if (glfwGetKey(window, keys.add5) == GLFW_PRESS)add[5] = true;
+        if (glfwGetKey(window, keys.add6) == GLFW_PRESS)add[6] = true;
+        if (glfwGetKey(window, keys.add7) == GLFW_PRESS)add[7] = true;
+        if (glfwGetKey(window, keys.add8) == GLFW_PRESS)add[8] = true;
+        if (glfwGetKey(window, keys.add9) == GLFW_PRESS)add[9] = true;
 
         long long time = 0;
-        if (add[0] && glfwGetKey(window, keys.add1) == GLFW_RELEASE)time = 1, add[0] = false;
-        if (add[1] && glfwGetKey(window, keys.add2) == GLFW_RELEASE)time = 2, add[1] = false;
-        if (add[2] && glfwGetKey(window, keys.add3) == GLFW_RELEASE)time = 3, add[2] = false;
-        if (add[3] && glfwGetKey(window, keys.add4) == GLFW_RELEASE)time = 4, add[3] = false;
-        if (add[4] && glfwGetKey(window, keys.add5) == GLFW_RELEASE)time = 5, add[4] = false;
+        if (add[1] && glfwGetKey(window, keys.add1) == GLFW_RELEASE)time = 1, add[1] = false;
+        if (add[2] && glfwGetKey(window, keys.add2) == GLFW_RELEASE)time = 2, add[2] = false;
+        if (add[3] && glfwGetKey(window, keys.add3) == GLFW_RELEASE)time = 3, add[3] = false;
+        if (add[4] && glfwGetKey(window, keys.add4) == GLFW_RELEASE)time = 4, add[4] = false;
+        if (add[5] && glfwGetKey(window, keys.add5) == GLFW_RELEASE)time = 5, add[5] = false;
+        if (add[6] && glfwGetKey(window, keys.add6) == GLFW_RELEASE)time = 6, add[6] = false;
+        if (add[7] && glfwGetKey(window, keys.add7) == GLFW_RELEASE)time = 7, add[7] = false;
+        if (add[8] && glfwGetKey(window, keys.add8) == GLFW_RELEASE)time = 8, add[8] = false;
+        if (add[9] && glfwGetKey(window, keys.add9) == GLFW_RELEASE)time = 9, add[9] = false;
 
         if (glfwGetKey(window, keys.debug) == GLFW_PRESS)globalContext.debug = true;
         if (time == 0)return;

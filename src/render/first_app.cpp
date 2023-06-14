@@ -42,22 +42,22 @@ namespace crp {
         while (!windowSystem->shouldClose()) {
             glfwPollEvents();
 
-            auto newTime = std::chrono::high_resolution_clock::now();
-            float frameTime = std::chrono::duration<float, std::chrono::seconds::period>(newTime - currentTime).count();
-            currentTime = newTime;
+//            auto newTime = std::chrono::high_resolution_clock::now();
+//            float frameTime = std::chrono::duration<float, std::chrono::seconds::period>(newTime - currentTime).count();
+//            currentTime = newTime;
 
-            frameTime = glm::min(frameTime, FRAME_TIME);
+//            frameTime = glm::min(frameTime, FRAME_TIME);
 
             controller.addTask(windowSystem->getGLFWwindow());
             if (renderSystem->beginFrame()) {
-                int frameIndex = renderSystem->getFrameIndex();
-                RenderFrameInfo frameInfo{
-                        frameIndex,
-                        frameTime,
-                        *renderSystem->nowCommandBuffer,
-                        globalResources->globalDescriptorSets[frameIndex],
-                        globalContext.gameObjectManager->gameObjects,
-                };
+//                int frameIndex = renderSystem->getFrameIndex();
+//                RenderFrameInfo frameInfo{
+//                        frameIndex,
+//                        frameTime,
+//                        *renderSystem->nowCommandBuffer,
+//                        globalResources->globalDescriptorSets[frameIndex],
+//                        globalContext.gameObjectManager->gameObjects,
+//                };
                 //render
                 renderSystem->beginSwapChainRenderPass();
                 //order here matters

@@ -22,6 +22,10 @@ namespace crp {
             int add3 = GLFW_KEY_3;
             int add4 = GLFW_KEY_4;
             int add5 = GLFW_KEY_5;
+            int add6 = GLFW_KEY_6;
+            int add7 = GLFW_KEY_7;
+            int add8 = GLFW_KEY_8;
+            int add9 = GLFW_KEY_9;
             int debug = GLFW_KEY_M;
         };
 
@@ -33,6 +37,6 @@ namespace crp {
         float moveSpeed{3.f};
         float lookSpeed{1.5f};
 
-        bool add[6]{};
+        bool add[10]{};
     };
 }

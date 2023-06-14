@@ -48,7 +48,7 @@ namespace crp {
 
             if (locked)
                 return std::optional<TaskResult<Fun, Args...>>();
-            //条款34:优先选用lambda式，而非std::bin
+            //条款34:优先选用lambda式，而非std::bind
             //此处使用C++20捕获模版不定实参
             auto t = std::make_shared<task>(
                     [fun = std::forward<Fun>(fun), ...args = std::forward<Args>(args)]() -> decltype(auto) {
