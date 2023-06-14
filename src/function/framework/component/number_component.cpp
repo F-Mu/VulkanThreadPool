@@ -36,7 +36,7 @@ namespace crp {
         number = num;
         if (number == 0)return;
         auto color = glm::vec3{1., 0.8, 0.4} * (static_cast<float>(number) - deltaTime) / 10.f;
-//        for (int i = 0; i < 3; ++i)color[i] = pow(color[i], 0.45f);// gamma校正
+        for (int i = 0; i < 3; ++i)color[i] = pow(color[i], 0.45f);// gamma校正
         auto vertices = std::move(Number::getNumber(width, height, color, number));
         std::vector<uint32_t> indices;
         for (int i = 0; i < vertices.size(); i += 4) {
